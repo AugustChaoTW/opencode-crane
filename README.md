@@ -8,6 +8,28 @@
 
 ---
 
+## 主要功能
+
+- **論文搜尋與閱讀** — 搜尋 arXiv、下載 PDF、自動抽取全文
+- **文獻庫管理** — YAML + BibTeX 雙格式儲存，支援搜尋、篩選、AI 標註
+- **研究任務追蹤** — 透過 GitHub Issues 管理任務，自動建立 labels / milestones
+- **研究階段管理** — 文獻回顧 → 提案 → 實驗 → 寫作 → 審閱，全程追蹤進度
+- **專案初始化** — 一鍵設定研究專案結構（labels、milestones、目錄、Issue Template）
+- **OpenCode 原生整合** — MCP Server 架構，AI agent 透過自然語言直接操作
+
+```
+你說：「搜尋 transformer 相關的論文，把前 3 篇加入文獻庫，建立閱讀任務」
+
+crane 會：
+  1. search_papers("transformer")       → 搜尋 arXiv
+  2. add_reference(...)  ×3             → 寫入 YAML + BibTeX
+  3. download_paper(...) ×3             → 下載 PDF
+  4. annotate_reference(...) ×3         → AI 摘要標註
+  5. create_task(phase="literature-review") → 建立 GitHub Issue
+```
+
+---
+
 ## 快速安裝
 
 ### 一鍵安裝（推薦）
