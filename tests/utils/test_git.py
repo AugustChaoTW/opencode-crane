@@ -3,7 +3,7 @@ TDD tests for git info utilities.
 RED phase: define expected behavior before implementation.
 """
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 

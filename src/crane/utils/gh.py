@@ -4,7 +4,6 @@ GitHub CLI (gh) subprocess wrapper for CRANE.
 
 import json
 import subprocess
-from typing import Union
 
 
 def gh(args: list[str]) -> str:
@@ -14,7 +13,7 @@ def gh(args: list[str]) -> str:
     return result.stdout.strip()
 
 
-def gh_json(args: list[str]) -> Union[dict, list]:
+def gh_json(args: list[str]) -> dict | list:
     """Execute a gh command that returns JSON and parse it."""
     output = gh(args)
     return json.loads(output) if output else {}

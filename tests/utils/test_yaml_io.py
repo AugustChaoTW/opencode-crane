@@ -3,7 +3,6 @@ TDD tests for YAML read/write utilities.
 RED phase: define expected behavior before implementation.
 """
 
-import pytest
 
 from crane.utils.yaml_io import (
     delete_paper_yaml,

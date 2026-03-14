@@ -10,13 +10,9 @@ Provides:
 """
 
 import json
-import os
-import shutil
-from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # Temporary filesystem fixtures
@@ -66,7 +62,10 @@ SAMPLE_PAPER_DICT = {
     "venue": "NeurIPS",
     "url": "https://arxiv.org/abs/1706.03762",
     "pdf_url": "https://arxiv.org/pdf/1706.03762.pdf",
-    "abstract": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks.",
+    "abstract": (
+        "The dominant sequence transduction models are based on complex"
+        " recurrent or convolutional neural networks."
+    ),
     "source": "arxiv",
     "paper_type": "conference",
     "categories": ["cs.CL", "cs.AI"],
@@ -82,7 +81,10 @@ SAMPLE_PAPER_DICT_2 = {
     "venue": "NeurIPS",
     "url": "https://arxiv.org/abs/2005.14165",
     "pdf_url": "https://arxiv.org/pdf/2005.14165.pdf",
-    "abstract": "We demonstrate that scaling up language models greatly improves task-agnostic, few-shot performance.",
+    "abstract": (
+        "We demonstrate that scaling up language models greatly improves"
+        " task-agnostic, few-shot performance."
+    ),
     "source": "arxiv",
     "paper_type": "conference",
     "categories": ["cs.CL"],
@@ -231,7 +233,7 @@ SAMPLE_ARXIV_RESPONSE = """<?xml version="1.0" encoding="UTF-8"?>
   <entry>
     <id>http://arxiv.org/abs/1706.03762v7</id>
     <title>Attention Is All You Need</title>
-    <summary>The dominant sequence transduction models are based on complex recurrent or convolutional neural networks.</summary>
+    <summary>Dominant sequence transduction models use complex recurrent networks.</summary>
     <published>2017-06-12T00:00:00Z</published>
     <updated>2023-08-02T00:00:00Z</updated>
     <author><name>Ashish Vaswani</name></author>

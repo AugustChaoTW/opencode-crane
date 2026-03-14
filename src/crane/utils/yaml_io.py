@@ -3,7 +3,6 @@ YAML read/write utilities for CRANE paper metadata.
 """
 
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
@@ -19,12 +18,12 @@ def write_paper_yaml(papers_dir: str, key: str, data: dict) -> str:
     return str(path)
 
 
-def read_paper_yaml(papers_dir: str, key: str) -> Optional[dict]:
+def read_paper_yaml(papers_dir: str, key: str) -> dict | None:
     """Read a paper YAML file. Returns None if not found."""
     path = Path(papers_dir) / f"{key}.yaml"
     if not path.exists():
         return None
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 

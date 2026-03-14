@@ -3,7 +3,6 @@ TDD tests for BibTeX read/write utilities.
 RED phase: define expected behavior before implementation.
 """
 
-import pytest
 from pathlib import Path
 
 from crane.utils.bibtex import append_entry, read_entries, remove_entry

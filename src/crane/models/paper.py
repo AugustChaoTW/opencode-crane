@@ -9,8 +9,6 @@ Redesigned from gscientist/references/paper.py:
 """
 
 from dataclasses import dataclass, field
-from datetime import date
-from typing import Optional
 
 
 @dataclass
@@ -23,7 +21,7 @@ class AiAnnotations:
     relevance_notes: str = ""
     tags: list[str] = field(default_factory=list)
     related_issues: list[int] = field(default_factory=list)
-    added_date: Optional[str] = None
+    added_date: str | None = None
 
 
 @dataclass
@@ -57,7 +55,7 @@ class Paper:
     pages: str = ""
 
     # AI annotations
-    ai_annotations: Optional[AiAnnotations] = None
+    ai_annotations: AiAnnotations | None = None
 
     # Embedded BibTeX
     bibtex: str = ""
@@ -70,16 +68,101 @@ class Paper:
 
     def to_yaml_dict(self) -> dict:
         """Serialize to a dict suitable for YAML output."""
-        raise NotImplementedError
+        data = {
+            "key": self.key,
+            "title": self.title,
+            "authors": self.authors,
+            "year": self.year,
+            "doi": self.doi,
+            "url": self.url,
+            "pdf_url": self.pdf_url,
+            "pdf_path": self.pdf_path,
+            "abstract": self.abstract,
+            "venue": self.venue,
+            "source": self.source,
+            "paper_type": self.paper_type,
+            "categories": self.categories,
+            "keywords": self.keywords,
+            "publication": self.publication,
+            "publisher": self.publisher,
+            "volume": self.volume,
+            "issue": self.issue,
+            "pages": self.pages,
+            "bibtex": self.bibtex,
+        }
+
+        if self.ai_annotations is not None:
+            data["ai_annotations"] = {
+                "summary": self.ai_annotations.summary,
+                "key_contributions": self.ai_annotations.key_contributions,
+                "methodology": self.ai_annotations.methodology,
+                "relevance_notes": self.ai_annotations.relevance_notes,
+                "tags": self.ai_annotations.tags,
+                "related_issues": self.ai_annotations.related_issues,
+                "added_date": self.ai_annotations.added_date,
+            }
+
+        return data
 
     @classmethod
     def from_yaml_dict(cls, data: dict) -> "Paper":
         """Create a Paper from a YAML-loaded dict."""
-        raise NotImplementedError
+        raw_annotations = data.get("ai_annotations")
+        ai_annotations = None
+        if isinstance(raw_annotations, AiAnnotations):
+            ai_annotations = raw_annotations
+        elif isinstance(raw_annotations, dict):
+            ai_annotations = AiAnnotations(**raw_annotations)
+
+        return cls(
+            key=data["key"],
+            title=data["title"],
+            authors=data["authors"],
+            year=data["year"],
+            doi=data.get("doi", ""),
+            url=data.get("url", ""),
+            pdf_url=data.get("pdf_url", ""),
+            pdf_path=data.get("pdf_path", ""),
+            abstract=data.get("abstract", ""),
+            venue=data.get("venue", ""),
+            source=data.get("source", "manual"),
+            paper_type=data.get("paper_type", "unknown"),
+            categories=data.get("categories", []),
+            keywords=data.get("keywords", []),
+            publication=data.get("publication", ""),
+            publisher=data.get("publisher", ""),
+            volume=data.get("volume", ""),
+            issue=data.get("issue", ""),
+            pages=data.get("pages", ""),
+            ai_annotations=ai_annotations,
+            bibtex=data.get("bibtex", ""),
+        )
 
     def to_bibtex(self) -> str:
         """Generate a BibTeX entry string."""
-        raise NotImplementedError
+        paper_type_map = {
+            "conference": "inproceedings",
+            "journal": "article",
+        }
+        entry_type = paper_type_map.get(self.paper_type, "misc")
+
+        lines = [f"@{entry_type}{{{self.key},"]
+        lines.append(f"  title={{{self.title}}},")
+        lines.append(f"  author={{{' and '.join(self.authors)}}},")
+
+        if entry_type == "inproceedings":
+            lines.append(f"  booktitle={{{self.venue}}},")
+        elif entry_type == "article":
+            lines.append(f"  journal={{{self.venue}}},")
+
+        lines.append(f"  year={{{self.year}}}")
+
+        if self.doi:
+            lines[-1] = f"{lines[-1]},"
+            lines.append(f"  doi={{{self.doi}}}")
+
+        lines.append("}")
+        return "\n".join(lines)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Paper):

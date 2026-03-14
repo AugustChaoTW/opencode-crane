@@ -7,13 +7,12 @@ Usage:
 
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("crane", json_response=True)
-
-# Register all tools
-from .tools.project import register_tools as register_project_tools
 from .tools.papers import register_tools as register_paper_tools
+from .tools.project import register_tools as register_project_tools
 from .tools.references import register_tools as register_reference_tools
 from .tools.tasks import register_tools as register_task_tools
+
+mcp = FastMCP("crane", json_response=True)
 
 register_project_tools(mcp)
 register_paper_tools(mcp)

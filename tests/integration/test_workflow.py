@@ -7,7 +7,6 @@ init → search → add references → create tasks → report → close.
 All external calls (gh, git, arXiv) are mocked.
 """
 
-import pytest
 
 
 class TestLiteratureReviewWorkflow:
