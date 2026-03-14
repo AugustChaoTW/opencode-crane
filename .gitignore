@@ -167,6 +167,7 @@ cython_debug/
 /actions/
 /output.txt
 /config/config.yml
-.auto-coder/
-/actions/
-/output.txt
+
+# CRANE - opencode-crane
+references/pdfs/
+*.pdf
