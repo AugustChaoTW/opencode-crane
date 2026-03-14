@@ -153,7 +153,7 @@ def mock_gh():
     gh = MockGhCli()
     gh.set_response(
         "issue create",
-        json.dumps({"number": 1, "url": "https://github.com/test/repo/issues/1"}),
+        "https://github.com/test/repo/issues/1",
     )
     gh.set_response(
         "issue list",

@@ -3,8 +3,6 @@ Task management tools via GitHub Issues + gh CLI.
 create, list, view, update, report_progress, close, get_milestone_progress.
 """
 
-import json
-
 from crane.utils.gh import gh, gh_json
 from crane.utils.git import get_owner_repo
 
@@ -43,11 +41,13 @@ def register_tools(mcp):
         if assignee:
             args.extend(["--assignee", assignee])
 
-        output = gh(args)
-        data = json.loads(output) if output else {}
+        # gh issue create returns a URL string, not JSON
+        url = gh(args)
+        # Extract issue number from URL: https://github.com/owner/repo/issues/42
+        number = int(url.rstrip("/").split("/")[-1]) if url else 0
         return {
-            "number": data.get("number"),
-            "url": data.get("url"),
+            "number": number,
+            "url": url,
         }
 
     @mcp.tool()
