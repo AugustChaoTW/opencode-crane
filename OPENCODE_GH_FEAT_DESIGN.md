@@ -1065,3 +1065,60 @@ make test-cov         # 跑測試 + 覆蓋率報告（目標 ≥80%）
 make lint             # 跑 ruff 檢查
 make fmt              # 格式化程式碼
 ```
+
+---
+
+## 11. Event Hook 介面設計（Future Work）
+
+> 本節僅定義介面規格，不實作程式碼。當需要無人值守的自動化反應時再行實作。
+
+### 11.1 Event Schema
+
+每個事件包含以下欄位：
+
+```python
+@dataclass
+class CraneEvent:
+    event_type: str       # e.g. "paper_added", "task_closed"
+    timestamp: str        # ISO 8601
+    source_tool: str      # 觸發此事件的 tool 名稱
+    payload: dict         # 事件特定資料
+```
+
+### 11.2 事件類型
+
+| event_type | source_tool | payload | 觸發時機 |
+|---|---|---|---|
+| paper_added | add_reference | {key, title, authors} | 論文加入文獻庫 |
+| paper_annotated | annotate_reference | {key, summary} | 論文標註完成 |
+| paper_removed | remove_reference | {key} | 論文從文獻庫移除 |
+| task_created | create_task | {number, title, phase} | GitHub Issue 建立 |
+| task_closed | close_task | {number, reason} | GitHub Issue 關閉 |
+| milestone_completed | close_task | {milestone_title} | Milestone 所有 Issue 關閉 |
+| pipeline_completed | run_pipeline | {pipeline, completed_steps, artifacts} | Pipeline 成功完成 |
+| pipeline_failed | run_pipeline | {pipeline, failed_step, error} | Pipeline 執行失敗 |
+
+### 11.3 Hook 配置格式
+
+```yaml
+# .crane/hooks.yml (未來)
+hooks:
+  - on: paper_added
+    do: [download_paper, read_paper, annotate_reference]
+    condition: "payload.source == 'arxiv'"
+
+  - on: task_closed
+    do: [get_milestone_progress]
+
+  - on: pipeline_failed
+    do: [report_progress]
+    with:
+      comment: "Pipeline failed at {payload.failed_step}: {payload.error}"
+```
+
+### 11.4 實作考量
+
+- Hook 執行應為非同步，不阻塞主流程
+- 需要防止無限迴圈（hook A 觸發 hook B 觸發 hook A）
+- 每個 hook 需要超時和重試策略
+- 建議先從「通知型」hook（只 report_progress）開始，再擴充「動作型」hook

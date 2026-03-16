@@ -1,0 +1,38 @@
+name: Research Task
+description: Create a research task
+title: "[{PHASE}] "
+labels: ["research"]
+body:
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Research phase
+      options:
+        - Literature Review
+        - Proposal
+        - Experiment
+        - Writing
+        - Review
+    validations:
+      required: true
+
+  - type: dropdown
+    id: task_type
+    attributes:
+      label: Task type
+      options:
+        - search
+        - read
+        - analysis
+        - code
+        - write
+    validations:
+      required: true
+
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      placeholder: Describe the goal of this task...
+    validations:
+      required: true
