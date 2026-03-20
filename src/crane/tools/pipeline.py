@@ -307,7 +307,8 @@ def register_tools(mcp):
                                 "phase:literature-review,type:search,priority:medium",
                                 "--assignee",
                                 "@me",
-                            ]
+                            ],
+                            cwd=project_dir,
                         )
                         if issue_url:
                             artifacts_created.append(issue_url)
@@ -324,7 +325,8 @@ def register_tools(mcp):
                                     "--color",
                                     PHASE_COLORS.get(phase, "BFDADC"),
                                     "--force",
-                                ]
+                                ],
+                                cwd=project_dir,
                             )
                         for task_type, color in TYPE_LABEL_COLORS.items():
                             gh(
@@ -335,7 +337,8 @@ def register_tools(mcp):
                                     "--color",
                                     color,
                                     "--force",
-                                ]
+                                ],
+                                cwd=project_dir,
                             )
                         for priority, color in PRIORITY_LABEL_COLORS.items():
                             gh(
@@ -346,10 +349,11 @@ def register_tools(mcp):
                                     "--color",
                                     color,
                                     "--force",
-                                ]
+                                ],
+                                cwd=project_dir,
                             )
 
-                        owner, repo = git.get_owner_repo()
+                        owner, repo = git.get_owner_repo(cwd=project_dir)
                         for idx, phase in enumerate(selected_phases, start=1):
                             gh(
                                 [
@@ -359,7 +363,8 @@ def register_tools(mcp):
                                     f"repos/{owner}/{repo}/milestones",
                                     "-f",
                                     f"title=Phase {idx}: {_phase_display_name(phase)}",
-                                ]
+                                ],
+                                cwd=project_dir,
                             )
 
                         root = Path(project_dir) if project_dir else Path.cwd()
@@ -405,7 +410,8 @@ def register_tools(mcp):
                                     f"phase:{phase},type:analysis,priority:medium",
                                     "--assignee",
                                     "@me",
-                                ]
+                                ],
+                                cwd=project_dir,
                             )
                             if issue_url:
                                 artifacts_created.append(issue_url)

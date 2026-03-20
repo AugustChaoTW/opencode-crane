@@ -19,11 +19,17 @@ def register_tools(mcp):
         priority: str = "",
         milestone: str = "",
         assignee: str = "@me",
+        project_dir: str | None = None,
     ) -> dict[str, object]:
         """
         Create a research task (GitHub Issue).
         Automatically adds phase/type/priority labels.
         Returns {number, url}.
+
+        Args:
+            project_dir: Project root directory. When provided, gh commands
+                target the git repo in that directory instead of the server CWD.
+                Critical for cross-project isolation when MCP server is shared.
         """
         labels: list[str] = []
         if phase:
@@ -41,9 +47,7 @@ def register_tools(mcp):
         if assignee:
             args.extend(["--assignee", assignee])
 
-        # gh issue create returns a URL string, not JSON
-        url = gh(args)
-        # Extract issue number from URL: https://github.com/owner/repo/issues/42
+        url = gh(args, cwd=project_dir)
         number = int(url.rstrip("/").split("/")[-1]) if url else 0
         return {
             "number": number,
@@ -57,11 +61,8 @@ def register_tools(mcp):
         task_type: str = "",
         milestone: str = "",
         limit: int = 30,
+        project_dir: str | None = None,
     ) -> list[dict[str, object]]:
-        """
-        List research tasks. Filter by phase, state, type, milestone.
-        Returns JSON list from gh issue list.
-        """
         args = [
             "issue",
             "list",
@@ -83,14 +84,14 @@ def register_tools(mcp):
         if milestone:
             args.extend(["--milestone", milestone])
 
-        tasks = gh_json(args)
+        tasks = gh_json(args, cwd=project_dir)
         return tasks if isinstance(tasks, list) else []
 
     @mcp.tool()
-    def view_task(issue_number: int) -> dict[str, object]:
-        """
-        View a single task's full content including comment history.
-        """
+    def view_task(
+        issue_number: int,
+        project_dir: str | None = None,
+    ) -> dict[str, object]:
         data = gh_json(
             [
                 "issue",
@@ -98,7 +99,8 @@ def register_tools(mcp):
                 str(issue_number),
                 "--json",
                 "number,title,body,state,labels,milestone,assignees,comments,createdAt,updatedAt",
-            ]
+            ],
+            cwd=project_dir,
         )
         return data if isinstance(data, dict) else {}
 
@@ -110,10 +112,8 @@ def register_tools(mcp):
         remove_labels: list[str] | None = None,
         milestone: str = "",
         assignee: str = "",
+        project_dir: str | None = None,
     ) -> str:
-        """
-        Update task title, labels, milestone, or assignee.
-        """
         args = ["issue", "edit", str(issue_number)]
 
         if title:
@@ -127,16 +127,16 @@ def register_tools(mcp):
         if assignee:
             args.extend(["--add-assignee", assignee])
 
-        gh(args)
+        gh(args, cwd=project_dir)
         return f"Task #{issue_number} updated"
 
     @mcp.tool()
-    def report_progress(issue_number: int, comment: str) -> str:
-        """
-        Post a progress comment on a task.
-        Used to record findings, decisions, and results during research.
-        """
-        gh(["issue", "comment", str(issue_number), "--body", comment])
+    def report_progress(
+        issue_number: int,
+        comment: str,
+        project_dir: str | None = None,
+    ) -> str:
+        gh(["issue", "comment", str(issue_number), "--body", comment], cwd=project_dir)
         return f"Progress reported on task #{issue_number}"
 
     @mcp.tool()
@@ -144,24 +144,24 @@ def register_tools(mcp):
         issue_number: int,
         reason: str = "completed",
         comment: str = "",
+        project_dir: str | None = None,
     ) -> str:
-        """
-        Close a task. Reason can be 'completed' or 'not_planned'.
-        """
         args = ["issue", "close", str(issue_number), "--reason", reason]
         if comment:
             args.extend(["--comment", comment])
-        gh(args)
+        gh(args, cwd=project_dir)
         return f"Task #{issue_number} closed ({reason})"
 
     @mcp.tool()
-    def get_milestone_progress(milestone_name: str = "") -> list[dict[str, object]]:
-        """
-        Get research phase (milestone) progress statistics.
-        If milestone_name is empty, returns all milestones.
-        """
-        owner, repo = get_owner_repo()
-        milestones = gh_json(["api", f"repos/{owner}/{repo}/milestones?state=all"])
+    def get_milestone_progress(
+        milestone_name: str = "",
+        project_dir: str | None = None,
+    ) -> list[dict[str, object]]:
+        owner, repo = get_owner_repo(cwd=project_dir)
+        milestones = gh_json(
+            ["api", f"repos/{owner}/{repo}/milestones?state=all"],
+            cwd=project_dir,
+        )
         if not isinstance(milestones, list):
             return []
 

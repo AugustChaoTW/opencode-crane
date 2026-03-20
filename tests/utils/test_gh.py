@@ -25,6 +25,7 @@ class TestGhCommand:
                 capture_output=True,
                 text=True,
                 check=True,
+                cwd=None,
             )
             assert result == "output text"
 

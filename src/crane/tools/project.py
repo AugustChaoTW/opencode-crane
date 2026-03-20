@@ -109,7 +109,8 @@ def register_tools(mcp):
                     "--color",
                     PHASE_COLORS.get(phase, "BFDADC"),
                     "--force",
-                ]
+                ],
+                cwd=project_dir,
             )
 
         for task_type, color in TYPE_LABEL_COLORS.items():
@@ -121,7 +122,8 @@ def register_tools(mcp):
                     "--color",
                     color,
                     "--force",
-                ]
+                ],
+                cwd=project_dir,
             )
 
         for priority, color in PRIORITY_LABEL_COLORS.items():
@@ -133,10 +135,11 @@ def register_tools(mcp):
                     "--color",
                     color,
                     "--force",
-                ]
+                ],
+                cwd=project_dir,
             )
 
-        owner, repo = git.get_owner_repo()
+        owner, repo = git.get_owner_repo(cwd=project_dir)
         for idx, phase in enumerate(selected_phases, start=1):
             gh(
                 [
@@ -146,7 +149,8 @@ def register_tools(mcp):
                     f"repos/{owner}/{repo}/milestones",
                     "-f",
                     f"title=Phase {idx}: {_phase_display_name(phase)}",
-                ]
+                ],
+                cwd=project_dir,
             )
 
         root = Path(project_dir) if project_dir else Path.cwd()
@@ -172,18 +176,14 @@ def register_tools(mcp):
 
     @mcp.tool()
     def get_project_info(project_dir: str | None = None) -> dict[str, Any]:
-        """
-        Get current research project info: repo name, remote URL,
-        current branch, recent commit, milestone progress, reference count.
-        """
-        owner, repo = git.get_owner_repo()
-        branch = git.get_current_branch()
-        last_commit = git.get_last_commit()
+        owner, repo = git.get_owner_repo(cwd=project_dir)
+        branch = git.get_current_branch(cwd=project_dir)
+        last_commit = git.get_last_commit(cwd=project_dir)
 
         root = Path(project_dir) if project_dir else Path.cwd()
         references_count = len(list_paper_keys(str(root / "references" / "papers")))
 
-        milestone_data = gh_json(["api", f"repos/{owner}/{repo}/milestones"])
+        milestone_data = gh_json(["api", f"repos/{owner}/{repo}/milestones"], cwd=project_dir)
         milestones: list[dict[str, Any]] = []
         if isinstance(milestone_data, list):
             for milestone in milestone_data:
