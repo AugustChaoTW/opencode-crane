@@ -84,7 +84,7 @@ OpenCode CLI (AI Agent)
 
 ### 3.1 Tool 總覽
 
-共 **18 個 MCP Tools**，分 4 大類：
+共 **19 個 MCP Tools**，分 5 大類：
 
 ```
 opencode-crane (src/crane/)

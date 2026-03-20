@@ -97,7 +97,7 @@ for name in sorted(tools): print(f'  - {name}')
 "
 ```
 
-預期輸出：`OK: 18 tools registered`，列出所有 tool 名稱。
+預期輸出：`OK: 19 tools registered`，列出所有 tool 名稱。
 
 ### Step 2: 設定專案 MCP
 
@@ -176,7 +176,7 @@ git pull
 
 ## 功能總覽
 
-### 18 個 MCP Tools，分 4 大類
+### 19 個 MCP Tools，分 5 大類
 
 #### 專案管理（2 tools）
 | Tool | 說明 |
@@ -211,6 +211,11 @@ git pull
 | `report_progress` | 在任務上留言回報進度 | `gh issue comment` |
 | `close_task` | 完成任務 | `gh issue close` |
 | `get_milestone_progress` | 查看各研究階段的進度統計 | `gh api` |
+
+#### 工作流程（1 tool）
+| Tool | 說明 |
+|------|------|
+| `run_pipeline` | 執行預定義的多步驟工作流程（`literature-review` / `full-setup`），支援 checkpoints、skip_steps、dry_run |
 
 ---
 
