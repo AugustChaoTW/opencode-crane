@@ -12,7 +12,9 @@
 
 - **論文搜尋與閱讀** — 搜尋 arXiv、下載 PDF、自動抽取全文
 - **文獻庫管理** — YAML + BibTeX 雙格式儲存，支援搜尋、篩選、AI 標註
-- **研究任務追蹤** — 透過 GitHub Issues 管理任務，自動建立 labels / milestones
+- **引用驗證** — 檢查論文引用一致性，驗證文獻元資料
+- **研究任務追蹤** — 透過 GitHub Issues 管理任務與待辦事項
+- **工作區管理** — Stateless 設計，自動從 git context 解析工作區
 - **研究階段管理** — 文獻回顧 → 提案 → 實驗 → 寫作 → 審閱，全程追蹤進度
 - **專案初始化** — 一鍵設定研究專案結構（labels、milestones、目錄、Issue Template）
 - **OpenCode 原生整合** — MCP Server 架構，AI agent 透過自然語言直接操作
@@ -97,7 +99,7 @@ for name in sorted(tools): print(f'  - {name}')
 "
 ```
 
-預期輸出：`OK: 19 tools registered`，列出所有 tool 名稱。
+預期輸出：`OK: 24 tools registered`，列出所有 tool 名稱。
 
 ### Step 2: 設定專案 MCP
 
@@ -176,7 +178,7 @@ git pull
 
 ## 功能總覽
 
-### 19 個 MCP Tools，分 5 大類
+### 24 個 MCP Tools，分 7 大類
 
 #### 專案管理（2 tools）
 | Tool | 說明 |
@@ -201,16 +203,28 @@ git pull
 | `remove_reference` | 刪除文獻（YAML + BibTeX 條目 + 可選刪 PDF） |
 | `annotate_reference` | 為文獻新增 AI 標註：摘要、關鍵貢獻、方法論、相關 Issue |
 
+#### 引用驗證（3 tools）
+| Tool | 說明 |
+|------|------|
+| `check_citations` | 檢查論文中所有 `\cite{key}` 是否存在於文獻庫 |
+| `verify_reference` | 驗證文獻元資料（DOI、年份、標題）是否符合預期 |
+| `check_all_references` | 檢查所有文獻的元資料完整性（必填欄位） |
+
 #### 任務管理（7 tools）
 | Tool | 說明 | 底層 |
 |------|------|------|
-| `create_task` | 建立研究任務（GitHub Issue），自動加 labels | `gh issue create` |
-| `list_tasks` | 列出任務，按階段 / 狀態 / milestone 篩選 | `gh issue list` |
+| `create_task` | 建立研究任務或待辦事項（GitHub Issue），自動加 labels | `gh issue create` |
+| `list_tasks` | 列出任務/待辦，按階段 / 狀態 / 類型篩選 | `gh issue list` |
 | `view_task` | 查看單個任務內容與留言歷史 | `gh issue view` |
 | `update_task` | 更新任務標籤、milestone、指派人 | `gh issue edit` |
 | `report_progress` | 在任務上留言回報進度 | `gh issue comment` |
 | `close_task` | 完成任務 | `gh issue close` |
 | `get_milestone_progress` | 查看各研究階段的進度統計 | `gh api` |
+
+#### 工作區（1 tool）
+| Tool | 說明 |
+|------|------|
+| `workspace_status` | 查詢工作區概覽：repo、文獻統計、任務/待辦、milestone 進度 |
 
 #### 工作流程（1 tool）
 | Tool | 說明 |
@@ -237,20 +251,29 @@ git pull
 > 下載第一篇並幫我摘要重點
 ```
 
-### 任務管理
+### 引用驗證
+
+```
+> 檢查我的論文 manuscript.tex 中的引用是否都有對應文獻
+> 驗證 vaswani2017-attention 這篇論文的 DOI 是否正確
+> 列出所有文獻中缺少作者資訊的項目
+```
+
+### 任務與待辦管理
 
 ```
 > 建立一個文獻回顧任務：閱讀 5 篇 attention 相關論文
+> 建立待辦事項：review 第三章初稿
 > 目前的任務進度如何？
+> 列出所有待辦事項
 > 標記任務 #1 為已完成
 ```
 
-### 查看進度
+### 工作區狀態
 
 ```
-> 顯示整體研究進度
-> 列出所有文獻
-> 搜尋有關 self-attention 的文獻
+> 顯示工作區概覽
+> 這個專案目前有多少文獻？任務進度如何？
 ```
 
 ---
@@ -272,11 +295,76 @@ Phase 4: 實驗
   create_task(phase="experiment") → report_progress
 
 Phase 5: 寫作
-  get_reference → create_task(phase="writing")
+  get_reference → check_citations → create_task(phase="writing")
 
 Phase 6: 審閱
   create_task(phase="review") → get_milestone_progress
 ```
+
+---
+
+## 架構設計
+
+### 服務層（Service Layer）
+
+CRANE 採用服務層與工具層分離的架構，確保程式碼重用性和可測試性：
+
+```
+src/crane/
+├── workspace.py               # 工作區解析模組
+│   ├── WorkspaceContext       # 不可變工作區上下文（owner/repo、路徑）
+│   └── resolve_workspace()    # 從 git context 自動解析工作區
+│
+├── services/                  # 業務邏輯層
+│   ├── paper_service.py       # arXiv 搜尋 / 下載 / 閱讀
+│   ├── reference_service.py   # YAML + BibTeX CRUD
+│   ├── task_service.py        # GitHub Issues 管理（含 todo 支援）
+│   └── citation_service.py    # 引用驗證邏輯
+│
+├── tools/                     # MCP 工具層（薄封裝）
+│   ├── papers.py              # → PaperService
+│   ├── references.py          # → ReferenceService
+│   ├── tasks.py               # → TaskService
+│   ├── citations.py           # → CitationService
+│   ├── pipeline.py            # 工作流程編排 → 所有 services
+│   ├── project.py             # 專案初始化
+│   └── workspace.py           # 工作區狀態查詢
+│
+└── server.py                  # MCP Server 入口
+```
+
+### 工作區系統（Workspace System）
+
+CRANE 使用 Stateless 設計，每次呼叫自動從 git context 解析工作區：
+
+- **工作區識別**：使用 `owner/repo`（GitHub repo）作為標準 ID
+- **自動偵測**：從 `cwd` 自動解析 git repo
+- **狀態重建**：混合讀取——References（檔案式）+ Issues（GitHub API）
+
+```
+Workspace 狀態來源：
+├── references/           # 檔案式儲存
+│   ├── papers/*.yaml     # 文獻元資料
+│   ├── pdfs/*.pdf        # PDF 檔案
+│   └── bibliography.bib  # BibTeX 彙總
+│
+└── GitHub Issues         # 任務與待辦
+    ├── kind:task         # 一般任務
+    ├── kind:todo         # Runtime 待辦
+    ├── phase:*           # 研究階段
+    └── priority:*        # 優先級
+```
+
+### Label 系統
+
+| Label | 用途 | 範例 |
+|-------|------|------|
+| `crane` | CRANE 管理的 issues 篩選標記 | 所有 CRANE 建立的 issues |
+| `kind:task` | 一般任務 | 建立的正式任務 |
+| `kind:todo` | Runtime 待辦事項 | 執行期間產生的待辦 |
+| `phase:*` | 研究階段 | `phase:literature-review` |
+| `type:*` | 任務類型 | `type:search`、`type:read` |
+| `priority:*` | 優先級 | `priority:high` |
 
 ---
 
@@ -295,46 +383,132 @@ Phase 6: 審閱
         └── ...
 ```
 
-### GitHub Issues 標籤
+### 文獻 YAML 格式
 
-| 類別 | Labels |
-|------|--------|
-| 研究階段 | `phase:literature-review` `phase:proposal` `phase:experiment` `phase:writing` `phase:review` |
-| 任務類型 | `type:search` `type:read` `type:analysis` `type:code` `type:write` |
-| 優先權 | `priority:high` `priority:medium` `priority:low` |
+```yaml
+key: vaswani2017-attention
+title: "Attention Is All You Need"
+authors:
+  - Vaswani
+  - Shazeer
+  - Parmar
+year: 2017
+doi: "10.48550/arXiv.1706.03762"
+url: "https://arxiv.org/abs/1706.03762"
+pdf_url: "https://arxiv.org/pdf/1706.03762.pdf"
+venue: "NeurIPS"
+source: arxiv
+paper_type: conference
+categories:
+  - cs.CL
+keywords:
+  - transformer
+  - attention
+
+# AI 產生的標註
+ai_annotations:
+  summary: "提出 Transformer 架構，以 self-attention 取代 RNN..."
+  key_contributions:
+    - "首次提出純 attention 架構"
+    - "多頭注意力機制"
+  methodology: "Encoder-decoder with self-attention"
+  relevance_notes: "本研究的核心基礎論文"
+  tags:
+    - foundation
+    - architecture
+  related_issues:
+    - 5
+    - 12
+  added_date: "2025-03-15"
+```
+
+### GitHub Issues 結構
+
+CRANE 使用 GitHub Issues 追蹤所有任務與待辦：
+
+```
+Issue: "[LIT] 閱讀 attention 相關論文"
+Labels: crane, kind:task, phase:literature-review, type:read, priority:medium
+Milestone: Phase 2: Literature Review
+Assignee: @me
+
+Comments:
+  - 2025-03-15: "已閱讀 3/5 篇論文"
+  - 2025-03-16: "完成所有閱讀，開始撰寫摘要"
+```
 
 ---
 
 ## 開發
 
+### 環境設定
+
 ```bash
 cd ~/.opencode-crane
-pip install -e ".[dev]"
+python3 -m venv .venv
+.venv/bin/pip install -e ".[dev]"
+```
 
-make test             # 141 tests
-make test-cov         # 覆蓋率 93.78%
-make lint             # ruff 檢查
-make fmt              # 格式化
+### 執行測試
+
+```bash
+# 完整測試套件
+.venv/bin/python -m pytest tests/ -v
+
+# 特定測試類別
+.venv/bin/python -m pytest tests/services/ -v    # 服務層測試
+.venv/bin/python -m pytest tests/tools/ -v       # 工具層測試
+.venv/bin/python -m pytest tests/integration/ -v # 整合測試
+
+# 覆蓋率報告
+.venv/bin/python -m pytest tests/ --cov=crane --cov-report=term-missing
 ```
 
 ### 專案結構
 
 ```
 opencode-crane/
-├── pyproject.toml
-├── Makefile
-├── SKILL.md                        # OpenCode Skill 定義
-├── OPENCODE_GH_FEAT_DESIGN.md      # 完整設計規格書
+├── pyproject.toml               # 專案設定與依賴
+├── README.md                    # 本文件
+├── SKILL.md                     # OpenCode Skill 定義（AI agent 指引）
+├── OPENCODE_GH_FEAT_DESIGN.md   # 完整設計規格書
+│
 ├── scripts/
-│   ├── install.sh                  # 一鍵安裝
-│   └── setup-project.sh            # 專案設定
-├── src/crane/                      # 主套件
-│   ├── server.py                   # MCP Server 入口
-│   ├── models/paper.py             # Paper + AiAnnotations
-│   ├── tools/{project,papers,references,tasks}.py
-│   └── utils/{gh,git,bibtex,yaml_io}.py
-├── tests/                          # 141 tests（93.78% coverage）
-└── _archive/                       # 舊版程式碼封存
+│   ├── install.sh               # 一鍵安裝腳本
+│   └── setup-project.sh         # 專案設定腳本
+│
+├── src/crane/                   # 主套件
+│   ├── server.py                # MCP Server 入口
+│   ├── workspace.py             # 工作區解析模組
+│   ├── models/
+│   │   └── paper.py             # Paper + AiAnnotations 資料模型
+│   ├── services/                # 業務邏輯層
+│   │   ├── paper_service.py
+│   │   ├── reference_service.py
+│   │   ├── task_service.py
+│   │   └── citation_service.py
+│   ├── tools/                   # MCP 工具層
+│   │   ├── papers.py
+│   │   ├── references.py
+│   │   ├── tasks.py
+│   │   ├── citations.py
+│   │   ├── pipeline.py
+│   │   ├── project.py
+│   │   └── workspace.py
+│   └── utils/                   # 工具函數
+│       ├── gh.py                # GitHub CLI 封裝
+│       ├── git.py               # Git 操作
+│       ├── bibtex.py            # BibTeX 讀寫
+│       └── yaml_io.py           # YAML 讀寫
+│
+├── tests/                       # 測試套件（265 tests）
+│   ├── services/                # 服務層測試
+│   ├── tools/                   # 工具層測試
+│   ├── integration/             # 整合測試
+│   ├── models/                  # 模型測試
+│   └── utils/                   # 工具函數測試
+│
+└── _archive/                    # 舊版程式碼封存（gscientist）
 ```
 
 ---

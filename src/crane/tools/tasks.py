@@ -1,14 +1,19 @@
 """
 Task management tools via GitHub Issues + gh CLI.
-create, list, view, update, report_progress, close, get_milestone_progress.
+Thin MCP wrapper around TaskService.
 """
 
-from crane.utils.gh import gh, gh_json
-from crane.utils.git import get_owner_repo
+from crane.services.task_service import TaskService
+from crane.workspace import resolve_workspace
 
 
 def register_tools(mcp):
     """Register task management tools with the MCP server."""
+
+    def _get_service(project_dir: str | None) -> TaskService:
+        """Get service instance for specified project_dir."""
+        workspace = resolve_workspace(project_dir)
+        return TaskService(workspace.project_root or project_dir)
 
     @mcp.tool()
     def create_task(
@@ -31,28 +36,16 @@ def register_tools(mcp):
                 target the git repo in that directory instead of the server CWD.
                 Critical for cross-project isolation when MCP server is shared.
         """
-        labels: list[str] = []
-        if phase:
-            labels.append(f"phase:{phase}")
-        if task_type:
-            labels.append(f"type:{task_type}")
-        if priority:
-            labels.append(f"priority:{priority}")
-
-        args = ["issue", "create", "--title", title, "--body", body]
-        if labels:
-            args.extend(["--label", ",".join(labels)])
-        if milestone:
-            args.extend(["--milestone", milestone])
-        if assignee:
-            args.extend(["--assignee", assignee])
-
-        url = gh(args, cwd=project_dir)
-        number = int(url.rstrip("/").split("/")[-1]) if url else 0
-        return {
-            "number": number,
-            "url": url,
-        }
+        service = _get_service(project_dir)
+        return service.create(
+            title=title,
+            body=body,
+            phase=phase,
+            task_type=task_type,
+            priority=priority,
+            milestone=milestone,
+            assignee=assignee,
+        )
 
     @mcp.tool()
     def list_tasks(
@@ -63,46 +56,16 @@ def register_tools(mcp):
         limit: int = 30,
         project_dir: str | None = None,
     ) -> list[dict[str, object]]:
-        args = [
-            "issue",
-            "list",
-            "--json",
-            "number,title,labels,state,assignees,milestone,createdAt,updatedAt",
-            "--state",
-            state,
-            "--limit",
-            str(limit),
-        ]
-
-        labels: list[str] = []
-        if phase:
-            labels.append(f"phase:{phase}")
-        if task_type:
-            labels.append(f"type:{task_type}")
-        if labels:
-            args.extend(["--label", ",".join(labels)])
-        if milestone:
-            args.extend(["--milestone", milestone])
-
-        tasks = gh_json(args, cwd=project_dir)
-        return tasks if isinstance(tasks, list) else []
+        service = _get_service(project_dir)
+        return service.list(phase, state, task_type, milestone, limit)
 
     @mcp.tool()
     def view_task(
         issue_number: int,
         project_dir: str | None = None,
     ) -> dict[str, object]:
-        data = gh_json(
-            [
-                "issue",
-                "view",
-                str(issue_number),
-                "--json",
-                "number,title,body,state,labels,milestone,assignees,comments,createdAt,updatedAt",
-            ],
-            cwd=project_dir,
-        )
-        return data if isinstance(data, dict) else {}
+        service = _get_service(project_dir)
+        return service.view(issue_number)
 
     @mcp.tool()
     def update_task(
@@ -114,21 +77,15 @@ def register_tools(mcp):
         assignee: str = "",
         project_dir: str | None = None,
     ) -> str:
-        args = ["issue", "edit", str(issue_number)]
-
-        if title:
-            args.extend(["--title", title])
-        if add_labels:
-            args.extend(["--add-label", ",".join(add_labels)])
-        if remove_labels:
-            args.extend(["--remove-label", ",".join(remove_labels)])
-        if milestone:
-            args.extend(["--milestone", milestone])
-        if assignee:
-            args.extend(["--add-assignee", assignee])
-
-        gh(args, cwd=project_dir)
-        return f"Task #{issue_number} updated"
+        service = _get_service(project_dir)
+        return service.update(
+            issue_number=issue_number,
+            title=title,
+            add_labels=add_labels,
+            remove_labels=remove_labels,
+            milestone=milestone,
+            assignee=assignee,
+        )
 
     @mcp.tool()
     def report_progress(
@@ -136,8 +93,8 @@ def register_tools(mcp):
         comment: str,
         project_dir: str | None = None,
     ) -> str:
-        gh(["issue", "comment", str(issue_number), "--body", comment], cwd=project_dir)
-        return f"Progress reported on task #{issue_number}"
+        service = _get_service(project_dir)
+        return service.report_progress(issue_number, comment)
 
     @mcp.tool()
     def close_task(
@@ -146,43 +103,13 @@ def register_tools(mcp):
         comment: str = "",
         project_dir: str | None = None,
     ) -> str:
-        args = ["issue", "close", str(issue_number), "--reason", reason]
-        if comment:
-            args.extend(["--comment", comment])
-        gh(args, cwd=project_dir)
-        return f"Task #{issue_number} closed ({reason})"
+        service = _get_service(project_dir)
+        return service.close(issue_number, reason, comment)
 
     @mcp.tool()
     def get_milestone_progress(
         milestone_name: str = "",
         project_dir: str | None = None,
     ) -> list[dict[str, object]]:
-        owner, repo = get_owner_repo(cwd=project_dir)
-        milestones = gh_json(
-            ["api", f"repos/{owner}/{repo}/milestones?state=all"],
-            cwd=project_dir,
-        )
-        if not isinstance(milestones, list):
-            return []
-
-        progress = []
-        for item in milestones:
-            title = item.get("title", "")
-            if milestone_name and title != milestone_name:
-                continue
-
-            open_issues = item.get("open_issues", 0)
-            closed_issues = item.get("closed_issues", 0)
-            total = open_issues + closed_issues
-            pct = 0.0 if total == 0 else round((closed_issues / total) * 100, 1)
-
-            progress.append(
-                {
-                    "title": title,
-                    "open": open_issues,
-                    "closed": closed_issues,
-                    "progress": pct,
-                }
-            )
-
-        return progress
+        service = _get_service(project_dir)
+        return service.get_milestone_progress(milestone_name)

@@ -40,7 +40,7 @@ class TestSearchPapers:
         mock_response.content = mock_arxiv_response.encode("utf-8")
         mock_response.raise_for_status.return_value = None
 
-        with patch("crane.tools.papers.requests.get", return_value=mock_response):
+        with patch("crane.services.paper_service.requests.get", return_value=mock_response):
             results = paper_tools["search_papers"]("transformer")
 
         assert isinstance(results, list)
@@ -53,7 +53,7 @@ class TestSearchPapers:
         mock_response.content = mock_arxiv_response.encode("utf-8")
         mock_response.raise_for_status.return_value = None
 
-        with patch("crane.tools.papers.requests.get", return_value=mock_response):
+        with patch("crane.services.paper_service.requests.get", return_value=mock_response):
             results = paper_tools["search_papers"]("transformer")
 
         required_fields = {
@@ -74,7 +74,9 @@ class TestSearchPapers:
         mock_response.content = mock_arxiv_response.encode("utf-8")
         mock_response.raise_for_status.return_value = None
 
-        with patch("crane.tools.papers.requests.get", return_value=mock_response) as mock_get:
+        with patch(
+            "crane.services.paper_service.requests.get", return_value=mock_response
+        ) as mock_get:
             paper_tools["search_papers"]("transformer", max_results=3)
 
         assert mock_get.call_args.kwargs["params"]["max_results"] == 3
@@ -94,7 +96,7 @@ class TestDownloadPaper:
         mock_response.content = b"fake pdf"
         mock_response.raise_for_status.return_value = None
 
-        with patch("crane.tools.papers.requests.get", return_value=mock_response):
+        with patch("crane.services.paper_service.requests.get", return_value=mock_response):
             output_path = paper_tools["download_paper"]("1706.03762", save_dir=str(save_dir))
 
         assert isinstance(output_path, str)
@@ -106,7 +108,7 @@ class TestDownloadPaper:
         mock_response.content = b"fake pdf"
         mock_response.raise_for_status.return_value = None
 
-        with patch("crane.tools.papers.requests.get", return_value=mock_response):
+        with patch("crane.services.paper_service.requests.get", return_value=mock_response):
             output_path = paper_tools["download_paper"]("1706.03762", save_dir=str(save_dir))
 
         assert (save_dir / "1706.03762.pdf").exists()
@@ -119,7 +121,7 @@ class TestDownloadPaper:
         mock_response.content = b"fake pdf"
         mock_response.raise_for_status.return_value = None
 
-        with patch("crane.tools.papers.requests.get", return_value=mock_response):
+        with patch("crane.services.paper_service.requests.get", return_value=mock_response):
             output_path = paper_tools["download_paper"]("1706.03762", save_dir=str(save_dir))
 
         assert save_dir.exists()
@@ -142,7 +144,7 @@ class TestReadPaper:
         page_2.extract_text.return_value = "page two"
         mock_reader.pages = [page_1, page_2]
 
-        with patch("crane.tools.papers.PyPDF2.PdfReader", return_value=mock_reader):
+        with patch("crane.services.paper_service.PyPDF2.PdfReader", return_value=mock_reader):
             text = paper_tools["read_paper"]("1706.03762", save_dir=str(save_dir))
 
         assert isinstance(text, str)
@@ -161,8 +163,10 @@ class TestReadPaper:
         page.extract_text.return_value = "downloaded paper text"
         mock_reader.pages = [page]
 
-        with patch("crane.tools.papers.requests.get", return_value=mock_response) as mock_get:
-            with patch("crane.tools.papers.PyPDF2.PdfReader", return_value=mock_reader):
+        with patch(
+            "crane.services.paper_service.requests.get", return_value=mock_response
+        ) as mock_get:
+            with patch("crane.services.paper_service.PyPDF2.PdfReader", return_value=mock_reader):
                 text = paper_tools["read_paper"]("1706.03762", save_dir=str(save_dir))
 
         assert (save_dir / "1706.03762.pdf").exists()

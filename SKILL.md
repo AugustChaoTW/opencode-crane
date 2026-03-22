@@ -39,6 +39,14 @@ description: >
 - `close_task` — Complete a task with reason
 - `get_milestone_progress` — View research phase progress statistics
 
+### Citation Verification
+- `check_citations` — Validate all \cite{key} in manuscript exist in references/
+- `verify_reference` — Verify reference metadata (DOI, year, title) matches expected values
+- `check_all_references` — Check metadata completeness for all references
+
+### Workspace
+- `workspace_status` — View workspace overview (repo, references, tasks, todos, milestones)
+
 ### Workflow Orchestration
 - `run_pipeline` — Execute predefined multi-step workflows with checkpoints and recovery hints
 
@@ -57,6 +65,10 @@ Use these rules first. Prefer `run_pipeline` for multi-step goals; prefer atomic
 - "初始化" / "setup" / "init" -> `run_pipeline(pipeline="full-setup")`
 - "加入這篇論文" / single paper add request -> use `add_reference` directly (not pipeline)
 - "建立任務" / specific task request -> use `create_task` directly
+- "檢查引用" / "verify citations" / "check references" -> use `check_citations` with manuscript_path or manuscript_text
+- "驗證這篇論文" / "verify reference metadata" -> use `verify_reference` with key and expected values
+- "檢查所有文獻" / "check all references metadata" -> use `check_all_references`
+- "工作區狀態" / "workspace overview" / "project status" -> use `workspace_status`
 - "進度" / "status" -> call `get_milestone_progress` + `list_tasks`
 
 ### Chaining Rule (No Extra Prompt Needed)

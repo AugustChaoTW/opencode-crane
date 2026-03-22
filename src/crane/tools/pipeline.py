@@ -1,29 +1,18 @@
 """
 Research workflow pipeline tool with checkpoints.
-Orchestrates multi-step flows using shared Python functions (not MCP calls).
+Orchestrates multi-step flows using shared Service layer.
 """
 
 from datetime import date
 from pathlib import Path
 from typing import Any, cast
 
-import feedparser  # pyright: ignore[reportMissingImports]
-import requests
-from PyPDF2 import PdfReader  # pyright: ignore[reportMissingImports]
-
 from crane.models.paper import AiAnnotations, Paper
-from crane.tools.papers import ARXIV_API_URL
-from crane.tools.project import (
-    DEFAULT_PHASES,
-    ISSUE_TEMPLATE_CONTENT,
-    PHASE_COLORS,
-    PRIORITY_LABEL_COLORS,
-    TYPE_LABEL_COLORS,
-)
-from crane.utils import git
-from crane.utils.bibtex import append_entry
-from crane.utils.gh import gh
-from crane.utils.yaml_io import read_paper_yaml, write_paper_yaml
+from crane.services.paper_service import PaperService
+from crane.services.reference_service import ReferenceService
+from crane.services.task_service import TaskService
+from crane.tools.project import DEFAULT_PHASES
+from crane.workspace import resolve_workspace
 
 LITERATURE_REVIEW_STEPS = ["search", "add", "download", "read", "annotate", "create_task"]
 FULL_SETUP_STEPS = ["init", "create_starter_tasks"]
@@ -124,6 +113,8 @@ def register_tools(mcp):
         skip_steps = skip_steps or []
         completed_steps: list[str] = []
         artifacts_created: list[str] = []
+        workspace = resolve_workspace(project_dir)
+        project_root = Path(workspace.project_root)
 
         step_map = {
             "literature-review": LITERATURE_REVIEW_STEPS,
@@ -151,12 +142,22 @@ def register_tools(mcp):
             )
 
         refs_path = Path(refs_dir)
-        if not refs_path.is_absolute() and project_dir:
-            refs_path = Path(project_dir) / refs_path
+        if refs_path.is_absolute():
+            resolved_refs_path = refs_path
+        elif refs_path == Path("references"):
+            resolved_refs_path = Path(workspace.references_dir)
+        else:
+            resolved_refs_path = project_root / refs_path
 
-        papers_dir = refs_path / "papers"
-        pdfs_dir = refs_path / "pdfs"
-        bib_path = refs_path / "bibliography.bib"
+        # Initialize services
+        paper_svc = PaperService()
+        ref_svc = ReferenceService(str(resolved_refs_path))
+        task_svc = TaskService(workspace.project_root)
+
+        # Ensure directories exist
+        papers_dir = resolved_refs_path / "papers"
+        pdfs_dir = resolved_refs_path / "pdfs"
+        bib_path = resolved_refs_path / "bibliography.bib"
         papers_dir.mkdir(parents=True, exist_ok=True)
         pdfs_dir.mkdir(parents=True, exist_ok=True)
         bib_path.parent.mkdir(parents=True, exist_ok=True)
@@ -170,48 +171,7 @@ def register_tools(mcp):
             try:
                 if pipeline == "literature-review":
                     if step == "search":
-                        if source != "arxiv":
-                            raise ValueError(f"Unsupported source: {source}")
-                        params = {
-                            "search_query": topic,
-                            "max_results": max_papers,
-                            "sortBy": "submittedDate",
-                            "sortOrder": "descending",
-                        }
-                        response = requests.get(ARXIV_API_URL, params=params)
-                        response.raise_for_status()
-
-                        feed = feedparser.parse(response.text)
-                        entries = cast(list[dict[str, Any]], feed.get("entries", []))
-                        searched_papers = []
-                        for entry in entries:
-                            entry_id = str(entry.get("id", "")).split("/")[-1]
-                            links = cast(list[dict[str, Any]], entry.get("links", []))
-                            authors = cast(list[dict[str, Any]], entry.get("authors", []))
-                            tags = cast(list[dict[str, Any]], entry.get("tags", []))
-                            pdf_url = next(
-                                (
-                                    str(link.get("href", ""))
-                                    for link in links
-                                    if link.get("type") == "application/pdf"
-                                ),
-                                "",
-                            )
-                            searched_papers.append(
-                                {
-                                    "paper_id": entry_id.split("v")[0],
-                                    "title": str(entry.get("title", "")).replace("\n", " ").strip(),
-                                    "authors": [str(author.get("name", "")) for author in authors],
-                                    "abstract": str(entry.get("summary", ""))
-                                    .replace("\n", " ")
-                                    .strip(),
-                                    "doi": str(entry.get("doi", f"arxiv:{entry_id}")),
-                                    "url": str(entry.get("id", "")),
-                                    "pdf_url": pdf_url,
-                                    "year": int(str(entry.get("published", "")).split("-")[0] or 0),
-                                    "categories": [str(tag.get("term", "")) for tag in tags],
-                                }
-                            )
+                        searched_papers = paper_svc.search(topic, max_papers, source)
 
                     elif step == "add":
                         for paper_data in searched_papers:
@@ -234,6 +194,9 @@ def register_tools(mcp):
                                 categories=list(cast(list[str], paper_data.get("categories", []))),
                             )
                             paper.bibtex = paper.to_bibtex()
+                            from crane.utils.bibtex import append_entry
+                            from crane.utils.yaml_io import write_paper_yaml
+
                             yaml_path = write_paper_yaml(
                                 str(papers_dir),
                                 key,
@@ -245,41 +208,31 @@ def register_tools(mcp):
                     elif step == "download":
                         for paper_data in searched_papers:
                             paper_id = str(paper_data.get("paper_id", ""))
-                            pdf_url = str(paper_data.get("pdf_url", ""))
-                            if not pdf_url and paper_id:
-                                pdf_url = f"https://arxiv.org/pdf/{paper_id}.pdf"
-                            if not pdf_url:
+                            if not paper_id:
+                                paper_id = _paper_key_from_entry(paper_data)
+                            try:
+                                path = paper_svc.download(paper_id, str(pdfs_dir))
+                                artifacts_created.append(str(path))
+                            except Exception:
                                 continue
-                            output_path = (
-                                pdfs_dir / f"{paper_id or _paper_key_from_entry(paper_data)}.pdf"
-                            )
-                            response = requests.get(pdf_url)
-                            response.raise_for_status()
-                            output_path.write_bytes(response.content)
-                            artifacts_created.append(str(output_path))
 
                     elif step == "read":
                         for paper_data in searched_papers:
                             paper_id = str(paper_data.get("paper_id", ""))
-                            pdf_path = (
-                                pdfs_dir / f"{paper_id or _paper_key_from_entry(paper_data)}.pdf"
-                            )
+                            if not paper_id:
+                                paper_id = _paper_key_from_entry(paper_data)
+                            pdf_path = pdfs_dir / f"{paper_id}.pdf"
                             if not pdf_path.exists():
                                 continue
-                            reader = PdfReader(str(pdf_path))
-                            extracted_pages = [(page.extract_text() or "") for page in reader.pages]
+                            text = paper_svc.read(paper_id, str(pdfs_dir))
                             text_path = pdf_path.with_suffix(".txt")
-                            text_path.write_text(
-                                "\n".join(extracted_pages).strip(), encoding="utf-8"
-                            )
+                            text_path.write_text(text, encoding="utf-8")
                             artifacts_created.append(str(text_path))
 
                     elif step == "annotate":
                         for paper_data in searched_papers:
                             key = _paper_key_from_entry(paper_data)
-                            data = read_paper_yaml(str(papers_dir), key)
-                            if data is None:
-                                continue
+                            data = ref_svc.get(key)
                             paper = Paper.from_yaml_dict(data)
                             summary = str(paper_data.get("abstract", "")).strip()
                             paper.ai_annotations = AiAnnotations(
@@ -291,30 +244,32 @@ def register_tools(mcp):
                                 related_issues=[],
                                 added_date=date.today().isoformat(),
                             )
+                            from crane.utils.yaml_io import write_paper_yaml
+
                             yaml_path = write_paper_yaml(str(papers_dir), key, paper.to_yaml_dict())
                             artifacts_created.append(yaml_path)
 
                     elif step == "create_task":
-                        issue_url = gh(
-                            [
-                                "issue",
-                                "create",
-                                "--title",
-                                f"[LIT] Literature review: {topic}",
-                                "--body",
-                                f"Automated literature-review pipeline for topic: {topic}",
-                                "--label",
-                                "phase:literature-review,type:search,priority:medium",
-                                "--assignee",
-                                "@me",
-                            ],
-                            cwd=project_dir,
+                        result = task_svc.create(
+                            title=f"[LIT] Literature review: {topic}",
+                            body=f"Automated literature-review pipeline for topic: {topic}",
+                            phase="literature-review",
+                            task_type="search",
+                            priority="medium",
                         )
-                        if issue_url:
-                            artifacts_created.append(issue_url)
+                        if result.get("url"):
+                            artifacts_created.append(result["url"])
 
                 elif pipeline == "full-setup":
                     if step == "init":
+                        from crane.tools.project import (
+                            ISSUE_TEMPLATE_CONTENT,
+                            PHASE_COLORS,
+                            PRIORITY_LABEL_COLORS,
+                            TYPE_LABEL_COLORS,
+                        )
+                        from crane.utils.gh import gh
+
                         selected_phases = DEFAULT_PHASES
                         for phase in selected_phases:
                             gh(
@@ -326,7 +281,7 @@ def register_tools(mcp):
                                     PHASE_COLORS.get(phase, "BFDADC"),
                                     "--force",
                                 ],
-                                cwd=project_dir,
+                                cwd=workspace.project_root,
                             )
                         for task_type, color in TYPE_LABEL_COLORS.items():
                             gh(
@@ -338,7 +293,7 @@ def register_tools(mcp):
                                     color,
                                     "--force",
                                 ],
-                                cwd=project_dir,
+                                cwd=workspace.project_root,
                             )
                         for priority, color in PRIORITY_LABEL_COLORS.items():
                             gh(
@@ -350,10 +305,11 @@ def register_tools(mcp):
                                     color,
                                     "--force",
                                 ],
-                                cwd=project_dir,
+                                cwd=workspace.project_root,
                             )
 
-                        owner, repo = git.get_owner_repo(cwd=project_dir)
+                        owner = workspace.owner
+                        repo = workspace.repo_name
                         for idx, phase in enumerate(selected_phases, start=1):
                             gh(
                                 [
@@ -364,11 +320,11 @@ def register_tools(mcp):
                                     "-f",
                                     f"title=Phase {idx}: {_phase_display_name(phase)}",
                                 ],
-                                cwd=project_dir,
+                                cwd=workspace.project_root,
                             )
 
-                        root = Path(project_dir) if project_dir else Path.cwd()
-                        references_dir = root / "references"
+                        root = project_root
+                        references_dir = resolved_refs_path
                         (references_dir / "papers").mkdir(parents=True, exist_ok=True)
                         (references_dir / "pdfs").mkdir(parents=True, exist_ok=True)
                         bibliography_path = references_dir / "bibliography.bib"
@@ -393,28 +349,18 @@ def register_tools(mcp):
 
                     elif step == "create_starter_tasks":
                         for phase in DEFAULT_PHASES:
-                            title = f"[{phase.upper().replace('-', ' ')}] Starter task"
-                            body = (
-                                f"Initial task for phase '{phase}'.\n\n"
-                                "Define objectives, deliverables, and first concrete actions."
+                            result = task_svc.create(
+                                title=f"[{phase.upper().replace('-', ' ')}] Starter task",
+                                body=(
+                                    f"Initial task for phase '{phase}'.\n\n"
+                                    "Define objectives, deliverables, and first concrete actions."
+                                ),
+                                phase=phase,
+                                task_type="analysis",
+                                priority="medium",
                             )
-                            issue_url = gh(
-                                [
-                                    "issue",
-                                    "create",
-                                    "--title",
-                                    title,
-                                    "--body",
-                                    body,
-                                    "--label",
-                                    f"phase:{phase},type:analysis,priority:medium",
-                                    "--assignee",
-                                    "@me",
-                                ],
-                                cwd=project_dir,
-                            )
-                            if issue_url:
-                                artifacts_created.append(issue_url)
+                            if result.get("url"):
+                                artifacts_created.append(result["url"])
 
                 completed_steps.append(step)
 

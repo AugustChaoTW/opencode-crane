@@ -116,11 +116,19 @@ class TestLiteratureReviewPipeline:
 
         @contextlib.contextmanager
         def patches():
-            mock_response = MagicMock()
-            mock_response.status_code = 200
-            mock_response.text = mock_arxiv_xml
-            mock_response.content = b"%PDF-fake"
-            mock_response.raise_for_status = MagicMock()
+            def mock_get(url, **kwargs):
+                mock_response = MagicMock()
+                mock_response.status_code = 200
+                mock_response.raise_for_status = MagicMock()
+                if "export.arxiv.org" in url:
+                    # Search request - return XML
+                    mock_response.text = mock_arxiv_xml
+                    mock_response.content = mock_arxiv_xml.encode("utf-8")
+                else:
+                    # Download request - return PDF bytes
+                    mock_response.text = ""
+                    mock_response.content = b"%PDF-fake"
+                return mock_response
 
             mock_pdf_reader = MagicMock()
             mock_page = MagicMock()
@@ -137,11 +145,11 @@ class TestLiteratureReviewPipeline:
                     side_effect=_mock_subprocess_for_gh(mock_gh),
                 ),
                 patch(
-                    "crane.tools.pipeline.requests.get",
-                    return_value=mock_response,
+                    "crane.services.paper_service.requests.get",
+                    side_effect=mock_get,
                 ),
                 patch(
-                    "crane.tools.pipeline.PdfReader",
+                    "crane.services.paper_service.PyPDF2.PdfReader",
                     return_value=mock_pdf_reader,
                 ),
             ):

@@ -5,7 +5,10 @@ RED phase: define expected behavior before implementation.
 All gh CLI calls are mocked — no real GitHub API interaction.
 """
 
+# pyright: reportMissingImports=false
+
 import json
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -32,6 +35,15 @@ def task_tools():
     return collector.tools
 
 
+@pytest.fixture(autouse=True)
+def mock_workspace():
+    with patch(
+        "crane.tools.tasks.resolve_workspace",
+        return_value=SimpleNamespace(project_root=None),
+    ):
+        yield
+
+
 class TestCreateTask:
     def test_registered(self, task_tools):
         assert "create_task" in task_tools
@@ -41,7 +53,7 @@ class TestCreateTask:
             result = task_tools["create_task"](title="[LIT] Survey of X", body="task body")
 
         assert result == {"number": 1, "url": "https://github.com/test/repo/issues/1"}
-        assert mock_gh.calls[0] == [
+        assert mock_gh.calls[0][:7] == [
             "gh",
             "issue",
             "create",
@@ -49,9 +61,13 @@ class TestCreateTask:
             "[LIT] Survey of X",
             "--body",
             "task body",
-            "--assignee",
-            "@me",
         ]
+        label_idx = mock_gh.calls[0].index("--label")
+        labels = mock_gh.calls[0][label_idx + 1].split(",")
+        assert "crane" in labels
+        assert "kind:task" in labels
+        assignee_idx = mock_gh.calls[0].index("--assignee")
+        assert mock_gh.calls[0][assignee_idx + 1] == "@me"
 
     def test_includes_phase_label(self, task_tools, mock_gh):
         with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
@@ -59,21 +75,30 @@ class TestCreateTask:
 
         assert "--label" in mock_gh.calls[0]
         label_idx = mock_gh.calls[0].index("--label")
-        assert mock_gh.calls[0][label_idx + 1] == "phase:literature-review"
+        labels = mock_gh.calls[0][label_idx + 1].split(",")
+        assert "crane" in labels
+        assert "kind:task" in labels
+        assert "phase:literature-review" in labels
 
     def test_includes_type_label(self, task_tools, mock_gh):
         with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
             task_tools["create_task"](title="Task", task_type="analysis")
 
         label_idx = mock_gh.calls[0].index("--label")
-        assert mock_gh.calls[0][label_idx + 1] == "type:analysis"
+        labels = mock_gh.calls[0][label_idx + 1].split(",")
+        assert "crane" in labels
+        assert "kind:task" in labels
+        assert "type:analysis" in labels
 
     def test_includes_priority_label(self, task_tools, mock_gh):
         with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
             task_tools["create_task"](title="Task", priority="high")
 
         label_idx = mock_gh.calls[0].index("--label")
-        assert mock_gh.calls[0][label_idx + 1] == "priority:high"
+        labels = mock_gh.calls[0][label_idx + 1].split(",")
+        assert "crane" in labels
+        assert "kind:task" in labels
+        assert "priority:high" in labels
 
     def test_sets_milestone(self, task_tools, mock_gh):
         with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
@@ -111,7 +136,10 @@ class TestListTasks:
 
         assert "--label" in mock_gh.calls[0]
         label_idx = mock_gh.calls[0].index("--label")
-        assert mock_gh.calls[0][label_idx + 1] == "phase:literature-review"
+        labels = mock_gh.calls[0][label_idx + 1].split(",")
+        assert "crane" in labels
+        assert "kind:task" in labels
+        assert "phase:literature-review" in labels
 
     def test_filters_by_state(self, task_tools, mock_gh):
         with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
@@ -257,7 +285,9 @@ class TestGetMilestoneProgress:
             ),
         )
 
-        with patch("crane.tools.tasks.get_owner_repo", return_value=("testuser", "test-research")):
+        with patch(
+            "crane.services.task_service.get_owner_repo", return_value=("testuser", "test-research")
+        ):
             with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
                 result = task_tools["get_milestone_progress"]()
 
@@ -285,7 +315,9 @@ class TestGetMilestoneProgress:
             ),
         )
 
-        with patch("crane.tools.tasks.get_owner_repo", return_value=("testuser", "test-research")):
+        with patch(
+            "crane.services.task_service.get_owner_repo", return_value=("testuser", "test-research")
+        ):
             with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
                 result = task_tools["get_milestone_progress"]("Experiment")
 

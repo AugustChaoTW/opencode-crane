@@ -1,15 +1,27 @@
 """
 Paper search and retrieval tools: search_papers, download_paper, read_paper
+Thin MCP wrapper around PaperService.
 """
 
 from pathlib import Path
-from typing import Any, cast
 
-import feedparser  # pyright: ignore[reportMissingImports]
-import PyPDF2  # pyright: ignore[reportMissingImports]
-import requests
+from crane.services.paper_service import PaperService
+from crane.workspace import resolve_workspace
 
-ARXIV_API_URL = "http://export.arxiv.org/api/query"
+# Shared service instance
+_paper_service = PaperService()
+
+
+def _resolve_save_dir(save_dir: str, project_dir: str | None) -> str:
+    save_path = Path(save_dir)
+    if save_path.is_absolute():
+        return str(save_path)
+
+    workspace = resolve_workspace(project_dir)
+    if save_path == Path("references") / "pdfs":
+        return workspace.pdfs_dir
+
+    return str(Path(workspace.project_root) / save_path)
 
 
 def register_tools(mcp):
@@ -26,86 +38,30 @@ def register_tools(mcp):
         doi, url, pdf_url, published_date, categories.
         Supported sources: arxiv (google_scholar, semantic_scholar planned).
         """
-        if source != "arxiv":
-            raise ValueError(f"Unsupported source: {source}")
-
-        params = {
-            "search_query": query,
-            "max_results": max_results,
-            "sortBy": "submittedDate",
-            "sortOrder": "descending",
-        }
-        response = requests.get(ARXIV_API_URL, params=params)
-        response.raise_for_status()
-
-        feed = feedparser.parse(response.content)
-        entries = cast(list[dict[str, Any]], feed.get("entries", []))
-        results: list[dict[str, object]] = []
-
-        for entry in entries:
-            entry_id = str(entry.get("id", "")).split("/")[-1]
-            links = cast(list[dict[str, Any]], entry.get("links", []))
-            authors = cast(list[dict[str, Any]], entry.get("authors", []))
-            tags = cast(list[dict[str, Any]], entry.get("tags", []))
-            pdf_url = next(
-                (
-                    str(link.get("href", ""))
-                    for link in links
-                    if link.get("type") == "application/pdf"
-                ),
-                "",
-            )
-            results.append(
-                {
-                    "title": str(entry.get("title", "")).replace("\n", " ").strip(),
-                    "authors": [str(author.get("name", "")) for author in authors],
-                    "abstract": str(entry.get("summary", "")).replace("\n", " ").strip(),
-                    "doi": entry.get("doi", f"arxiv:{entry_id}"),
-                    "url": str(entry.get("id", "")),
-                    "pdf_url": pdf_url,
-                    "published_date": str(entry.get("published", "")).split("T")[0],
-                    "categories": [str(tag.get("term", "")) for tag in tags],
-                    "paper_id": entry_id,
-                }
-            )
-
-        return results
+        return _paper_service.search(query, max_results, source)
 
     @mcp.tool()
     def download_paper(
         paper_id: str,
         save_dir: str = "references/pdfs",
+        project_dir: str | None = None,
     ) -> str:
         """
         Download paper PDF to references/pdfs/ directory.
         Returns local file path.
         """
-        save_path = Path(save_dir)
-        save_path.mkdir(parents=True, exist_ok=True)
-
-        pdf_url = f"https://arxiv.org/pdf/{paper_id}.pdf"
-        output_path = save_path / f"{paper_id}.pdf"
-
-        response = requests.get(pdf_url)
-        response.raise_for_status()
-        output_path.write_bytes(response.content)
-
-        return str(output_path)
+        path = _paper_service.download(paper_id, _resolve_save_dir(save_dir, project_dir))
+        return str(path)
 
     @mcp.tool()
     def read_paper(
         paper_id: str,
         save_dir: str = "references/pdfs",
+        project_dir: str | None = None,
     ) -> str:
         """
         Read paper PDF and extract full text.
         Auto-downloads if PDF doesn't exist locally.
         Returns plain text content.
         """
-        pdf_path = Path(save_dir) / f"{paper_id}.pdf"
-        if not pdf_path.exists():
-            pdf_path = Path(download_paper(paper_id, save_dir))
-
-        reader = PyPDF2.PdfReader(str(pdf_path))
-        extracted_pages = [(page.extract_text() or "") for page in reader.pages]
-        return "\n".join(extracted_pages).strip()
+        return _paper_service.read(paper_id, _resolve_save_dir(save_dir, project_dir))
