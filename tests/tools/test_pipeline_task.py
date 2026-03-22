@@ -79,11 +79,10 @@ class TestPipelineTaskCreation:
             assert "priority:medium" in labels
 
     def test_build_labels_excludes_nonexistent(self):
-        """Verify _build_labels doesn't include crane or kind:*."""
         from crane.services.task_service import TaskService
 
-        labels = TaskService._build_labels(
-            TaskService,
+        svc = TaskService(project_dir=None)
+        labels = svc._build_labels(
             phase="literature-review",
             task_type="search",
             priority="high",
