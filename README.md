@@ -235,7 +235,7 @@ uv sync
 
 ## 功能總覽
 
-### 24 個 MCP Tools，分 7 大類
+### 23 個 MCP Tools，分 7 大類
 
 #### 專案管理（2 tools）
 | Tool | 說明 |
