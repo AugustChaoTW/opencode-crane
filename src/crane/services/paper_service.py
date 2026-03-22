@@ -12,30 +12,19 @@ import feedparser  # pyright: ignore[reportMissingImports]
 import PyPDF2  # pyright: ignore[reportMissingImports]
 import requests
 
+from crane.utils.retry import retry
+
 ARXIV_API_URL = "http://export.arxiv.org/api/query"
 
 
 class PaperService:
-    """Service for paper search, download, and text extraction."""
-
+    @retry(max_attempts=3, delay=1.0, exceptions=(requests.RequestException,))
     def search(
         self,
         query: str,
         max_results: int = 10,
         source: str = "arxiv",
     ) -> list[dict[str, Any]]:
-        """
-        Search academic papers from supported sources.
-
-        Args:
-            query: Search query string
-            max_results: Maximum number of results to return
-            source: Paper source ("arxiv" supported, others planned)
-
-        Returns:
-            List of paper dicts with title, authors, abstract, doi, url,
-            pdf_url, published_date, categories, paper_id.
-        """
         if source != "arxiv":
             raise ValueError(f"Unsupported source: {source}")
 
@@ -81,21 +70,12 @@ class PaperService:
 
         return results
 
+    @retry(max_attempts=3, delay=1.0, exceptions=(requests.RequestException,))
     def download(
         self,
         paper_id: str,
         save_dir: str | Path = "references/pdfs",
     ) -> Path:
-        """
-        Download paper PDF to specified directory.
-
-        Args:
-            paper_id: arXiv paper ID (e.g., "2301.00001")
-            save_dir: Directory to save PDF
-
-        Returns:
-            Path to downloaded PDF file.
-        """
         save_path = Path(save_dir)
         save_path.mkdir(parents=True, exist_ok=True)
 

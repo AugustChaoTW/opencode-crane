@@ -44,6 +44,11 @@ description: >
 - `verify_reference` — Verify reference metadata (DOI, year, title) matches expected values
 - `check_all_references` — Check metadata completeness for all references
 
+### Screening & Comparison
+- `screen_reference` — Record include/exclude/maybe decision for a reference
+- `list_screened_references` — List all screened references with optional decision filter
+- `compare_papers` — Create comparison matrix for multiple papers
+
 ### Workspace
 - `workspace_status` — View workspace overview (repo, references, tasks, todos, milestones)
 
