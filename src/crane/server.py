@@ -12,6 +12,7 @@ from .tools.papers import register_tools as register_paper_tools
 from .tools.pipeline import register_tools as register_pipeline_tools
 from .tools.project import register_tools as register_project_tools
 from .tools.references import register_tools as register_reference_tools
+from .tools.screening import register_tools as register_screening_tools
 from .tools.tasks import register_tools as register_task_tools
 from .tools.workspace import register_tools as register_workspace_tools
 
@@ -23,6 +24,7 @@ register_reference_tools(mcp)
 register_task_tools(mcp)
 register_workspace_tools(mcp)
 register_citation_tools(mcp)
+register_screening_tools(mcp)
 register_pipeline_tools(mcp)
 
 
