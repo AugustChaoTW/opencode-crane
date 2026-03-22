@@ -3,7 +3,7 @@
   "mcp": {
     "crane": {
       "type": "local",
-      "command": ["/home/augchao/auto-research/.venv/bin/python", "-m", "crane"],
+      "command": ["uv", "run", "crane"],
       "enabled": true
     }
   }
