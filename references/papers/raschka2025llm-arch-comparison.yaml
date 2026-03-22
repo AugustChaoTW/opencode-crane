@@ -1,0 +1,37 @@
+key: raschka2025llm-arch-comparison
+title: 'The Big LLM Architecture Comparison: From DeepSeek V3 to GLM-5'
+authors:
+- Sebastian Raschka
+year: 2025
+doi: ''
+url: https://magazine.sebastianraschka.com/p/the-big-llm-architecture-comparison
+pdf_url: ''
+pdf_path: ''
+abstract: 'Comprehensive comparison of 18+ modern LLM architectures (2024-2025): DeepSeek
+  V3/R1, OLMo 2, Gemma 3, Llama 4, Qwen3, Kimi K2, Grok 2.5, GLM-5. Key innovations:
+  Multi-Head Latent Attention (MLA), Mixture-of-Experts (MoE), Sliding Window Attention,
+  QK-Norm, MatFormer, normalization placement strategies.'
+venue: ''
+source: web
+paper_type: survey
+categories:
+- cs.CL
+- cs.AI
+- cs.LG
+keywords:
+- LLM architecture
+- MLA
+- MoE
+- sliding window attention
+- QK-Norm
+- MatFormer
+- early exit
+- KV cache
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{raschka2025llm-arch-comparison,\n  title={The Big LLM Architecture\
+  \ Comparison: From DeepSeek V3 to GLM-5},\n  author={Sebastian Raschka},\n  year={2025}\n\
+  }"

@@ -1,7 +1,4 @@
-"""
-Tests for TaskService todo support.
-Validates runtime todos as GitHub Issues.
-"""
+"""Tests for TaskService label behavior."""
 
 from __future__ import annotations
 
@@ -14,8 +11,6 @@ from crane.services.task_service import TaskService
 
 
 class MockGh:
-    """Mock for gh CLI calls."""
-
     def __init__(self):
         self.calls: list[list[str]] = []
 
@@ -46,78 +41,47 @@ def mock_gh():
     return MockGh()
 
 
-class TestTaskServiceCreateTodo:
-    """Test creating todos via TaskService."""
-
-    def test_create_todo_has_crane_label(self, task_service, mock_gh):
+class TestTaskServiceLabels:
+    def test_create_with_phase_only(self, task_service, mock_gh):
         with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
-            task_service.create(title="Review paper X", type="todo")
-
-        cmd = mock_gh.calls[0]
-        label_idx = cmd.index("--label") + 1
-        labels = cmd[label_idx].split(",")
-        assert "crane" in labels
-
-    def test_create_todo_has_kind_todo_label(self, task_service, mock_gh):
-        with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
-            task_service.create(title="Review paper X", type="todo")
-
-        cmd = mock_gh.calls[0]
-        label_idx = cmd.index("--label") + 1
-        labels = cmd[label_idx].split(",")
-        assert "kind:todo" in labels
-
-    def test_create_task_has_kind_task_label(self, task_service, mock_gh):
-        with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
-            task_service.create(title="Search papers", type="task")
-
-        cmd = mock_gh.calls[0]
-        label_idx = cmd.index("--label") + 1
-        labels = cmd[label_idx].split(",")
-        assert "kind:task" in labels
-
-    def test_create_todo_with_phase(self, task_service, mock_gh):
-        with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
-            task_service.create(title="Review", type="todo", phase="writing")
+            task_service.create(title="Test", phase="writing")
 
         cmd = mock_gh.calls[0]
         label_idx = cmd.index("--label") + 1
         labels = cmd[label_idx].split(",")
         assert "phase:writing" in labels
-        assert "kind:todo" in labels
-        assert "crane" in labels
+        assert "crane" not in labels
+        assert "kind:task" not in labels
 
-
-class TestTaskServiceListByType:
-    """Test listing tasks filtered by type."""
-
-    def test_list_todos_only(self, task_service, mock_gh):
+    def test_create_with_all_labels(self, task_service, mock_gh):
         with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
-            result = task_service.list(type="todo")
-
-        cmd = mock_gh.calls[0]
-        assert "--label" in cmd
-        label_idx = cmd.index("--label") + 1
-        assert "kind:todo" in cmd[label_idx]
-
-    def test_list_tasks_only(self, task_service, mock_gh):
-        with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
-            result = task_service.list(type="task")
-
-        cmd = mock_gh.calls[0]
-        assert "--label" in cmd
-        label_idx = cmd.index("--label") + 1
-        assert "kind:task" in cmd[label_idx]
-
-
-class TestTaskServiceDefaultType:
-    """Test default type is task."""
-
-    def test_default_type_is_task(self, task_service, mock_gh):
-        with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
-            task_service.create(title="Default task")
+            task_service.create(
+                title="Test",
+                phase="literature-review",
+                task_type="search",
+                priority="high",
+            )
 
         cmd = mock_gh.calls[0]
         label_idx = cmd.index("--label") + 1
         labels = cmd[label_idx].split(",")
-        assert "kind:task" in labels
+        assert "phase:literature-review" in labels
+        assert "type:search" in labels
+        assert "priority:high" in labels
+        assert "crane" not in labels
+        assert "kind:task" not in labels
+
+
+class TestTaskServiceBuildLabels:
+    def test_build_labels_excludes_nonexistent(self):
+        labels = TaskService._build_labels(
+            TaskService,
+            phase="literature-review",
+            task_type="search",
+            priority="high",
+        )
+        assert "crane" not in labels
+        assert "kind:task" not in labels
+        assert "phase:literature-review" in labels
+        assert "type:search" in labels
+        assert "priority:high" in labels

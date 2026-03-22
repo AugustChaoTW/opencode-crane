@@ -62,10 +62,6 @@ class TestCreateTask:
             "--body",
             "task body",
         ]
-        label_idx = mock_gh.calls[0].index("--label")
-        labels = mock_gh.calls[0][label_idx + 1].split(",")
-        assert "crane" in labels
-        assert "kind:task" in labels
         assignee_idx = mock_gh.calls[0].index("--assignee")
         assert mock_gh.calls[0][assignee_idx + 1] == "@me"
 
@@ -76,8 +72,6 @@ class TestCreateTask:
         assert "--label" in mock_gh.calls[0]
         label_idx = mock_gh.calls[0].index("--label")
         labels = mock_gh.calls[0][label_idx + 1].split(",")
-        assert "crane" in labels
-        assert "kind:task" in labels
         assert "phase:literature-review" in labels
 
     def test_includes_type_label(self, task_tools, mock_gh):
@@ -86,8 +80,6 @@ class TestCreateTask:
 
         label_idx = mock_gh.calls[0].index("--label")
         labels = mock_gh.calls[0][label_idx + 1].split(",")
-        assert "crane" in labels
-        assert "kind:task" in labels
         assert "type:analysis" in labels
 
     def test_includes_priority_label(self, task_tools, mock_gh):
@@ -96,8 +88,6 @@ class TestCreateTask:
 
         label_idx = mock_gh.calls[0].index("--label")
         labels = mock_gh.calls[0][label_idx + 1].split(",")
-        assert "crane" in labels
-        assert "kind:task" in labels
         assert "priority:high" in labels
 
     def test_sets_milestone(self, task_tools, mock_gh):
@@ -137,8 +127,6 @@ class TestListTasks:
         assert "--label" in mock_gh.calls[0]
         label_idx = mock_gh.calls[0].index("--label")
         labels = mock_gh.calls[0][label_idx + 1].split(",")
-        assert "crane" in labels
-        assert "kind:task" in labels
         assert "phase:literature-review" in labels
 
     def test_filters_by_state(self, task_tools, mock_gh):

@@ -33,7 +33,7 @@ class TaskService:
         priority: str = "",
         item_type: str = "task",
     ) -> list[str]:
-        labels = ["crane", f"kind:{self._normalize_kind(item_type)}"]
+        labels: list[str] = []
         if phase:
             labels.append(f"phase:{phase}")
         if task_type:
