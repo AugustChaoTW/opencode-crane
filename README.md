@@ -109,39 +109,46 @@ bash ~/.opencode-crane/scripts/setup-project.sh
 
 ### 系統需求
 
-在安裝前，先確認以下工具可用：
+支援作業系統：Ubuntu 20.04+、Rocky Linux 8+、RHEL 8+、Fedora 36+
+
+安裝腳本會自動處理：
+- 系統依賴（git、curl）
+- uv（Python 套件管理器）
+- GitHub CLI（可選）
+
+### 一鍵安裝（推薦）
 
 ```bash
-# 檢查 Python 版本（需要 3.10+）
-python3 --version
-
-# 檢查 git
-git --version
-
-# 檢查 GitHub CLI（任務管理需要）
-gh --version
-gh auth status
+curl -fsSL https://raw.githubusercontent.com/AugustChaoTW/opencode-crane/main/scripts/install.sh | bash
 ```
 
-如果 `gh` 未安裝，請參考 https://cli.github.com/ 安裝。
-如果 `gh` 未認證，執行 `gh auth login`。
+安裝腳本會：
+1. 偵測作業系統（Ubuntu/Rocky/RHEL/Fedora）
+2. 自動安裝系統依賴
+3. 安裝 uv（如未安裝）
+4. 安裝 GitHub CLI（如未安裝）
+5. 使用 uv sync 安裝 opencode-crane
 
-### Step 1: 安裝 crane
+### 手動安裝
+
+#### Step 1: 安裝 uv
 
 ```bash
-# Clone 到 ~/.opencode-crane（標準安裝位置）
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+#### Step 2: 安裝 crane
+
+```bash
 git clone https://github.com/AugustChaoTW/opencode-crane.git ~/.opencode-crane
-
-# 建立虛擬環境並安裝
 cd ~/.opencode-crane
-python3 -m venv .venv
-.venv/bin/pip install -e .
+uv sync
 ```
 
-**驗證**：
+#### Step 3: 驗證
 
 ```bash
-~/.opencode-crane/.venv/bin/python -c "
+uv run python -c "
 from crane.server import mcp
 tools = mcp._tool_manager._tools
 print(f'OK: {len(tools)} tools registered')
@@ -156,7 +163,6 @@ for name in sorted(tools): print(f'  - {name}')
 在你的研究專案根目錄執行：
 
 ```bash
-# 建立 .opencode 目錄和 MCP 設定
 mkdir -p .opencode
 
 cat > .opencode/opencode.json << 'MCPEOF'
@@ -164,7 +170,8 @@ cat > .opencode/opencode.json << 'MCPEOF'
   "mcp": {
     "crane": {
       "type": "local",
-      "command": ["~/.opencode-crane/.venv/bin/python", "-m", "crane"],
+      "command": ["uv", "run", "crane"],
+      "cwd": "$HOME/.opencode-crane",
       "enabled": true
     }
   }
@@ -221,7 +228,7 @@ bash ~/.opencode-crane/scripts/setup-project.sh
 ```bash
 cd ~/.opencode-crane
 git pull
-.venv/bin/pip install -e .
+uv sync
 ```
 
 ---
