@@ -19,15 +19,65 @@
 - **專案初始化** — 一鍵設定研究專案結構（labels、milestones、目錄、Issue Template）
 - **OpenCode 原生整合** — MCP Server 架構，AI agent 透過自然語言直接操作
 
-```
-你說：「搜尋 transformer 相關的論文，把前 3 篇加入文獻庫，建立閱讀任務」
+---
 
-crane 會：
-  1. search_papers("transformer")       → 搜尋 arXiv
-  2. add_reference(...)  ×3             → 寫入 YAML + BibTeX
-  3. download_paper(...) ×3             → 下載 PDF
-  4. annotate_reference(...) ×3         → AI 摘要標註
-  5. create_task(phase="literature-review") → 建立 GitHub Issue
+## 快速命令卡
+
+> 💡 **快捷參考**：常用自然語言指令對應的 CRANE 工具
+
+<table>
+<tr><th>你的需求</th><th>自然語言</th><th>對應工具</th></tr>
+
+<tr><td>🚀 初始化專案</td><td><code>幫我初始化這個 repo 為研究專案</code></td><td><code>init_research</code></td></tr>
+
+<tr><td>🔍 搜尋論文</td><td><code>搜尋關於 transformer 的論文</code></td><td><code>search_papers</code></td></tr>
+
+<tr><td>📥 加入文獻</td><td><code>把這篇論文加入文獻庫</code></td><td><code>add_reference</code></td></tr>
+
+<tr><td>📄 下載 PDF</td><td><code>下載論文 2301.00001</code></td><td><code>download_paper</code></td></tr>
+
+<tr><td>📖 閱讀論文</td><td><code>幫我閱讀這篇論文並摘要</code></td><td><code>read_paper</code></td></tr>
+
+<tr><td>✅ 檢查引用</td><td><code>檢查論文中的引用是否都有文獻</code></td><td><code>check_citations</code></td></tr>
+
+<tr><td>🔎 驗證文獻</td><td><code>驗證 vaswani2017-attention 的 DOI</code></td><td><code>verify_reference</code></td></tr>
+
+<tr><td>📋 建立任務</td><td><code>建立一個文獻回顧任務</code></td><td><code>create_task</code></td></tr>
+
+<tr><td>📝 建立待辦</td><td><code>建立待辦：review 第三章</code></td><td><code>create_task(type="todo")</code></td></tr>
+
+<tr><td>📊 查看進度</td><td><code>目前的任務進度如何？</code></td><td><code>get_milestone_progress</code></td></tr>
+
+<tr><td>🏠 工作區狀態</td><td><code>顯示工作區概覽</code></td><td><code>workspace_status</code></td></tr>
+
+<tr><td>🔄 執行工作流</td><td><code>幫我做文獻回顧</code></td><td><code>run_pipeline</code></td></tr>
+
+</table>
+
+### Label 對照表
+
+| 類別 | Labels | 說明 |
+|------|--------|------|
+| 🔖 CRANE 標記 | `crane` | 所有 CRANE 管理的 issues |
+| 📌 類型 | `kind:task` / `kind:todo` | 任務 / 待辦 |
+| 🎯 階段 | `phase:literature-review`<br>`phase:proposal`<br>`phase:experiment`<br>`phase:writing`<br>`phase:review` | 研究階段 |
+| 🏷️ 任務類型 | `type:search` / `type:read`<br>`type:analysis` / `type:code` / `type:write` | 任務性質 |
+| ⚡ 優先級 | `priority:high`<br>`priority:medium`<br>`priority:low` | 優先順序 |
+
+### 典型工作流程
+
+```
+1️⃣ 初始化        → init_research
+      ↓
+2️⃣ 文獻搜尋      → search_papers → add_reference → download_paper
+      ↓
+3️⃣ 閱讀標註      → read_paper → annotate_reference
+      ↓
+4️⃣ 任務追蹤      → create_task → report_progress → close_task
+      ↓
+5️⃣ 引用驗證      → check_citations → verify_reference
+      ↓
+6️⃣ 進度查看      → workspace_status → get_milestone_progress
 ```
 
 ---
