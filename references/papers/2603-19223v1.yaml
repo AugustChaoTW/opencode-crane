@@ -1,0 +1,63 @@
+key: 2603-19223v1
+title: 'F2LLM-v2: Inclusive, Performant, and Efficient Embeddings for a Multilingual
+  World'
+authors:
+- Ziyin Zhang
+- Zihan Liao
+- Hang Yu
+- Peng Di
+- Rui Wang
+year: 2026
+doi: arxiv:2603.19223v1
+url: http://arxiv.org/abs/2603.19223v1
+pdf_url: https://arxiv.org/pdf/2603.19223v1
+pdf_path: ''
+abstract: We present F2LLM-v2, a new family of general-purpose, multilingual embedding
+  models in 8 distinct sizes ranging from 80M to 14B. Trained on a newly curated composite
+  of 60 million publicly available high-quality data samples, F2LLM-v2 supports more
+  than 200 languages, with a particular emphasis on previously underserved mid- and
+  low-resource languages. By integrating a two-stage LLM-based embedding training
+  pipeline with matryoshka learning, model pruning, and knowledge distillation techniques,
+  we present models that are far more efficient than previous LLM-based embedding
+  models while retaining competitive performances. Extensive evaluations confirm that
+  F2LLM-v2-14B ranks first on 11 MTEB benchmarks, while the smaller models in the
+  family also set a new state of the art for resource-constrained applications. To
+  facilitate open-source embedding model research, we release all models, data, code,
+  and intermediate checkpoints.
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- cs.CL
+- cs.AI
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@inproceedings{2603-19223v1,\n  title={F2LLM-v2: Inclusive, Performant, and\
+  \ Efficient Embeddings for a Multilingual World},\n  author={Ziyin Zhang and Zihan\
+  \ Liao and Hang Yu and Peng Di and Rui Wang},\n  booktitle={arXiv},\n  year={2026},\n\
+  \  doi={arxiv:2603.19223v1}\n}"
+ai_annotations:
+  summary: We present F2LLM-v2, a new family of general-purpose, multilingual embedding
+    models in 8 distinct sizes ranging from 80M to 14B. Trained on a newly curated
+    composite of 60 million publicly available high-quality data samples, F2LLM-v2
+    supports more than 200 languages, with a particular emphasis on previously underserved
+    mid- and low-resource languages. By integrating a two-stage LLM-based embedding
+    training pipeline with matryoshka learning, model pruning, and knowledge distillation
+    techniques, we present models that are far more efficient than previous LLM-based
+    embedding models while retaining competitive performances. Extensive evaluations
+    confirm that F2LLM-v2-14B ranks first on 11 MTEB benchmarks, while the smaller
+    models in the family also set a new state of the art for resource-constrained
+    applications. To facilitate open-source embedding model research, we release all
+    models, data, code, and intermediate checkpoints.
+  key_contributions: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-03-23'

@@ -10,11 +10,15 @@
 
 ## 主要功能
 
-- **論文搜尋與閱讀** — 搜尋 arXiv、下載 PDF、自動抽取全文
+- **多來源論文搜尋** — 支援 arXiv、OpenAlex、Semantic Scholar 三大資料庫
 - **文獻庫管理** — YAML + BibTeX 雙格式儲存，支援搜尋、篩選、AI 標註
+- **元資料標準化** — 自動去重、衝突解決、引用數量聚合
 - **引用驗證** — 檢查論文引用一致性，驗證文獻元資料
+- **篩選與比較** — 系統性文獻回顧的納入/排除決策，多維度比較矩陣
+- **證據溯源** — 所有 AI 產出可追溯至原文來源
 - **研究任務追蹤** — 透過 GitHub Issues 管理任務與待辦事項
 - **工作區管理** — Stateless 設計，自動從 git context 解析工作區
+- **可靠執行** — 自動重試機制，優雅處理網路失敗
 - **研究階段管理** — 文獻回顧 → 提案 → 實驗 → 寫作 → 審閱，全程追蹤進度
 - **專案初始化** — 一鍵設定研究專案結構（labels、milestones、目錄、Issue Template）
 - **OpenCode 原生整合** — MCP Server 架構，AI agent 透過自然語言直接操作
@@ -52,6 +56,10 @@
 
 <tr><td>🔄 執行工作流</td><td><code>幫我做文獻回顧</code></td><td><code>run_pipeline</code></td></tr>
 
+<tr><td>📊 篩選文獻</td><td><code>把這篇論文標記為納入</code></td><td><code>screen_reference</code></td></tr>
+
+<tr><td>🔍 比較論文</td><td><code>比較這三篇論文的差異</code></td><td><code>compare_papers</code></td></tr>
+
 </table>
 
 ### Label 對照表
@@ -73,11 +81,13 @@
       ↓
 3️⃣ 閱讀標註      → read_paper → annotate_reference
       ↓
-4️⃣ 任務追蹤      → create_task → report_progress → close_task
+4️⃣ 篩選比較      → screen_reference → compare_papers
       ↓
-5️⃣ 引用驗證      → check_citations → verify_reference
+5️⃣ 任務追蹤      → create_task → report_progress → close_task
       ↓
-6️⃣ 進度查看      → workspace_status → get_milestone_progress
+6️⃣ 引用驗證      → check_citations → verify_reference
+      ↓
+7️⃣ 進度查看      → workspace_status → get_milestone_progress
 ```
 
 ---
