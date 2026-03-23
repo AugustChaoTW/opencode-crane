@@ -1,0 +1,55 @@
+conferences:
+  - full_name: Neural Information Processing Systems
+    abbr: NIPS
+    aliases:
+      - NeurIPS
+      - NIPS
+      - Conference on Neural Information Processing Systems
+    topic_keywords:
+      - machine learning
+      - deep learning
+      - optimization
+      - representation learning
+  - full_name: International Conference on Machine Learning
+    abbr: ICML
+    aliases:
+      - ICML
+      - International Conference on Machine Learning
+    topic_keywords:
+      - machine learning
+      - statistical learning
+      - optimization
+      - generalization
+  - full_name: AAAI Conference on Artificial Intelligence
+    abbr: AAAI
+    aliases:
+      - AAAI
+      - AAAI Conference on Artificial Intelligence
+      - Association for the Advancement of Artificial Intelligence Conference
+    topic_keywords:
+      - artificial intelligence
+      - reasoning
+      - planning
+      - machine learning
+  - full_name: IEEE/CVF Conference on Computer Vision and Pattern Recognition
+    abbr: CVPR
+    aliases:
+      - CVPR
+      - Conference on Computer Vision and Pattern Recognition
+      - IEEE Conference on Computer Vision and Pattern Recognition
+    topic_keywords:
+      - computer vision
+      - image understanding
+      - recognition
+      - deep learning
+  - full_name: Annual Meeting of the Association for Computational Linguistics
+    abbr: ACL
+    aliases:
+      - ACL
+      - Association for Computational Linguistics
+      - Annual Meeting of the Association for Computational Linguistics
+    topic_keywords:
+      - natural language processing
+      - language modeling
+      - machine translation
+      - information extraction

@@ -1,0 +1,18 @@
+full_name,abbr,quartile,acceptance_rate,h_index,topics,aliases,venue_type
+Journal of Machine Learning Research,JMLR,Q1,0.18,305,machine learning|statistical learning|optimization|representation learning,JMLR,journal
+Artificial Intelligence,ARTIN,Q1,0.15,288,artificial intelligence|reasoning|planning|knowledge representation,Artificial Intelligence Journal,journal
+Journal of Artificial Intelligence Research,JAIR,Q1,0.12,201,artificial intelligence|machine learning|reasoning|planning,JAIR,journal
+Machine Learning,MLJ,Q1,0.20,183,machine learning|representation learning|optimization,MLJ,journal
+IEEE Transactions on Pattern Analysis and Machine Intelligence,TPAMI,Q1,0.16,484,computer vision|pattern recognition|deep learning|image understanding,PAMI|IEEE TPAMI,journal
+International Journal of Computer Vision,IJCV,Q1,0.17,311,computer vision|image recognition|3d vision|deep learning,IJCV,journal
+Transactions of the Association for Computational Linguistics,TACL,Q1,0.21,129,natural language processing|language modeling|machine translation,TACL,journal
+Computational Linguistics,CL,Q1,0.19,165,natural language processing|syntax|semantics|linguistics,Computational Linguistics Journal,journal
+Knowledge-Based Systems,KBS,Q1,0.24,219,knowledge graphs|expert systems|applied ai,KBS,journal
+Neural Networks,NN,Q1,0.22,274,neural networks|deep learning|representation learning,Neural Networks Journal,journal
+Pattern Recognition,PR,Q1,0.23,260,computer vision|pattern recognition|classification,Pattern Recognition Journal,journal
+Data and Knowledge Engineering,DKE,Q2,0.27,107,data mining|knowledge engineering|database systems,Data & Knowledge Engineering,journal
+Neural Information Processing Systems,NIPS,Q1,0.26,400,machine learning|deep learning|optimization|representation learning,NeurIPS|Conference on Neural Information Processing Systems,conference
+International Conference on Machine Learning,ICML,Q1,0.27,360,machine learning|optimization|representation learning|generalization,ICML,conference
+AAAI Conference on Artificial Intelligence,AAAI,Q1,0.23,320,artificial intelligence|reasoning|planning|machine learning,AAAI|AAAI Conference on Artificial Intelligence,conference
+IEEE/CVF Conference on Computer Vision and Pattern Recognition,CVPR,Q1,0.24,390,computer vision|image recognition|detection|deep learning,CVPR|Conference on Computer Vision and Pattern Recognition,conference
+Annual Meeting of the Association for Computational Linguistics,ACL,Q1,0.25,310,natural language processing|language modeling|machine translation|information extraction,ACL|Association for Computational Linguistics,conference

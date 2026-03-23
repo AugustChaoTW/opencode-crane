@@ -1,0 +1,11 @@
+document_id: example-paper
+changes:
+  - id: E1
+    source_finding_ids: [D1]
+    change_type: lexical
+    location_hint: ""
+    rationale: ""
+    protected_zone_respected: true
+summary:
+  total_changes: 1
+  unresolved_findings: []

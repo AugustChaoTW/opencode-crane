@@ -8,6 +8,7 @@ Usage:
 from mcp.server.fastmcp import FastMCP  # pyright: ignore[reportMissingImports]
 
 from .tools.citations import register_tools as register_citation_tools
+from .tools.figures import register_tools as register_figure_tools
 from .tools.papers import register_tools as register_paper_tools
 from .tools.pipeline import register_tools as register_pipeline_tools
 from .tools.project import register_tools as register_project_tools
@@ -24,6 +25,7 @@ register_reference_tools(mcp)
 register_task_tools(mcp)
 register_workspace_tools(mcp)
 register_citation_tools(mcp)
+register_figure_tools(mcp)
 register_screening_tools(mcp)
 register_pipeline_tools(mcp)
 

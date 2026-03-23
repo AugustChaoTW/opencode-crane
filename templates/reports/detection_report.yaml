@@ -1,0 +1,23 @@
+document_id: example-paper
+overall_risk: medium
+summary:
+  strongest_signal: L1
+  editable_hotspots: 0
+findings:
+  - id: D1
+    level: L1
+    editable_span: ""
+    signal: ""
+    confidence: medium
+    evidence:
+      - ""
+    impact: readability
+    editor_goal: ""
+protected_zone_conflicts:
+  - finding_id: D1
+    protected_text: ""
+    handling: avoid
+editor_priorities:
+  - priority: 1
+    target: D1
+    instruction: ""

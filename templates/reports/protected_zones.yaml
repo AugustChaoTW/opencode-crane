@@ -1,0 +1,6 @@
+document_id: example-paper
+zones:
+  - id: P1
+    label: numeric_result
+    exact_text: ""
+    reason: ""

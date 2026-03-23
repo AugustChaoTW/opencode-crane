@@ -16,6 +16,8 @@ dependencies = [
     "PyPDF2",
     "pyyaml",
     "bibtexparser",
+    "matplotlib>=3.8",
+    "seaborn>=0.13",
 ]
 
 [project.optional-dependencies]

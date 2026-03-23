@@ -1,0 +1,36 @@
+document_id: example-paper
+edit_safety: PASS
+summary:
+  total_claims: 0
+  supported_claims: 0
+  unsupported_claims: 0
+  ambiguous_claims: 0
+  citation_issues: 0
+sections:
+  inventory:
+    claims:
+      - id: C1
+        claim: ""
+        type: result
+        support_source: none
+    critical_entities:
+      datasets: []
+      models: []
+      metrics: []
+      citations: []
+  data_tracing:
+    - id: T1
+      source_claim_id: C1
+      status: supported
+      evidence: ""
+      rationale: ""
+  citation_audit:
+    - id: R1
+      source_claim_id: C1
+      status: ok
+      citation_span: ""
+      rationale: ""
+  assessment:
+    blocking_issues: []
+    safe_edit_scope: []
+    required_constraints: []
