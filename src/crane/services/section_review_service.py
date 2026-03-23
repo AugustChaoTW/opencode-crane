@@ -19,6 +19,7 @@ class ReviewType(Enum):
     COMPLETENESS = "completeness"
     WRITING = "writing"
     FIGURES = "figures"
+    SCHOLARLY_VOICE = "scholarly_voice"
 
 
 class Severity(Enum):
@@ -157,6 +158,86 @@ class SectionReviewService:
                     "pattern": re.compile(r"\\begin\{figure\}.*?\\end\{figure\}", re.DOTALL),
                     "check": "figure_completeness",
                     "severity": Severity.MEDIUM,
+                },
+            ],
+            ReviewType.SCHOLARLY_VOICE: [
+                {
+                    "pattern": re.compile(
+                        r"\b(awesome|cool|nice|great|amazing|fantastic|incredible|super|wonderful)\b",
+                        re.IGNORECASE,
+                    ),
+                    "issue": "Informal/colloquial language inappropriate for academic writing",
+                    "suggestion": "Replace with precise academic terms (e.g., 'significant', 'substantial', 'effective')",
+                    "severity": Severity.MEDIUM,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(stuff|things|basically|literally|actually|really|very|pretty much|kind of|sort of)\b",
+                        re.IGNORECASE,
+                    ),
+                    "issue": "Vague or informal language",
+                    "suggestion": "Use specific technical terms instead of vague descriptors",
+                    "severity": Severity.MEDIUM,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(I think|I believe|in my opinion|I feel|we think|we believe)\b",
+                        re.IGNORECASE,
+                    ),
+                    "issue": "Personal opinion language inappropriate for academic writing",
+                    "suggestion": "Remove personal pronouns and state findings objectively",
+                    "severity": Severity.HIGH,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(a lot of|lots of|tons of|loads of|bunch of)\b", re.IGNORECASE
+                    ),
+                    "issue": "Informal quantification",
+                    "suggestion": "Use precise quantifiers (e.g., 'numerous', 'several', 'multiple', specific numbers)",
+                    "severity": Severity.MEDIUM,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(gets?|got|gotten|gotta|gonna|wanna|kinda)\b", re.IGNORECASE
+                    ),
+                    "issue": "Informal verb forms",
+                    "suggestion": "Use formal equivalents (e.g., 'obtains', 'obtained', 'must', 'going to')",
+                    "severity": Severity.MEDIUM,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(big|huge|tiny|small|fast|slow)\b(?!\s+(?:scale|data|model|number|amount))",
+                        re.IGNORECASE,
+                    ),
+                    "issue": "Informal adjective (consider context)",
+                    "suggestion": "Use precise technical terms (e.g., 'large-scale', 'high-speed', 'computationally efficient')",
+                    "severity": Severity.LOW,
+                },
+                {
+                    "pattern": re.compile(r"(?<!\. )\b(And|But|So|Or)\b\s+[A-Z]", re.IGNORECASE),
+                    "issue": "Sentence starting with conjunction (common in informal writing)",
+                    "suggestion": "Restructure sentence or use formal transition (e.g., 'Furthermore', 'However', 'Consequently')",
+                    "severity": Severity.LOW,
+                },
+                {
+                    "pattern": re.compile(r"\b(show|shows|showed)\s+(that|how)\b", re.IGNORECASE),
+                    "check": "demonstrate_precision",
+                    "severity": Severity.LOW,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(thing|things|stuff|issue|problem)\s+(is|are|was|were)\b", re.IGNORECASE
+                    ),
+                    "issue": "Vague subject reference",
+                    "suggestion": "Specify what you're referring to (e.g., 'The challenge is', 'The limitation is')",
+                    "severity": Severity.MEDIUM,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(like|such as)\s+\w+,\s*\w+,\s*(and|or)\s+\w+", re.IGNORECASE
+                    ),
+                    "check": "list_completeness",
+                    "severity": Severity.LOW,
                 },
             ],
         }

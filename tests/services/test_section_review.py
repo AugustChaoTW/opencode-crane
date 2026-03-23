@@ -102,3 +102,79 @@ class TestSectionReviewTools:
         tools = mcp._tool_manager._tools if hasattr(mcp, "_tool_manager") else {}
         assert "review_paper_sections" in tools
         assert "parse_paper_structure" in tools
+
+
+class TestScholarlyVoiceReview:
+    def test_detects_informal_language(self):
+        review = _load_review()
+        parser = _load_parser()
+        service = review.SectionReviewService()
+
+        section = parser.SectionLocation(
+            name="Test",
+            level=1,
+            start_line=1,
+            end_line=10,
+            content="This is an awesome result. The model gets better performance.",
+        )
+
+        result = service.review_section(section, [review.ReviewType.SCHOLARLY_VOICE])
+
+        assert len(result.issues) > 0
+        issue_types = [i.issue for i in result.issues]
+        assert any("informal" in t.lower() for t in issue_types)
+
+    def test_detects_personal_opinion(self):
+        review = _load_review()
+        parser = _load_parser()
+        service = review.SectionReviewService()
+
+        section = parser.SectionLocation(
+            name="Test",
+            level=1,
+            start_line=1,
+            end_line=10,
+            content="I believe this approach is superior. We think it works well.",
+        )
+
+        result = service.review_section(section, [review.ReviewType.SCHOLARLY_VOICE])
+
+        assert len(result.issues) > 0
+        issue_types = [i.issue for i in result.issues]
+        assert any("personal opinion" in t.lower() for t in issue_types)
+
+    def test_detects_vague_quantifiers(self):
+        review = _load_review()
+        parser = _load_parser()
+        service = review.SectionReviewService()
+
+        section = parser.SectionLocation(
+            name="Test",
+            level=1,
+            start_line=1,
+            end_line=10,
+            content="We tested a lot of samples with tons of data.",
+        )
+
+        result = service.review_section(section, [review.ReviewType.SCHOLARLY_VOICE])
+
+        assert len(result.issues) > 0
+        issue_types = [i.issue for i in result.issues]
+        assert any("informal quantification" in t.lower() for t in issue_types)
+
+    def test_no_issues_in_academic_text(self):
+        review = _load_review()
+        parser = _load_parser()
+        service = review.SectionReviewService()
+
+        section = parser.SectionLocation(
+            name="Test",
+            level=1,
+            start_line=1,
+            end_line=10,
+            content="The proposed method demonstrates significant improvements. Results indicate a 15% increase in accuracy.",
+        )
+
+        result = service.review_section(section, [review.ReviewType.SCHOLARLY_VOICE])
+
+        assert len(result.issues) == 0
