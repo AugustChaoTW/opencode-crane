@@ -1,0 +1,87 @@
+key: 2603-20193v1
+title: 'From Masks to Pixels and Meaning: A New Taxonomy, Benchmark, and Metrics for
+  VLM Image Tampering'
+authors:
+- Xinyi Shang
+- Yi Tang
+- Jiacheng Cui
+- Ahmed Elhagry
+- Salwa K. Al Khatib
+- Sondos Mahmoud Bsharat
+- Jiacheng Liu
+- Xiaohan Zhao
+- Jing-Hao Xue
+- Hao Li
+- Salman Khan
+- Zhiqiang Shen
+year: 2026
+doi: arxiv:2603.20193v1
+url: http://arxiv.org/abs/2603.20193v1
+pdf_url: https://arxiv.org/pdf/2603.20193v1
+pdf_path: ''
+abstract: 'Existing tampering detection benchmarks largely rely on object masks, which
+  severely misalign with the true edit signal: many pixels inside a mask are untouched
+  or only trivially modified, while subtle yet consequential edits outside the mask
+  are treated as natural. We reformulate VLM image tampering from coarse region labels
+  to a pixel-grounded, meaning and language-aware task. First, we introduce a taxonomy
+  spanning edit primitives (replace/remove/splice/inpaint/attribute/colorization,
+  etc.) and their semantic class of tampered object, linking low-level changes to
+  high-level understanding. Second, we release a new benchmark with per-pixel tamper
+  maps and paired category supervision to evaluate detection and classification within
+  a unified protocol. Third, we propose a training framework and evaluation metrics
+  that quantify pixel-level correctness with localization to assess confidence or
+  prediction on true edit intensity, and further measure tamper meaning understanding
+  via semantics-aware classification and natural language descriptions for the predicted
+  regions. We also re-evaluate the existing strong segmentation/localization baselines
+  on recent strong tamper detectors and reveal substantial over- and under-scoring
+  using mask-only metrics, and expose failure modes on micro-edits and off-mask changes.
+  Our framework advances the field from masks to pixels, meanings and language descriptions,
+  establishing a rigorous standard for tamper localization, semantic classification
+  and description. Code and benchmark data are available at https://github.com/VILA-Lab/PIXAR.'
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- cs.CV
+- cs.AI
+- cs.LG
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@inproceedings{2603-20193v1,\n  title={From Masks to Pixels and Meaning:\
+  \ A New Taxonomy, Benchmark, and Metrics for VLM Image Tampering},\n  author={Xinyi\
+  \ Shang and Yi Tang and Jiacheng Cui and Ahmed Elhagry and Salwa K. Al Khatib and\
+  \ Sondos Mahmoud Bsharat and Jiacheng Liu and Xiaohan Zhao and Jing-Hao Xue and\
+  \ Hao Li and Salman Khan and Zhiqiang Shen},\n  booktitle={arXiv},\n  year={2026},\n\
+  \  doi={arxiv:2603.20193v1}\n}"
+ai_annotations:
+  summary: 'Existing tampering detection benchmarks largely rely on object masks,
+    which severely misalign with the true edit signal: many pixels inside a mask are
+    untouched or only trivially modified, while subtle yet consequential edits outside
+    the mask are treated as natural. We reformulate VLM image tampering from coarse
+    region labels to a pixel-grounded, meaning and language-aware task. First, we
+    introduce a taxonomy spanning edit primitives (replace/remove/splice/inpaint/attribute/colorization,
+    etc.) and their semantic class of tampered object, linking low-level changes to
+    high-level understanding. Second, we release a new benchmark with per-pixel tamper
+    maps and paired category supervision to evaluate detection and classification
+    within a unified protocol. Third, we propose a training framework and evaluation
+    metrics that quantify pixel-level correctness with localization to assess confidence
+    or prediction on true edit intensity, and further measure tamper meaning understanding
+    via semantics-aware classification and natural language descriptions for the predicted
+    regions. We also re-evaluate the existing strong segmentation/localization baselines
+    on recent strong tamper detectors and reveal substantial over- and under-scoring
+    using mask-only metrics, and expose failure modes on micro-edits and off-mask
+    changes. Our framework advances the field from masks to pixels, meanings and language
+    descriptions, establishing a rigorous standard for tamper localization, semantic
+    classification and description. Code and benchmark data are available at https://github.com/VILA-Lab/PIXAR.'
+  key_contributions: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-03-23'

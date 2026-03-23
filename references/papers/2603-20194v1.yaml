@@ -1,0 +1,79 @@
+key: 2603-20194v1
+title: 'MME-CoF-Pro: Evaluating Reasoning Coherence in Video Generative Models with
+  Text and Visual Hints'
+authors:
+- Yu Qi
+- Xinyi Xu
+- Ziyu Guo
+- Siyuan Ma
+- Renrui Zhang
+- Xinyan Chen
+- Ruichuan An
+- Ruofan Xing
+- Jiayi Zhang
+- Haojie Huang
+- Pheng-Ann Heng
+- Jonathan Tremblay
+- Lawson L. S. Wong
+year: 2026
+doi: arxiv:2603.20194v1
+url: http://arxiv.org/abs/2603.20194v1
+pdf_url: https://arxiv.org/pdf/2603.20194v1
+pdf_path: ''
+abstract: 'Video generative models show emerging reasoning behaviors. It is essential
+  to ensure that generated events remain causally consistent across frames for reliable
+  deployment, a property we define as reasoning coherence. To bridge the gap in literature
+  for missing reasoning coherence evaluation, we propose MME-CoF-Pro, a comprehensive
+  video reasoning benchmark to assess reasoning coherence in video models. Specifically,
+  MME-CoF-Pro contains 303 samples across 16 categories, ranging from visual logical
+  to scientific reasoning. It introduces Reasoning Score as evaluation metric for
+  assessing process-level necessary intermediate reasoning steps, and includes three
+  evaluation settings, (a) no hint (b) text hint and (c) visual hint, enabling a controlled
+  investigation into the underlying mechanisms of reasoning hint guidance. Evaluation
+  results in 7 open and closed-source video models reveals insights including: (1)
+  Video generative models exhibit weak reasoning coherence, decoupled from generation
+  quality. (2) Text hints boost apparent correctness but often cause inconsistency
+  and hallucinated reasoning (3) Visual hints benefit structured perceptual tasks
+  but struggle with fine-grained perception. Website: https://video-reasoning-coherence.github.io/'
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- cs.CV
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@inproceedings{2603-20194v1,\n  title={MME-CoF-Pro: Evaluating Reasoning\
+  \ Coherence in Video Generative Models with Text and Visual Hints},\n  author={Yu\
+  \ Qi and Xinyi Xu and Ziyu Guo and Siyuan Ma and Renrui Zhang and Xinyan Chen and\
+  \ Ruichuan An and Ruofan Xing and Jiayi Zhang and Haojie Huang and Pheng-Ann Heng\
+  \ and Jonathan Tremblay and Lawson L. S. Wong},\n  booktitle={arXiv},\n  year={2026},\n\
+  \  doi={arxiv:2603.20194v1}\n}"
+ai_annotations:
+  summary: 'Video generative models show emerging reasoning behaviors. It is essential
+    to ensure that generated events remain causally consistent across frames for reliable
+    deployment, a property we define as reasoning coherence. To bridge the gap in
+    literature for missing reasoning coherence evaluation, we propose MME-CoF-Pro,
+    a comprehensive video reasoning benchmark to assess reasoning coherence in video
+    models. Specifically, MME-CoF-Pro contains 303 samples across 16 categories, ranging
+    from visual logical to scientific reasoning. It introduces Reasoning Score as
+    evaluation metric for assessing process-level necessary intermediate reasoning
+    steps, and includes three evaluation settings, (a) no hint (b) text hint and (c)
+    visual hint, enabling a controlled investigation into the underlying mechanisms
+    of reasoning hint guidance. Evaluation results in 7 open and closed-source video
+    models reveals insights including: (1) Video generative models exhibit weak reasoning
+    coherence, decoupled from generation quality. (2) Text hints boost apparent correctness
+    but often cause inconsistency and hallucinated reasoning (3) Visual hints benefit
+    structured perceptual tasks but struggle with fine-grained perception. Website:
+    https://video-reasoning-coherence.github.io/'
+  key_contributions: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-03-23'

@@ -1,0 +1,67 @@
+key: 2603-20191v1
+title: 'Deterministic Mode Proposals: An Efficient Alternative to Generative Sampling
+  for Ambiguous Segmentation'
+authors:
+- Sebastian Gerard
+- Josephine Sullivan
+year: 2026
+doi: arxiv:2603.20191v1
+url: http://arxiv.org/abs/2603.20191v1
+pdf_url: https://arxiv.org/pdf/2603.20191v1
+pdf_path: ''
+abstract: Many segmentation tasks, such as medical image segmentation or future state
+  prediction, are inherently ambiguous, meaning that multiple predictions are equally
+  correct. Current methods typically rely on generative models to capture this uncertainty.
+  However, identifying the underlying modes of the distribution with these methods
+  is computationally expensive, requiring large numbers of samples and post-hoc clustering.
+  In this paper, we shift the focus from stochastic sampling to the direct generation
+  of likely outcomes. We introduce mode proposal models, a deterministic framework
+  that efficiently produces a fixed-size set of proposal masks in a single forward
+  pass. To handle superfluous proposals, we adapt a confidence mechanism, traditionally
+  used in object detection, to the high-dimensional space of segmentation masks. Our
+  approach significantly reduces inference time while achieving higher ground-truth
+  coverage than existing generative models. Furthermore, we demonstrate that our model
+  can be trained without knowing the full distribution of outcomes, making it applicable
+  to real-world datasets. Finally, we show that by decomposing the velocity field
+  of a pre-trained flow model, we can efficiently estimate prior mode probabilities
+  for our proposals.
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- cs.CV
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@inproceedings{2603-20191v1,\n  title={Deterministic Mode Proposals: An Efficient\
+  \ Alternative to Generative Sampling for Ambiguous Segmentation},\n  author={Sebastian\
+  \ Gerard and Josephine Sullivan},\n  booktitle={arXiv},\n  year={2026},\n  doi={arxiv:2603.20191v1}\n\
+  }"
+ai_annotations:
+  summary: Many segmentation tasks, such as medical image segmentation or future state
+    prediction, are inherently ambiguous, meaning that multiple predictions are equally
+    correct. Current methods typically rely on generative models to capture this uncertainty.
+    However, identifying the underlying modes of the distribution with these methods
+    is computationally expensive, requiring large numbers of samples and post-hoc
+    clustering. In this paper, we shift the focus from stochastic sampling to the
+    direct generation of likely outcomes. We introduce mode proposal models, a deterministic
+    framework that efficiently produces a fixed-size set of proposal masks in a single
+    forward pass. To handle superfluous proposals, we adapt a confidence mechanism,
+    traditionally used in object detection, to the high-dimensional space of segmentation
+    masks. Our approach significantly reduces inference time while achieving higher
+    ground-truth coverage than existing generative models. Furthermore, we demonstrate
+    that our model can be trained without knowing the full distribution of outcomes,
+    making it applicable to real-world datasets. Finally, we show that by decomposing
+    the velocity field of a pre-trained flow model, we can efficiently estimate prior
+    mode probabilities for our proposals.
+  key_contributions: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-03-23'

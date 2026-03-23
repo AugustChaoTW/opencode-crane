@@ -1,0 +1,83 @@
+key: 2603-20192v1
+title: 'LumosX: Relate Any Identities with Their Attributes for Personalized Video
+  Generation'
+authors:
+- Jiazheng Xing
+- Fei Du
+- Hangjie Yuan
+- Pengwei Liu
+- Hongbin Xu
+- Hai Ci
+- Ruigang Niu
+- Weihua Chen
+- Fan Wang
+- Yong Liu
+year: 2026
+doi: arxiv:2603.20192v1
+url: http://arxiv.org/abs/2603.20192v1
+pdf_url: https://arxiv.org/pdf/2603.20192v1
+pdf_path: ''
+abstract: Recent advances in diffusion models have significantly improved text-to-video
+  generation, enabling personalized content creation with fine-grained control over
+  both foreground and background elements. However, precise face-attribute alignment
+  across subjects remains challenging, as existing methods lack explicit mechanisms
+  to ensure intra-group consistency. Addressing this gap requires both explicit modeling
+  strategies and face-attribute-aware data resources. We therefore propose LumosX,
+  a framework that advances both data and model design. On the data side, a tailored
+  collection pipeline orchestrates captions and visual cues from independent videos,
+  while multimodal large language models (MLLMs) infer and assign subject-specific
+  dependencies. These extracted relational priors impose a finer-grained structure
+  that amplifies the expressive control of personalized video generation and enables
+  the construction of a comprehensive benchmark. On the modeling side, Relational
+  Self-Attention and Relational Cross-Attention intertwine position-aware embeddings
+  with refined attention dynamics to inscribe explicit subject-attribute dependencies,
+  enforcing disciplined intra-group cohesion and amplifying the separation between
+  distinct subject clusters. Comprehensive evaluations on our benchmark demonstrate
+  that LumosX achieves state-of-the-art performance in fine-grained, identity-consistent,
+  and semantically aligned personalized multi-subject video generation. Code and models
+  are available at https://jiazheng-xing.github.io/lumosx-home/.
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- cs.CV
+- cs.AI
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@inproceedings{2603-20192v1,\n  title={LumosX: Relate Any Identities with\
+  \ Their Attributes for Personalized Video Generation},\n  author={Jiazheng Xing\
+  \ and Fei Du and Hangjie Yuan and Pengwei Liu and Hongbin Xu and Hai Ci and Ruigang\
+  \ Niu and Weihua Chen and Fan Wang and Yong Liu},\n  booktitle={arXiv},\n  year={2026},\n\
+  \  doi={arxiv:2603.20192v1}\n}"
+ai_annotations:
+  summary: Recent advances in diffusion models have significantly improved text-to-video
+    generation, enabling personalized content creation with fine-grained control over
+    both foreground and background elements. However, precise face-attribute alignment
+    across subjects remains challenging, as existing methods lack explicit mechanisms
+    to ensure intra-group consistency. Addressing this gap requires both explicit
+    modeling strategies and face-attribute-aware data resources. We therefore propose
+    LumosX, a framework that advances both data and model design. On the data side,
+    a tailored collection pipeline orchestrates captions and visual cues from independent
+    videos, while multimodal large language models (MLLMs) infer and assign subject-specific
+    dependencies. These extracted relational priors impose a finer-grained structure
+    that amplifies the expressive control of personalized video generation and enables
+    the construction of a comprehensive benchmark. On the modeling side, Relational
+    Self-Attention and Relational Cross-Attention intertwine position-aware embeddings
+    with refined attention dynamics to inscribe explicit subject-attribute dependencies,
+    enforcing disciplined intra-group cohesion and amplifying the separation between
+    distinct subject clusters. Comprehensive evaluations on our benchmark demonstrate
+    that LumosX achieves state-of-the-art performance in fine-grained, identity-consistent,
+    and semantically aligned personalized multi-subject video generation. Code and
+    models are available at https://jiazheng-xing.github.io/lumosx-home/.
+  key_contributions: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-03-23'

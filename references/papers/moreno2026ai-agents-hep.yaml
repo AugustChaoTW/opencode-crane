@@ -1,0 +1,32 @@
+key: moreno2026ai-agents-hep
+title: AI Agents Can Already Autonomously Perform Experimental High Energy Physics
+authors:
+- Eric A. Moreno
+- Samuel Bright-Thonney
+- Andrzej Novak
+- Dolores Garcia
+- Philip Harris
+year: 2026
+doi: arxiv:2603.20179v1
+url: http://arxiv.org/abs/2603.20179v1
+pdf_url: ''
+pdf_path: ''
+abstract: Large language model-based AI agents are now able to autonomously execute
+  substantial portions of a high energy physics (HEP) analysis pipeline with minimal
+  expert-curated input. Given access to a HEP dataset, an execution framework, and
+  a corpus of prior experimental literature, we find that Claude Code succeeds in
+  automating all stages of a typical analysis.
+venue: arXiv
+source: arxiv
+paper_type: unknown
+categories: []
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{moreno2026ai-agents-hep,\n  title={AI Agents Can Already Autonomously\
+  \ Perform Experimental High Energy Physics},\n  author={Eric A. Moreno and Samuel\
+  \ Bright-Thonney and Andrzej Novak and Dolores Garcia and Philip Harris},\n  year={2026},\n\
+  \  doi={arxiv:2603.20179v1}\n}"
