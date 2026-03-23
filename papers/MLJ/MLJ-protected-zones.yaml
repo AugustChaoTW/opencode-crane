@@ -1,0 +1,32 @@
+metadata:
+  paper_path: papers/MLJ/MLJ-MAIN.tex
+  generated_at: "2026-03-23T10:30:00"
+  version: 1
+
+protected_zones:
+  - id: "pz_001"
+    kind: "citation"
+    file: "MLJ-MAIN.tex"
+    anchor_start: "Abstract, Para 1, Sentence 4"
+    checksum: "abc123"
+    reason: "Verified citation-claim link"
+    source: "moreno2026ai-agents-hep"
+    verified_at: "2026-03-23T10:30:00"
+
+  - id: "pz_002"
+    kind: "citation"
+    file: "MLJ-MAIN.tex"
+    anchor_start: "Related Work, Para 2, Sentence 2"
+    checksum: "def456"
+    reason: "Verified citation-claim link"
+    source: "raschka2025llm-arch-comparison"
+    verified_at: "2026-03-23T10:30:00"
+
+  - id: "pz_003"
+    kind: "factual"
+    file: "MLJ-MAIN.tex"
+    anchor_start: "Evaluation, Para 1, Sentence 2"
+    checksum: "ghi789"
+    reason: "Verified system statistics"
+    source: "system_metrics"
+    verified_at: "2026-03-23T10:30:00"

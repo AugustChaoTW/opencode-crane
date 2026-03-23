@@ -1,0 +1,20 @@
+\begin{thebibliography}{2}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Moreno et~al.(2026)Moreno, Bright-Thonney, Novak, Garcia, and
+  Harris]{moreno2026ai-agents-hep}
+Eric~A. Moreno, Samuel Bright-Thonney, Andrzej Novak, Dolores Garcia, and
+  Philip Harris.
+\newblock Ai agents can already autonomously perform experimental high energy
+  physics.
+\newblock \emph{arXiv preprint arXiv:2603.20179}, 2026.
+
+\bibitem[Raschka(2025)]{raschka2025llm-arch-comparison}
+Sebastian Raschka.
+\newblock The big llm architecture comparison: From deepseek v3 to glm-5, 2025.
+
+\end{thebibliography}
