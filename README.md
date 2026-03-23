@@ -10,6 +10,8 @@
 
 ## 主要功能
 
+- **章節級論文審查** — 逐章節偵測 6 種常見問題（邏輯錯誤、數據不一致、過度聲張、完整性缺失、AI 寫作痕跡、圖表品質）
+- **LaTeX 結構解析** — 自動偵測 `\section{}`、`\subsection{}`、`\appendix`
 - **3-LLM 論文驗證** — Auditor/Detector/Editor 三角色 AI 審查流程
 - **AI 寫作偵測** — L1 詞彙、L2 段落節奏、L3 學術主體性三層分析
 - **Protected Zones** — 驗證通過內容自動保護，防止意外修改
@@ -71,6 +73,10 @@
 
 <tr><td>📊 產生圖表</td><td><code>產生一個比較圖表</code></td><td><code>generate_figure</code></td></tr>
 
+<tr><td>📝 審查章節</td><td><code>幫我審查這篇論文的各個章節</code></td><td><code>review_paper_sections</code></td></tr>
+
+<tr><td>🔍 解析結構</td><td><code>解析這篇論文的章節結構</code></td><td><code>parse_paper_structure</code></td></tr>
+
 </table>
 
 ### Label 對照表
@@ -120,6 +126,37 @@
       ↓
 7️⃣ 報告         → PAPER_HEALTH_REPORT.md
 ```
+
+#### 章節級論文審查流程
+
+```
+1️⃣ 解析結構     → parse_paper_structure
+      ↓
+2️⃣ 逐章節審查   → review_paper_sections
+      ├─ 邏輯錯誤 (logic)
+      ├─ 數據一致性 (data)
+      ├─ 聲稱範圍 (framing)
+      ├─ 完整性 (completeness)
+      ├─ AI 寫作痕跡 (writing)
+      └─ 圖表品質 (figures)
+      ↓
+3️⃣ 產生報告     → section_review_report.yaml
+      ↓
+4️⃣ 修正問題     → 根據建議逐一修正
+      ↓
+5️⃣ 重新驗證     → 重新執行審查
+```
+
+### 章節審查類型
+
+| 類型 | 偵測項目 | 常見問題範例 |
+|------|----------|-------------|
+| `logic` | Python 邏輯錯誤、算法正確性 | `if "good" or "positive" in text` |
+| `data` | 百分比、成本、延遲一致性 | 62.5% vs 87.5% 矛盾 |
+| `framing` | 過度聲張、術語濫用 | "neuro-symbolic expert system" |
+| `completeness` | 基線缺失、限制未討論 | 缺 constrained decoding baseline |
+| `writing` | AI 寫作痕跡、模糊量詞 | "It is worth noting that" |
+| `figures` | 圖表複雜度、圖說完整性 | Figure 1 過度複雜 |
 
 ### 3-LLM 角色定義
 
