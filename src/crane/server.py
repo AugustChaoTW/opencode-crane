@@ -12,6 +12,7 @@ from .tools.figures import register_tools as register_figure_tools
 from .tools.papers import register_tools as register_paper_tools
 from .tools.pipeline import register_tools as register_pipeline_tools
 from .tools.project import register_tools as register_project_tools
+from .tools.q1_evaluation import register_tools as register_q1_evaluation_tools
 from .tools.references import register_tools as register_reference_tools
 from .tools.screening import register_tools as register_screening_tools
 from .tools.section_review import register_tools as register_section_review_tools
@@ -29,6 +30,7 @@ register_citation_tools(mcp)
 register_figure_tools(mcp)
 register_screening_tools(mcp)
 register_section_review_tools(mcp)
+register_q1_evaluation_tools(mcp)
 register_pipeline_tools(mcp)
 
 
