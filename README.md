@@ -10,7 +10,12 @@
 
 ## 主要功能
 
-- **多來源論文搜尋** — 支援 arXiv、OpenAlex、Semantic Scholar 三大資料庫
+- **3-LLM 論文驗證** — Auditor/Detector/Editor 三角色 AI 審查流程
+- **AI 寫作偵測** — L1 詞彙、L2 段落節奏、L3 學術主體性三層分析
+- **Protected Zones** — 驗證通過內容自動保護，防止意外修改
+- **期刊推薦** — 自動推薦 Q1/Q2 適合投稿的期刊（OpenAlex + SJR）
+- **向量圖產生** — Matplotlib/Seaborn 產生 PDF 格式 publication-quality 圖表
+- **多來源論文搜尋** — 支援 arXiv、OpenAlex、Semantic Scholar、Crossref 四大資料庫
 - **文獻庫管理** — YAML + BibTeX 雙格式儲存，支援搜尋、篩選、AI 標註
 - **元資料標準化** — 自動去重、衝突解決、引用數量聚合
 - **引用驗證** — 檢查論文引用一致性，驗證文獻元資料
@@ -60,6 +65,12 @@
 
 <tr><td>🔍 比較論文</td><td><code>比較這三篇論文的差異</code></td><td><code>compare_papers</code></td></tr>
 
+<tr><td>🔬 驗證論文</td><td><code>幫我驗證這篇論文的品質</code></td><td><code>verify_paper</code></td></tr>
+
+<tr><td>🎯 推薦期刊</td><td><code>推薦適合投稿的期刊</code></td><td><code>recommend_journals</code></td></tr>
+
+<tr><td>📊 產生圖表</td><td><code>產生一個比較圖表</code></td><td><code>generate_figure</code></td></tr>
+
 </table>
 
 ### Label 對照表
@@ -73,6 +84,8 @@
 | ⚡ 優先級 | `priority:high`<br>`priority:medium`<br>`priority:low` | 優先順序 |
 
 ### 典型工作流程
+
+#### 文獻回顧流程
 
 ```
 1️⃣ 初始化        → init_research
@@ -89,6 +102,32 @@
       ↓
 7️⃣ 進度查看      → workspace_status → get_milestone_progress
 ```
+
+#### 3-LLM 論文驗證流程
+
+```
+1️⃣ 推薦期刊      → recommend_journals
+      ↓
+2️⃣ AUDIT        → LLM-A: 圖表資料追溯 + 引用驗證
+      ↓
+3️⃣ DETECTION    → LLM-B: L1/L2/L3 AI 寫作偵測
+      ↓
+4️⃣ EDITING      → LLM-C: 約束式重寫
+      ↓
+5️⃣ RE-VERIFY    → LLM-A: 驗證修改（FAIL → 回傳 Step 4）
+      ↓
+6️⃣ 產生圖表     → generate_figure / generate_comparison
+      ↓
+7️⃣ 報告         → PAPER_HEALTH_REPORT.md
+```
+
+### 3-LLM 角色定義
+
+| 角色 | 認知模式 | 職責 |
+|------|----------|------|
+| **LLM-A (Auditor)** | 精確、保守、二元判斷 | 資料追溯、引用驗證、重新驗證 |
+| **LLM-B (Detector)** | 模式敏感、語言學分析 | L1 詞彙、L2 段落、L3 主體性偵測 |
+| **LLM-C (Editor)** | 創意、領域專家 | 約束式重寫、保留 Protected Zones |
 
 ---
 
