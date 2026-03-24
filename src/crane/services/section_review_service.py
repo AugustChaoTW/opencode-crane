@@ -20,6 +20,11 @@ class ReviewType(Enum):
     WRITING = "writing"
     FIGURES = "figures"
     SCHOLARLY_VOICE = "scholarly_voice"
+    BASELINE_COMPLETENESS = "baseline_completeness"
+    EVALUATION_RIGOR = "evaluation_rigor"
+    SCOPE_LIMITATION = "scope_limitation"
+    METHODOLOGY = "methodology"
+    LENGTH = "length"
 
 
 class Severity(Enum):
@@ -112,6 +117,23 @@ class SectionReviewService:
                     "pattern": re.compile(r"expert\s+system|neuro-symbolic", re.IGNORECASE),
                     "issue": "Technical term requiring precise definition",
                     "suggestion": "Define term or use more precise language",
+                    "severity": Severity.HIGH,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(deterministic repair|post-processing pipeline|repair layer)\b",
+                        re.IGNORECASE,
+                    ),
+                    "check": "appropriate_framing",
+                    "severity": Severity.LOW,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(breakthrough|revolutionary|groundbreaking|unprecedented)\b",
+                        re.IGNORECASE,
+                    ),
+                    "issue": "Overclaiming detected",
+                    "suggestion": "Use more measured language (e.g., 'effective', 'competitive')",
                     "severity": Severity.HIGH,
                 },
             ],
@@ -238,6 +260,142 @@ class SectionReviewService:
                     ),
                     "check": "list_completeness",
                     "severity": Severity.LOW,
+                },
+            ],
+            ReviewType.BASELINE_COMPLETENESS: [
+                {
+                    "pattern": re.compile(
+                        r"\b(PICARD|Outlines|Guidance|Constrained Decoding|grammar-constrained)\b",
+                        re.IGNORECASE,
+                    ),
+                    "issue": "Missing constrained decoding baseline comparison",
+                    "suggestion": "Add comparison with PICARD, Outlines, or Guidance",
+                    "severity": Severity.HIGH,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(Model Retry|naive|strawman|without repair)\b", re.IGNORECASE
+                    ),
+                    "issue": "Possible strawman baseline detected",
+                    "suggestion": "Ensure baseline is meaningful, not a strawman",
+                    "severity": Severity.HIGH,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(state-of-the-art|SOTA|current best)\b", re.IGNORECASE
+                    ),
+                    "issue": "SOTA comparison required",
+                    "suggestion": "Add comparison with current state-of-the-art methods",
+                    "severity": Severity.HIGH,
+                },
+            ],
+            ReviewType.EVALUATION_RIGOR: [
+                {
+                    "pattern": re.compile(
+                        r"\b(parse success|structural success|format compliance)\b", re.IGNORECASE
+                    ),
+                    "issue": "Structural metric only, missing semantic evaluation",
+                    "suggestion": "Add semantic accuracy evaluation alongside structural metrics",
+                    "severity": Severity.HIGH,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(semantic reversal|semantic accuracy|semantic correctness)\b",
+                        re.IGNORECASE,
+                    ),
+                    "check": "semantic_evaluation_present",
+                    "severity": Severity.MEDIUM,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(failure rate|failure analysis|edge cases|0\.02\%)\b", re.IGNORECASE
+                    ),
+                    "check": "failure_analysis_present",
+                    "severity": Severity.MEDIUM,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(p-value|confidence interval|statistical significance|standard deviation)\b",
+                        re.IGNORECASE,
+                    ),
+                    "check": "statistical_analysis_present",
+                    "severity": Severity.MEDIUM,
+                },
+            ],
+            ReviewType.SCOPE_LIMITATION: [
+                {
+                    "pattern": re.compile(
+                        r"\b(production-ready|production-grade|fully online|real-world deployment)\b",
+                        re.IGNORECASE,
+                    ),
+                    "issue": "Strong scope claim requiring validation",
+                    "suggestion": "Clarify: controlled experimental evaluation, not production deployment",
+                    "severity": Severity.HIGH,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(all tasks|any domain|universal|general-purpose)\b", re.IGNORECASE
+                    ),
+                    "issue": "Overgeneralization detected",
+                    "suggestion": "Specify limitations or mark as future work",
+                    "severity": Severity.HIGH,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(generalize to|applicable to|transfer to)\s+(NER|QA|summarization|translation)\b",
+                        re.IGNORECASE,
+                    ),
+                    "issue": "Generalization claim without validation",
+                    "suggestion": "Add validation or mark as hypothesized",
+                    "severity": Severity.HIGH,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(beyond the scope|out of scope|future work|limitation)\b", re.IGNORECASE
+                    ),
+                    "check": "limitations_discussed",
+                    "severity": Severity.LOW,
+                },
+            ],
+            ReviewType.METHODOLOGY: [
+                {
+                    "pattern": re.compile(
+                        r"\b(hyperparameter|parameter sensitivity|threshold selection)\b",
+                        re.IGNORECASE,
+                    ),
+                    "check": "parameter_discussion_present",
+                    "severity": Severity.MEDIUM,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(implementation detail|training setup|experimental setup)\b",
+                        re.IGNORECASE,
+                    ),
+                    "check": "implementation_details_present",
+                    "severity": Severity.MEDIUM,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(code available|github|repository|open source|reproducibility)\b",
+                        re.IGNORECASE,
+                    ),
+                    "check": "code_availability_mentioned",
+                    "severity": Severity.LOW,
+                },
+            ],
+            ReviewType.LENGTH: [
+                {
+                    "pattern": re.compile(r"\d+\s*pages", re.IGNORECASE),
+                    "check": "page_count_mentioned",
+                    "severity": Severity.LOW,
+                },
+                {
+                    "pattern": re.compile(
+                        r"\b(repeated|redundant|duplicate|unnecessary)\b", re.IGNORECASE
+                    ),
+                    "issue": "Possible redundancy detected",
+                    "suggestion": "Remove redundant content",
+                    "severity": Severity.MEDIUM,
                 },
             ],
         }

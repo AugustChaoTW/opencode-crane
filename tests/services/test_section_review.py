@@ -94,6 +94,57 @@ We achieve 62.5% improvement.
         assert "overall_score" in result.summary
         assert "recommendation" in result.summary
 
+    def test_baseline_completeness_detects_missing(self):
+        review = _load_review()
+        parser = _load_parser()
+        service = review.SectionReviewService()
+
+        section = parser.SectionLocation(
+            name="Test",
+            level=1,
+            start_line=1,
+            end_line=10,
+            content="We compare with Model Retry (no repair). Our approach is better.",
+        )
+
+        result = service.review_section(section, [review.ReviewType.BASELINE_COMPLETENESS])
+
+        assert len(result.issues) > 0
+
+    def test_evaluation_rigor_detects_missing_semantic(self):
+        review = _load_review()
+        parser = _load_parser()
+        service = review.SectionReviewService()
+
+        section = parser.SectionLocation(
+            name="Test",
+            level=1,
+            start_line=1,
+            end_line=10,
+            content="We achieve 99.98% parse success rate.",
+        )
+
+        result = service.review_section(section, [review.ReviewType.EVALUATION_RIGOR])
+
+        assert len(result.issues) > 0
+
+    def test_scope_limitation_detects_overclaim(self):
+        review = _load_review()
+        parser = _load_parser()
+        service = review.SectionReviewService()
+
+        section = parser.SectionLocation(
+            name="Test",
+            level=1,
+            start_line=1,
+            end_line=10,
+            content="Our production-ready system is applicable to all NLP tasks.",
+        )
+
+        result = service.review_section(section, [review.ReviewType.SCOPE_LIMITATION])
+
+        assert len(result.issues) > 0
+
 
 class TestSectionReviewTools:
     def test_registered(self):
