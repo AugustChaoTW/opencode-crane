@@ -12,9 +12,7 @@ def write_paper_yaml(papers_dir: str, key: str, data: dict) -> str:
     path = Path(papers_dir) / f"{key}.yaml"
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
-        yaml.dump(
-            data, f, sort_keys=False, allow_unicode=True, default_flow_style=False
-        )
+        yaml.dump(data, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
     return str(path)
 
 

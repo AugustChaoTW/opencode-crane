@@ -8,7 +8,6 @@ All external calls (gh, git, arXiv) are mocked.
 """
 
 
-
 class TestLiteratureReviewWorkflow:
     """Phase 1: init project → search papers → add references → annotate."""
 
