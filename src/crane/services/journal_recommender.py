@@ -225,6 +225,125 @@ class JournalRecommender:
         )
         return recommendations[:5]
 
+    def find_similar_papers_in_journal(
+        self,
+        paper_keywords: list[str],
+        journal_name: str,
+        max_results: int = 10,
+    ) -> dict[str, Any]:
+        """Find similar papers in a specific journal based on keywords.
+
+        Args:
+            paper_keywords: Keywords from the target paper
+            journal_name: Name or abbreviation of the journal
+            max_results: Maximum number of similar papers to return
+
+        Returns:
+            Dict with similar_papers list and match statistics.
+        """
+        canonical_name = self._canonicalize_name(journal_name)
+        journal_metrics = self.query_journal_metrics(canonical_name)
+
+        if not journal_metrics:
+            return {
+                "journal": journal_name,
+                "similar_papers": [],
+                "match_count": 0,
+                "total_searched": 0,
+                "match_rate": 0.0,
+                "keywords_matched": [],
+                "recommendation": "Journal not found in database",
+            }
+
+        journal_id = journal_metrics.get("id", "")
+
+        try:
+            query = " ".join(paper_keywords[:5])
+            response = requests.get(
+                "https://api.openalex.org/works",
+                params={
+                    "filter": f"primary_location.source.id:{journal_id}",
+                    "search": query,
+                    "per_page": max_results,
+                    "mailto": OPENALEX_EMAIL,
+                },
+                timeout=15,
+            )
+            response.raise_for_status()
+            results = response.json().get("results", [])
+        except Exception:
+            return {
+                "journal": canonical_name,
+                "similar_papers": [],
+                "match_count": 0,
+                "total_searched": 0,
+                "match_rate": 0.0,
+                "keywords_matched": [],
+                "recommendation": "Failed to query OpenAlex API",
+            }
+
+        similar_papers = []
+        keywords_matched = set()
+
+        for work in results:
+            title = str(work.get("title", "")).lower()
+            abstract_inverted = work.get("abstract_inverted_index") or {}
+            abstract = " ".join(
+                word
+                for word, positions in sorted(
+                    [(w, min(p)) for w, p in abstract_inverted.items()],
+                    key=lambda x: x[1],
+                )
+            ).lower()
+
+            combined_text = f"{title} {abstract}"
+            matched_keywords = [kw for kw in paper_keywords if kw.lower() in combined_text]
+
+            if matched_keywords:
+                keywords_matched.update(matched_keywords)
+
+                authors = []
+                for authorship in work.get("authorships", [])[:3]:
+                    author = authorship.get("author", {})
+                    if author.get("display_name"):
+                        authors.append(author["display_name"])
+
+                similar_papers.append(
+                    {
+                        "title": work.get("title", ""),
+                        "authors": authors,
+                        "year": work.get("publication_year", 0),
+                        "doi": (work.get("doi") or "").replace("https://doi.org/", ""),
+                        "url": work.get("doi", "")
+                        or f"https://openalex.org/{work.get('id', '').split('/')[-1]}",
+                        "keywords_matched": matched_keywords,
+                        "match_score": len(matched_keywords) / max(len(paper_keywords), 1),
+                    }
+                )
+
+        total_searched = len(results)
+        match_count = len(similar_papers)
+        match_rate = match_count / max(total_searched, 1)
+
+        if match_count >= 3:
+            recommendation = f"STRONG FIT: {match_count} similar papers found in {canonical_name}"
+        elif match_count >= 1:
+            recommendation = (
+                f"MODERATE FIT: {match_count} similar papers found, consider framing adjustments"
+            )
+        else:
+            recommendation = f"WEAK FIT: No similar papers found, consider different journal"
+
+        return {
+            "journal": canonical_name,
+            "similar_papers": sorted(similar_papers, key=lambda x: -x["match_score"]),
+            "match_count": match_count,
+            "total_searched": total_searched,
+            "match_rate": round(match_rate, 2),
+            "keywords_matched": sorted(keywords_matched),
+            "recommendation": recommendation,
+        }
+
     def _load_candidates(self) -> list[dict[str, Any]]:
         if not self.sjr_path.exists():
             raise FileNotFoundError(f"SJR snapshot not found: {self.sjr_path}")
