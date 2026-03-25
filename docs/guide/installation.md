@@ -7,6 +7,7 @@
 | 作業系統 | Ubuntu 20.04+, Rocky Linux 8+, RHEL 8+, Fedora 36+ |
 | Python | 3.10+ |
 | Git | 2.0+ |
+| bun | 最新版（Plugin 安裝需要）|
 | GitHub CLI | 可選（任務管理需要） |
 
 ---
@@ -79,13 +80,70 @@ EOF
 
 ### 方式 2：全域配置
 
-在 `~/.config/opencode/opencode.json` 中新增：
+一鍵安裝腳本會自動建立全域配置（含 Plugin），位於 `~/.config/opencode/opencode.json`。
+
+---
+
+## Plugin 安裝
+
+CRANE 安裝腳本會自動安裝以下 4 個 OpenCode Plugin 到 `~/.config/opencode/`：
+
+| Plugin | 來源 | 功能 |
+|--------|------|------|
+| oh-my-opencode (omo) | npm | Agent 增強框架 |
+| opencode-claude-auth | npm | Claude Code 認證整合 |
+| claude-max-headers | GitHub 下載 | Anthropic API 會話追蹤頭部注入 |
+| memory-system | GitHub clone + build | Agent 持久化記憶系統 |
+
+### 自動安裝
+
+一鍵安裝腳本已整合 Plugin 安裝，無需額外步驟。
+
+### 手動安裝
+
+如果自動安裝失敗或需要個別安裝：
 
 ```bash
-mkdir -p ~/.config/opencode
-cat > ~/.config/opencode/opencode.json << 'EOF'
+cd ~/.config/opencode
+
+# 1. npm plugins
+cat > package.json << 'EOF'
+{
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.3.2",
+    "oh-my-opencode": "^3.12.3",
+    "opencode-claude-auth": "^1.3.1"
+  }
+}
+EOF
+bun install
+
+# 2. claude-max-headers
+mkdir -p plugins/claude-max-headers
+curl -fsSL https://raw.githubusercontent.com/rynfar/opencode-claude-max-proxy/main/src/plugin/claude-max-headers.ts \
+  -o plugins/claude-max-headers/claude-max-headers.ts
+
+# 3. memory-system
+git clone --depth 1 https://github.com/AugustChaoTW/aug-money.git /tmp/aug-money
+cd /tmp/aug-money/opencode-memory-system && bun install && bun run build
+mkdir -p ~/.config/opencode/plugins/memory-system
+cp dist/index.js dist/sql-wasm.wasm package.json ~/.config/opencode/plugins/memory-system/
+rm -rf /tmp/aug-money
+```
+
+### Plugin 配置
+
+`~/.config/opencode/opencode.json` 中需包含 `plugin` 陣列：
+
+```json
 {
   "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "oh-my-opencode",
+    "opencode-claude-auth",
+    "./plugins/claude-max-headers/claude-max-headers.ts",
+    "./plugins/memory-system"
+  ],
   "mcp": {
     "crane": {
       "type": "local",
@@ -94,10 +152,17 @@ cat > ~/.config/opencode/opencode.json << 'EOF'
     }
   }
 }
-EOF
 ```
 
-**⚠️ 注意**：使用 `sh -c` 包裝命令，不要使用 `cwd` 參數。
+oh-my-opencode 需要額外配置檔 `~/.config/opencode/oh-my-opencode.json`：
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
+  "google_auth": false,
+  "agents": {}
+}
+```
 
 ---
 
@@ -268,14 +333,15 @@ sudo dnf install python3.12
 ## 解除安裝
 
 ```bash
-# 刪除 CRANE
 rm -rf ~/.opencode-crane
 
-# 刪除配置
 rm -rf ~/.config/opencode/plugins/memory-system
-rm ~/.config/opencode/skills/opencode-crane
+rm -rf ~/.config/opencode/plugins/claude-max-headers
+rm -f ~/.config/opencode/skills/opencode-crane/SKILL.md
+rm -f ~/.config/opencode/oh-my-opencode.json
 
-# 清理 MCP 配置（手動編輯 ~/.config/opencode/opencode.json）
+# 清理 npm plugins（手動編輯 package.json 移除相關依賴後執行）
+cd ~/.config/opencode && bun install
 ```
 
 ---

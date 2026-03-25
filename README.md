@@ -197,113 +197,147 @@ bash ~/.opencode-crane/scripts/setup-project.sh
 
 支援作業系統：Ubuntu 20.04+、Rocky Linux 8+、RHEL 8+、Fedora 36+
 
-安裝腳本會自動處理：
-- 系統依賴（git、curl）
-- uv（Python 套件管理器）
-- GitHub CLI（可選）
-
 ### 一鍵安裝（推薦）
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AugustChaoTW/opencode-crane/main/scripts/install.sh | bash
 ```
 
-安裝腳本會：
-1. 偵測作業系統（Ubuntu/Rocky/RHEL/Fedora）
-2. 自動安裝系統依賴
-3. 安裝 uv（如未安裝）
-4. 安裝 GitHub CLI（如未安裝）
-5. 使用 uv sync 安裝 opencode-crane
+完成後，跳到 **[專案設定](#專案設定)**。
 
 ### 手動安裝
 
-#### Step 1: 安裝 uv
+從頭到尾複製貼上即可。每一行可獨立執行。
+
+#### 安裝工具鏈
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -fsSL https://bun.sh/install | bash
+hash -r
 ```
 
-#### Step 2: 安裝 crane
+#### 安裝 CRANE
 
 ```bash
 git clone https://github.com/AugustChaoTW/opencode-crane.git ~/.opencode-crane
-cd ~/.opencode-crane
-uv sync
+cd ~/.opencode-crane && uv sync
 ```
 
-#### Step 3: 驗證
+#### 安裝 Plugin
 
 ```bash
-uv run python -c "
-from crane.server import mcp
-tools = mcp._tool_manager._tools
-print(f'OK: {len(tools)} tools registered')
-for name in sorted(tools): print(f'  - {name}')
-"
-```
+OPENCODE="$HOME/.config/opencode"
 
-預期輸出：`OK: 24 tools registered`，列出所有 tool 名稱。
-
-### Step 2: 設定專案 MCP
-
-在你的研究專案根目錄執行：
-
-```bash
-mkdir -p .opencode
-
-cat > .opencode/opencode.json << 'MCPEOF'
+cat > "$OPENCODE/package.json" << 'EOF'
 {
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.3.2",
+    "oh-my-opencode": "^3.12.3",
+    "opencode-claude-auth": "^1.3.1"
+  }
+}
+EOF
+cd "$OPENCODE" && bun install
+
+mkdir -p "$OPENCODE/plugins/claude-max-headers"
+curl -fsSL https://raw.githubusercontent.com/rynfar/opencode-claude-max-proxy/main/src/plugin/claude-max-headers.ts \
+  -o "$OPENCODE/plugins/claude-max-headers/claude-max-headers.ts"
+
+git clone --depth 1 https://github.com/AugustChaoTW/aug-money.git /tmp/aug-money
+cd /tmp/aug-money/opencode-memory-system && bun install && bun run build
+mkdir -p "$OPENCODE/plugins/memory-system"
+cp dist/index.js dist/sql-wasm.wasm package.json "$OPENCODE/plugins/memory-system/"
+rm -rf /tmp/aug-money
+```
+
+#### 寫入配置
+
+```bash
+OPENCODE="$HOME/.config/opencode"
+
+cat > "$OPENCODE/opencode.json" << 'EOF'
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "oh-my-opencode",
+    "opencode-claude-auth",
+    "./plugins/claude-max-headers/claude-max-headers.ts",
+    "./plugins/memory-system"
+  ],
   "mcp": {
     "crane": {
       "type": "local",
-      "command": ["uv", "run", "crane"],
-      "cwd": "$HOME/.opencode-crane",
+      "command": ["sh", "-c", "cd $HOME/.opencode-crane && uv run crane"],
       "enabled": true
     }
   }
 }
-MCPEOF
+EOF
+
+cat > "$OPENCODE/oh-my-opencode.json" << 'EOF'
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
+  "google_auth": false,
+  "agents": {}
+}
+EOF
 ```
 
-> **注意**：如果你的專案已有 `.opencode/opencode.json`，請手動將 `crane` 區塊
-> 合併到現有的 `mcp` 物件中，而非覆蓋整個檔案。
-
-### Step 3: 安裝 SKILL.md（建議）
-
-SKILL.md 告訴 AI agent 何時以及如何使用 crane 工具：
+#### 安裝 SKILL.md
 
 ```bash
+mkdir -p "$HOME/.config/opencode/skills/opencode-crane"
+cp ~/.opencode-crane/SKILL.md "$HOME/.config/opencode/skills/opencode-crane/SKILL.md"
+```
+
+---
+
+### 專案設定
+
+在你的研究專案根目錄執行，完成 MCP + gitignore 設定：
+
+```bash
+# 方法 A：使用腳本（推薦）
+bash ~/.opencode-crane/scripts/setup-project.sh
+```
+
+```bash
+# 方法 B：手動
+cd ~/your-research-project
+mkdir -p .opencode
+cat > .opencode/opencode.json << 'EOF'
+{
+  "mcp": {
+    "crane": {
+      "type": "local",
+      "command": ["sh", "-c", "cd $HOME/.opencode-crane && uv run crane"],
+      "enabled": true
+    }
+  }
+}
+EOF
 mkdir -p .opencode/skills/opencode-crane
 cp ~/.opencode-crane/SKILL.md .opencode/skills/opencode-crane/SKILL.md
-```
-
-### Step 4: 設定 .gitignore
-
-確保 PDF 檔案不被追蹤：
-
-```bash
-# 如果 .gitignore 中還沒有這行，加上去
 grep -q "references/pdfs/" .gitignore 2>/dev/null || echo "references/pdfs/" >> .gitignore
 ```
 
-### Step 5: 驗證
-
-重新啟動 OpenCode，然後輸入：
-
-```
-幫我初始化這個 repo 為研究專案
-```
-
-如果 crane 正確安裝，AI agent 會呼叫 `init_research` 工具，你會看到：
-- GitHub labels 被建立（`phase:literature-review` 等）
-- Milestones 被建立
-- `references/` 目錄被建立
-
-### 或用腳本一步完成（Step 2-4）
+#### 驗證
 
 ```bash
-bash ~/.opencode-crane/scripts/setup-project.sh
+# CRANE 本體
+cd ~/.opencode-crane && uv run python -c "from crane.server import mcp; print(f'OK: {len(mcp._tool_manager._tools)} tools registered')"
+
+# Plugin 狀態
+echo "oh-my-opencode:      $([ -d ~/.config/opencode/node_modules/oh-my-opencode ] && echo '✓' || echo '✗')"
+echo "opencode-claude-auth: $([ -d ~/.config/opencode/node_modules/opencode-claude-auth ] && echo '✓' || echo '✗')"
+echo "claude-max-headers:   $([ -f ~/.config/opencode/plugins/claude-max-headers/claude-max-headers.ts ] && echo '✓' || echo '✗')"
+echo "memory-system:        $([ -f ~/.config/opencode/plugins/memory-system/index.js ] && echo '✓' || echo '✗')"
 ```
+
+預期：`OK: N tools registered` + 全部 ✓
+
+啟動 OpenCode 輸入 `幫我初始化這個 repo 為研究專案` 驗證完整功能。
 
 <!-- OPENCODE-INSTALL-GUIDE-END -->
 
@@ -312,9 +346,19 @@ bash ~/.opencode-crane/scripts/setup-project.sh
 ## 更新
 
 ```bash
-cd ~/.opencode-crane
-git pull
-uv sync
+cd ~/.opencode-crane && git pull && uv sync
+cd ~/.config/opencode && bun install
+```
+
+## 解除安裝
+
+```bash
+rm -rf ~/.opencode-crane
+rm -rf ~/.config/opencode/plugins/memory-system
+rm -rf ~/.config/opencode/plugins/claude-max-headers
+rm -f ~/.config/opencode/skills/opencode-crane/SKILL.md
+rm -f ~/.config/opencode/oh-my-opencode.json
+# 清理 npm plugins: cd ~/.config/opencode && bun install
 ```
 
 ---

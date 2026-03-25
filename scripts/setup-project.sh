@@ -13,6 +13,7 @@ set -euo pipefail
 INSTALL_DIR="${CRANE_INSTALL_DIR:-$HOME/.opencode-crane}"
 VENV_DIR="$INSTALL_DIR/.venv"
 PYTHON_BIN="$VENV_DIR/bin/python"
+OPENCODE_CONFIG_DIR="$HOME/.config/opencode"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -94,6 +95,41 @@ else
     echo "# opencode-crane" > "$GITIGNORE"
     echo "references/pdfs/" >> "$GITIGNORE"
     ok "Created .gitignore with references/pdfs/"
+fi
+
+# ---------------------------------------------------------------------------
+# 4. Plugin package.json (project-level)
+# ---------------------------------------------------------------------------
+PKG_FILE="$MCP_DIR/package.json"
+if [ -f "$PKG_FILE" ]; then
+    ok "package.json already exists at $PKG_FILE"
+else
+    cat > "$PKG_FILE" << 'PKGEOF'
+{
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.3.2",
+    "oh-my-opencode": "^3.12.3",
+    "opencode-claude-auth": "^1.3.1"
+  }
+}
+PKGEOF
+    ok "Created $PKG_FILE"
+fi
+
+if command -v bun &>/dev/null; then
+    (cd "$MCP_DIR" && bun install --no-save 2>/dev/null) && ok "Project plugins installed" || warn "bun install failed"
+else
+    warn "bun not found — run 'cd $MCP_DIR && npm install' manually"
+fi
+
+# ---------------------------------------------------------------------------
+# 5. Global plugin check
+# ---------------------------------------------------------------------------
+if [ -f "$OPENCODE_CONFIG_DIR/opencode.json" ]; then
+    ok "Global config exists at $OPENCODE_CONFIG_DIR/opencode.json"
+else
+    warn "No global config found. Run install.sh first for full plugin setup:"
+    warn "  curl -fsSL https://raw.githubusercontent.com/AugustChaoTW/opencode-crane/main/scripts/install.sh | bash"
 fi
 
 # ---------------------------------------------------------------------------
