@@ -6,7 +6,6 @@ INSTALL_DIR="${CRANE_INSTALL_DIR:-$HOME/.opencode-crane}"
 OPENCODE_CONFIG_DIR="$HOME/.config/opencode"
 
 # Plugin sources
-CLAUDE_MAX_HEADERS_URL="https://raw.githubusercontent.com/rynfar/opencode-claude-max-proxy/main/src/plugin/claude-max-headers.ts"
 MEMORY_SYSTEM_REPO="https://github.com/AugustChaoTW/aug-money.git"
 
 RED='\033[0;31m'
@@ -129,19 +128,6 @@ PKGEOF
     info "Installing npm plugins via bun..."
     (cd "$OPENCODE_CONFIG_DIR" && bun install --no-save 2>/dev/null) && ok "npm plugins installed" || warn "bun install failed"
 
-    local headers_dir="$OPENCODE_CONFIG_DIR/plugins/claude-max-headers"
-    if [ -f "$headers_dir/claude-max-headers.ts" ]; then
-        ok "claude-max-headers already installed"
-    else
-        info "Downloading claude-max-headers plugin..."
-        mkdir -p "$headers_dir"
-        if curl -fsSL "$CLAUDE_MAX_HEADERS_URL" -o "$headers_dir/claude-max-headers.ts"; then
-            ok "claude-max-headers downloaded"
-        else
-            warn "Failed to download claude-max-headers"
-        fi
-    fi
-
     local memory_dir="$OPENCODE_CONFIG_DIR/plugins/memory-system"
     if [ -f "$memory_dir/index.js" ]; then
         ok "memory-system already installed"
@@ -181,7 +167,7 @@ setup_plugin_config() {
             ok "opencode.json already has plugin config"
         else
             warn "opencode.json exists but no plugin[] — add manually:"
-            echo '  "plugin": ["oh-my-opencode", "opencode-claude-auth", "./plugins/claude-max-headers/claude-max-headers.ts", "./plugins/memory-system"]'
+            echo '  "plugin": ["oh-my-opencode", "opencode-claude-auth", "./plugins/memory-system"]'
         fi
     else
         mkdir -p "$OPENCODE_CONFIG_DIR"
@@ -191,7 +177,6 @@ setup_plugin_config() {
   "plugin": [
     "oh-my-opencode",
     "opencode-claude-auth",
-    "./plugins/claude-max-headers/claude-max-headers.ts",
     "./plugins/memory-system"
   ],
   "mcp": {
@@ -331,7 +316,6 @@ echo ""
 info "Plugins installed:"
 [ -d "$OPENCODE_CONFIG_DIR/node_modules/oh-my-opencode" ] && echo "  ✓ oh-my-opencode" || echo "  ✗ oh-my-opencode"
 [ -d "$OPENCODE_CONFIG_DIR/node_modules/opencode-claude-auth" ] && echo "  ✓ opencode-claude-auth" || echo "  ✗ opencode-claude-auth"
-[ -f "$OPENCODE_CONFIG_DIR/plugins/claude-max-headers/claude-max-headers.ts" ] && echo "  ✓ claude-max-headers" || echo "  ✗ claude-max-headers"
 [ -f "$OPENCODE_CONFIG_DIR/plugins/memory-system/index.js" ] && echo "  ✓ memory-system" || echo "  ✗ memory-system"
 echo ""
 info "Next steps:"

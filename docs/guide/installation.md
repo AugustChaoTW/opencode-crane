@@ -86,13 +86,12 @@ EOF
 
 ## Plugin 安裝
 
-CRANE 安裝腳本會自動安裝以下 4 個 OpenCode Plugin 到 `~/.config/opencode/`：
+CRANE 安裝腳本會自動安裝以下 3 個 OpenCode Plugin 到 `~/.config/opencode/`：
 
 | Plugin | 來源 | 功能 |
 |--------|------|------|
 | oh-my-opencode (omo) | npm | Agent 增強框架 |
 | opencode-claude-auth | npm | Claude Code 認證整合 |
-| claude-max-headers | GitHub 下載 | Anthropic API 會話追蹤頭部注入 |
 | memory-system | GitHub clone + build | Agent 持久化記憶系統 |
 
 ### 自動安裝
@@ -118,12 +117,7 @@ cat > package.json << 'EOF'
 EOF
 bun install
 
-# 2. claude-max-headers
-mkdir -p plugins/claude-max-headers
-curl -fsSL https://raw.githubusercontent.com/rynfar/opencode-claude-max-proxy/main/src/plugin/claude-max-headers.ts \
-  -o plugins/claude-max-headers/claude-max-headers.ts
-
-# 3. memory-system
+# 2. memory-system
 git clone --depth 1 https://github.com/AugustChaoTW/aug-money.git /tmp/aug-money
 cd /tmp/aug-money/opencode-memory-system && bun install && bun run build
 mkdir -p ~/.config/opencode/plugins/memory-system
@@ -141,7 +135,6 @@ rm -rf /tmp/aug-money
   "plugin": [
     "oh-my-opencode",
     "opencode-claude-auth",
-    "./plugins/claude-max-headers/claude-max-headers.ts",
     "./plugins/memory-system"
   ],
   "mcp": {
@@ -330,18 +323,31 @@ sudo dnf install python3.12
 
 ---
 
+## 安裝檢查清單
+
+- [ ] uv 已安裝（`command -v uv`）
+- [ ] bun 已安裝（`command -v bun`）
+- [ ] `~/.opencode-crane/.venv` 存在（CRANE 本體）
+- [ ] `~/.config/opencode/package.json` 存在
+- [ ] `~/.config/opencode/node_modules/oh-my-opencode` 存在
+- [ ] `~/.config/opencode/node_modules/opencode-claude-auth` 存在
+- [ ] `~/.config/opencode/plugins/memory-system/index.js` 存在
+- [ ] `~/.config/opencode/opencode.json` 包含 `plugin` 陣列
+- [ ] `~/.config/opencode/oh-my-opencode.json` 存在
+- [ ] `~/.config/opencode/skills/opencode-crane/SKILL.md` 存在
+- [ ] 專案 `.opencode/opencode.json` 已設定 MCP（crane）
+- [ ] 專案 `.gitignore` 包含 `references/pdfs/`
+
+---
+
 ## 解除安裝
 
 ```bash
 rm -rf ~/.opencode-crane
-
 rm -rf ~/.config/opencode/plugins/memory-system
-rm -rf ~/.config/opencode/plugins/claude-max-headers
 rm -f ~/.config/opencode/skills/opencode-crane/SKILL.md
 rm -f ~/.config/opencode/oh-my-opencode.json
-
-# 清理 npm plugins（手動編輯 package.json 移除相關依賴後執行）
-cd ~/.config/opencode && bun install
+# 清理 npm plugins: cd ~/.config/opencode && bun install
 ```
 
 ---
