@@ -7,8 +7,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 
 class MockGh:
     """Mock for gh CLI calls."""
@@ -28,7 +26,9 @@ class MockGh:
                 label_idx = cmd.index("--label") + 1
                 labels = cmd[label_idx].split(",")
                 # Verify no non-existent labels
-                invalid_labels = [l for l in labels if l in ["crane", "kind:task", "kind:todo"]]
+                invalid_labels = [
+                    lbl for lbl in labels if lbl in ["crane", "kind:task", "kind:todo"]
+                ]
                 if invalid_labels:
                     m.returncode = 1
                     m.stderr = f"Invalid labels: {invalid_labels}"
@@ -55,7 +55,7 @@ class TestPipelineTaskCreation:
         svc = TaskService(project_dir=None)
 
         with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
-            result = svc.create(
+            _result = svc.create(
                 title="[LIT] Literature review: test",
                 body="Test task",
                 phase="literature-review",

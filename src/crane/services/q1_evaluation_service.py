@@ -7,12 +7,12 @@ review criteria from top venues (IEEE TPAMI, NeurIPS, ICML, etc.).
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from crane.services.latex_parser import PaperStructure, parse_latex_sections
+from crane.services.latex_parser import parse_latex_sections
 
 
 class EvaluationCategory(Enum):

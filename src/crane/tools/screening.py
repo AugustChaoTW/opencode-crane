@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from crane.services.screening_service import ScreeningService
-from crane.workspace import resolve_workspace
 
 
 def register_tools(mcp):
@@ -74,7 +73,8 @@ def register_tools(mcp):
 
         Args:
             paper_keys: List of reference keys to compare
-            dimensions: Comparison dimensions (default: year, authors, venue, methodology, dataset, metric, result)
+            dimensions: Comparison dimensions (default: year, authors, venue,
+                methodology, dataset, metric, result)
             refs_dir: References directory
 
         Returns:

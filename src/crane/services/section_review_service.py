@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from crane.services.latex_parser import PaperStructure, SectionLocation, parse_latex_sections
+from crane.services.latex_parser import SectionLocation, parse_latex_sections
 
 
 class ReviewType(Enum):
@@ -189,12 +189,18 @@ class SectionReviewService:
                         re.IGNORECASE,
                     ),
                     "issue": "Informal/colloquial language inappropriate for academic writing",
-                    "suggestion": "Replace with precise academic terms (e.g., 'significant', 'substantial', 'effective')",
+                    "suggestion": (
+                        "Replace with precise academic terms "
+                        "(e.g., 'significant', 'substantial', 'effective')"
+                    ),
                     "severity": Severity.MEDIUM,
                 },
                 {
                     "pattern": re.compile(
-                        r"\b(stuff|things|basically|literally|actually|really|very|pretty much|kind of|sort of)\b",
+                        (
+                            r"\b(stuff|things|basically|literally|actually|really|very|"
+                            r"pretty much|kind of|sort of)\b"
+                        ),
                         re.IGNORECASE,
                     ),
                     "issue": "Vague or informal language",
@@ -215,7 +221,10 @@ class SectionReviewService:
                         r"\b(a lot of|lots of|tons of|loads of|bunch of)\b", re.IGNORECASE
                     ),
                     "issue": "Informal quantification",
-                    "suggestion": "Use precise quantifiers (e.g., 'numerous', 'several', 'multiple', specific numbers)",
+                    "suggestion": (
+                        "Use precise quantifiers "
+                        "(e.g., 'numerous', 'several', 'multiple', specific numbers)"
+                    ),
                     "severity": Severity.MEDIUM,
                 },
                 {
@@ -223,7 +232,9 @@ class SectionReviewService:
                         r"\b(gets?|got|gotten|gotta|gonna|wanna|kinda)\b", re.IGNORECASE
                     ),
                     "issue": "Informal verb forms",
-                    "suggestion": "Use formal equivalents (e.g., 'obtains', 'obtained', 'must', 'going to')",
+                    "suggestion": (
+                        "Use formal equivalents (e.g., 'obtains', 'obtained', 'must', 'going to')"
+                    ),
                     "severity": Severity.MEDIUM,
                 },
                 {
@@ -232,13 +243,19 @@ class SectionReviewService:
                         re.IGNORECASE,
                     ),
                     "issue": "Informal adjective (consider context)",
-                    "suggestion": "Use precise technical terms (e.g., 'large-scale', 'high-speed', 'computationally efficient')",
+                    "suggestion": (
+                        "Use precise technical terms "
+                        "(e.g., 'large-scale', 'high-speed', 'computationally efficient')"
+                    ),
                     "severity": Severity.LOW,
                 },
                 {
                     "pattern": re.compile(r"(?<!\. )\b(And|But|So|Or)\b\s+[A-Z]", re.IGNORECASE),
                     "issue": "Sentence starting with conjunction (common in informal writing)",
-                    "suggestion": "Restructure sentence or use formal transition (e.g., 'Furthermore', 'However', 'Consequently')",
+                    "suggestion": (
+                        "Restructure sentence or use formal transition "
+                        "(e.g., 'Furthermore', 'However', 'Consequently')"
+                    ),
                     "severity": Severity.LOW,
                 },
                 {
@@ -248,10 +265,14 @@ class SectionReviewService:
                 },
                 {
                     "pattern": re.compile(
-                        r"\b(thing|things|stuff|issue|problem)\s+(is|are|was|were)\b", re.IGNORECASE
+                        r"\b(thing|things|stuff|issue|problem)\s+(is|are|was|were)\b",
+                        re.IGNORECASE,
                     ),
                     "issue": "Vague subject reference",
-                    "suggestion": "Specify what you're referring to (e.g., 'The challenge is', 'The limitation is')",
+                    "suggestion": (
+                        "Specify what you're referring to "
+                        "(e.g., 'The challenge is', 'The limitation is')"
+                    ),
                     "severity": Severity.MEDIUM,
                 },
                 {
@@ -315,7 +336,10 @@ class SectionReviewService:
                 },
                 {
                     "pattern": re.compile(
-                        r"\b(p-value|confidence interval|statistical significance|standard deviation)\b",
+                        (
+                            r"\b(p-value|confidence interval|statistical significance|"
+                            r"standard deviation)\b"
+                        ),
                         re.IGNORECASE,
                     ),
                     "check": "statistical_analysis_present",
@@ -325,11 +349,16 @@ class SectionReviewService:
             ReviewType.SCOPE_LIMITATION: [
                 {
                     "pattern": re.compile(
-                        r"\b(production-ready|production-grade|fully online|real-world deployment)\b",
+                        (
+                            r"\b(production-ready|production-grade|fully online|"
+                            r"real-world deployment)\b"
+                        ),
                         re.IGNORECASE,
                     ),
                     "issue": "Strong scope claim requiring validation",
-                    "suggestion": "Clarify: controlled experimental evaluation, not production deployment",
+                    "suggestion": (
+                        "Clarify: controlled experimental evaluation, not production deployment"
+                    ),
                     "severity": Severity.HIGH,
                 },
                 {
@@ -342,7 +371,10 @@ class SectionReviewService:
                 },
                 {
                     "pattern": re.compile(
-                        r"\b(generalize to|applicable to|transfer to)\s+(NER|QA|summarization|translation)\b",
+                        (
+                            r"\b(generalize to|applicable to|transfer to)\s+"
+                            r"(NER|QA|summarization|translation)\b"
+                        ),
                         re.IGNORECASE,
                     ),
                     "issue": "Generalization claim without validation",

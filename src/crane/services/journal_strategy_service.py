@@ -6,7 +6,7 @@ scope filtering, impact analysis, and submission strategy.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -330,7 +330,9 @@ class JournalRecommendationService:
                 "abbreviation": j.abbreviation,
                 "impact_factor": j.impact_factor,
                 "acceptance_rate": round(j.acceptance_rate * 100, 1),
-                "review_timeline": f"{j.review_timeline_months[0]}-{j.review_timeline_months[1]} months",
+                "review_timeline": (
+                    f"{j.review_timeline_months[0]}-{j.review_timeline_months[1]} months"
+                ),
                 "scope": j.scope,
                 "scope_fit": round(j.scope_fit * 100, 1),
                 "apc": j.apc,

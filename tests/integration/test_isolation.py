@@ -18,7 +18,6 @@ from crane.tools.tasks import register_tools as register_task_tools
 from crane.utils import git
 from crane.utils.gh import gh, gh_json
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -209,7 +208,7 @@ class TestTasksIsolation:
             patch("crane.utils.git.subprocess.run", side_effect=mock_subprocess_run),
         ):
             # Create task targeting project B
-            result = task_tools["create_task"](
+            task_tools["create_task"](
                 title="Task in Project B",
                 body="Body",
                 project_dir=str(proj_b),

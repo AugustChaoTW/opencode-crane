@@ -54,7 +54,8 @@ def register_tools(mcp):
         Generate submission checklist for a paper type.
 
         Args:
-            paper_type: One of application_system, theoretical_diagnostic, empirical_study, survey_review
+            paper_type: One of application_system, theoretical_diagnostic,
+                empirical_study, survey_review
 
         Returns:
             List of checklist items.

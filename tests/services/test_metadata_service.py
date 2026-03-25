@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import importlib
 
-import pytest
-
 
 def _load():
     return importlib.import_module("crane.services.metadata_service")

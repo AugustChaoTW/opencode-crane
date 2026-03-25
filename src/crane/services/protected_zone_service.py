@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import re
+from collections.abc import Iterable
 from dataclasses import replace
 from datetime import datetime
 from hashlib import sha256
 from pathlib import Path
-import re
-from typing import Iterable, cast
+from typing import cast
 
 import yaml
 

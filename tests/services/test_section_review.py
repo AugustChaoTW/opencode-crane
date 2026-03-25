@@ -3,9 +3,6 @@
 from __future__ import annotations
 
 import importlib
-from pathlib import Path
-
-import pytest
 
 
 def _load_parser():
@@ -69,7 +66,10 @@ class TestSectionReviewService:
             level=1,
             start_line=1,
             end_line=10,
-            content="It is worth noting that this is a novel approach. Furthermore, we achieve significant improvement.",
+            content=(
+                "It is worth noting that this is a novel approach. "
+                "Furthermore, we achieve significant improvement."
+            ),
         )
 
         result = service.review_section(section, [review.ReviewType.WRITING])
@@ -223,7 +223,10 @@ class TestScholarlyVoiceReview:
             level=1,
             start_line=1,
             end_line=10,
-            content="The proposed method demonstrates significant improvements. Results indicate a 15% increase in accuracy.",
+            content=(
+                "The proposed method demonstrates significant improvements. "
+                "Results indicate a 15% increase in accuracy."
+            ),
         )
 
         result = service.review_section(section, [review.ReviewType.SCHOLARLY_VOICE])

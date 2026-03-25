@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 
 @dataclass
@@ -84,7 +83,10 @@ def create_workspace(
 
     if not health_report.exists():
         health_report.write_text(
-            f"# {journal_abbr.upper()} Paper Health Report\n\nGenerated: {datetime.now().isoformat()}\n",
+            (
+                f"# {journal_abbr.upper()} Paper Health Report\n\n"
+                f"Generated: {datetime.now().isoformat()}\n"
+            ),
             encoding="utf-8",
         )
 

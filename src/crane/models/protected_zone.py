@@ -46,7 +46,7 @@ class ProtectedZone:
         }
 
     @classmethod
-    def from_yaml_dict(cls, data: dict[str, str]) -> "ProtectedZone":
+    def from_yaml_dict(cls, data: dict[str, str]) -> ProtectedZone:
         return cls(
             id=data.get("id", ""),
             kind=ProtectedZoneKind(data["kind"]),

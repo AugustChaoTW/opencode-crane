@@ -5,8 +5,6 @@ Tests reference CRUD operations with YAML + BibTeX persistence.
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from crane.services.reference_service import ReferenceService

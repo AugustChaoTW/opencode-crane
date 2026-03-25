@@ -71,7 +71,7 @@ class CrossrefProvider(PaperProvider):
         abstract = abstract.replace("<jats:italic>", "").replace("</jats:italic>", "")
 
         container = work.get("container-title", [])
-        venue = container[0] if container else ""
+        _venue = container[0] if container else ""
 
         citations = work.get("is-referenced-by-count", 0) or 0
 

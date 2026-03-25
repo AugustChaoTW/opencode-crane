@@ -39,7 +39,7 @@ def parse_latex_sections(tex_path: str | Path) -> PaperStructure:
         raise FileNotFoundError(f"LaTeX file not found: {tex_path}")
 
     content = path.read_text(encoding="utf-8")
-    lines = content.split("\n")
+    _lines = content.split("\n")
 
     title_match = TITLE_PATTERN.search(content)
     title = title_match.group(1) if title_match else ""

@@ -1215,7 +1215,7 @@ dependencies = [
     { name = "seaborn" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -1229,14 +1229,17 @@ requires-dist = [
     { name = "matplotlib", specifier = ">=3.8" },
     { name = "mcp", extras = ["cli"] },
     { name = "pypdf2" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'" },
     { name = "pyyaml" },
     { name = "requests" },
-    { name = "ruff", marker = "extra == 'dev'" },
     { name = "seaborn", specifier = ">=0.13" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=8.0" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "packaging"

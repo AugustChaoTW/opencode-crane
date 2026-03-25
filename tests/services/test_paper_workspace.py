@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from crane.services.paper_workspace import (
-    PaperWorkspace,
     create_workspace,
     get_workspace,
     list_workspaces,
@@ -16,7 +13,7 @@ from crane.services.paper_workspace import (
 
 class TestCreateWorkspace:
     def test_creates_directory_structure(self, tmp_path):
-        ws = create_workspace("NIPS", tmp_path)
+        _ws = create_workspace("NIPS", tmp_path)
 
         assert (tmp_path / "papers" / "NIPS").exists()
         assert (tmp_path / "papers" / "NIPS" / "figures").exists()

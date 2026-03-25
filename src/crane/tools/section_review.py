@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from crane.services.section_review_service import SectionReviewService, ReviewType
+from crane.services.section_review_service import ReviewType, SectionReviewService
 
 
 def register_tools(mcp):

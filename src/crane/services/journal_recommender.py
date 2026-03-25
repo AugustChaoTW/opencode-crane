@@ -332,7 +332,7 @@ class JournalRecommender:
                 f"MODERATE FIT: {match_count} similar papers found, consider framing adjustments"
             )
         else:
-            recommendation = f"WEAK FIT: No similar papers found, consider different journal"
+            recommendation = "WEAK FIT: No similar papers found, consider different journal"
 
         return {
             "journal": canonical_name,

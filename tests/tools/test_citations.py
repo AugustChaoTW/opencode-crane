@@ -5,8 +5,6 @@ Tests both the service layer and MCP tool layer.
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
-
 import pytest
 
 from crane.services.citation_service import CitationService
