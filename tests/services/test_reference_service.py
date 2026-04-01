@@ -174,6 +174,43 @@ class TestReferenceServiceAnnotate:
         with pytest.raises(ValueError, match="Reference not found"):
             reference_service.annotate(key="nonexistent2024", summary="test")
 
+    def test_annotate_appends_key_contributions(self, reference_service, sample_paper_data):
+        reference_service.add(**sample_paper_data)
+
+        reference_service.annotate(
+            key="vaswani2017-attention",
+            key_contributions=["Self-attention", "Parallel training"],
+        )
+        reference_service.annotate(
+            key="vaswani2017-attention",
+            key_contributions=["Long-range dependency modeling"],
+        )
+
+        result = reference_service.get("vaswani2017-attention")
+        assert result["ai_annotations"]["key_contributions"] == [
+            "Self-attention",
+            "Parallel training",
+            "Long-range dependency modeling",
+        ]
+
+    def test_annotate_appends_tags_and_related_issues(self, reference_service, sample_paper_data):
+        reference_service.add(**sample_paper_data)
+
+        reference_service.annotate(
+            key="vaswani2017-attention",
+            tags=["transformer", "nlp"],
+            related_issues=[11, 12],
+        )
+        reference_service.annotate(
+            key="vaswani2017-attention",
+            tags=["architecture"],
+            related_issues=[13],
+        )
+
+        result = reference_service.get("vaswani2017-attention")
+        assert result["ai_annotations"]["tags"] == ["transformer", "nlp", "architecture"]
+        assert result["ai_annotations"]["related_issues"] == [11, 12, 13]
+
 
 class TestReferenceServiceGetAllKeys:
     """Test getting all reference keys."""

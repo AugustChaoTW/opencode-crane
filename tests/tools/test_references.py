@@ -288,6 +288,6 @@ class TestAnnotateReference:
         data = read_paper_yaml(papers_dir, p.key)
         assert data is not None
         assert data["ai_annotations"]["summary"] == "Updated summary"
-        assert data["ai_annotations"]["tags"] == ["updated-tag"]
-        assert data["ai_annotations"]["related_issues"] == [2, 3]
+        assert data["ai_annotations"]["tags"] == ["old-tag", "updated-tag"]
+        assert data["ai_annotations"]["related_issues"] == [1, 2, 3]
         assert data["ai_annotations"]["methodology"] == "Original method"

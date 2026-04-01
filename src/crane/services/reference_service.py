@@ -272,15 +272,15 @@ class ReferenceService:
         if summary:
             paper.ai_annotations.summary = summary
         if key_contributions is not None:
-            paper.ai_annotations.key_contributions = key_contributions
+            paper.ai_annotations.key_contributions.extend(key_contributions)
         if methodology:
             paper.ai_annotations.methodology = methodology
         if relevance_notes:
             paper.ai_annotations.relevance_notes = relevance_notes
         if tags is not None:
-            paper.ai_annotations.tags = tags
+            paper.ai_annotations.tags.extend(tags)
         if related_issues is not None:
-            paper.ai_annotations.related_issues = related_issues
+            paper.ai_annotations.related_issues.extend(related_issues)
 
         paper.ai_annotations.added_date = date.today().isoformat()
         write_paper_yaml(str(self.papers_dir), key, paper.to_yaml_dict())
