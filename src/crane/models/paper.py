@@ -57,6 +57,10 @@ class Paper:
     # AI annotations
     ai_annotations: AiAnnotations | None = None
 
+    # Citation relationships
+    cited_by: list[str] = field(default_factory=list)
+    cites: list[str] = field(default_factory=list)
+
     # Embedded BibTeX
     bibtex: str = ""
 
@@ -88,6 +92,8 @@ class Paper:
             "volume": self.volume,
             "issue": self.issue,
             "pages": self.pages,
+            "cited_by": self.cited_by,
+            "cites": self.cites,
             "bibtex": self.bibtex,
         }
 
@@ -133,8 +139,9 @@ class Paper:
             publisher=data.get("publisher", ""),
             volume=data.get("volume", ""),
             issue=data.get("issue", ""),
-            pages=data.get("pages", ""),
             ai_annotations=ai_annotations,
+            cited_by=data.get("cited_by", []),
+            cites=data.get("cites", []),
             bibtex=data.get("bibtex", ""),
         )
 
