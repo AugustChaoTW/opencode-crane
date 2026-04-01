@@ -269,9 +269,9 @@ tools = mcp._tool_manager._tools if hasattr(mcp, '_tool_manager') else {}
 print(len(tools))
 " 2>/dev/null)
 
-EXPECTED_TOOLS=35
+EXPECTED_TOOLS=38
 if [ "$TOOL_COUNT" = "$EXPECTED_TOOLS" ]; then
-    ok "MCP Server OK: $TOOL_COUNT tools registered"
+    success "✓ Tool count verified ($TOOL_COUNT)."
 else
     warn "Expected $EXPECTED_TOOLS tools, got: ${TOOL_COUNT:-0}"
 fi
