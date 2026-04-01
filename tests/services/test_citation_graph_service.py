@@ -1,3 +1,5 @@
+# pyright: reportMissingImports=false
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -12,7 +14,7 @@ from crane.services.citation_graph_service import CitationGraphService
 
 def _build_service(
     service_refs_dir: Path,
-    sample_reference_map: Mapping[str, dict[str, object]],
+    sample_reference_map: Mapping[str, Mapping[str, object]],
     monkeypatch,
 ) -> CitationGraphService:
     monkeypatch.setattr(
