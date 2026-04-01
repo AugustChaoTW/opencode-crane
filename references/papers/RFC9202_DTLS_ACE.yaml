@@ -1,0 +1,35 @@
+key: RFC9202_DTLS_ACE
+title: Datagram Transport Layer Security (DTLS) Profile for Authentication and Authorization
+  for Constrained Environments (ACE)
+authors:
+- Ludwig Seitz
+- Gerdes et al.
+year: 2022
+doi: ''
+url: https://ftp.ripe.net/rfc/rfc9202.html
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: RFC 9202, IETF Standards Track
+source: manual
+paper_type: standard
+categories:
+- Constrained Devices
+- DTLS
+- Authentication
+- IoT Standards
+keywords:
+- DTLS
+- ACE
+- constrained
+- IoT
+- authentication
+- RFC
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{RFC9202_DTLS_ACE,\n  title={Datagram Transport Layer Security (DTLS)\
+  \ Profile for Authentication and Authorization for Constrained Environments (ACE)},\n\
+  \  author={Ludwig Seitz and Gerdes et al.},\n  year={2022}\n}"

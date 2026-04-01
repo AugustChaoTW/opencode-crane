@@ -1,0 +1,33 @@
+key: sole2022loramesh
+title: Implementation of a LoRa Mesh Library
+authors:
+- Joan Miquel Solé
+- Roger Pueyo Centelles
+- Felix Freitag
+- Roc Meseguer
+year: 2022
+doi: 10.1109/ACCESS.2022.3217215
+url: https://ieeexplore.ieee.org/document/9930341
+pdf_url: ''
+pdf_path: ''
+abstract: LoRa mesh networks enable long-range, low-power communication for IoT applications.
+  This paper presents the implementation of a LoRa mesh library using distance-vector
+  routing protocol for multi-hop communication among LoRa nodes.
+venue: IEEE Access
+source: manual
+paper_type: unknown
+categories: []
+keywords:
+- LoRa
+- mesh networking
+- distance-vector routing
+- IoT
+- wireless communication
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{sole2022loramesh,\n  title={Implementation of a LoRa Mesh Library},\n\
+  \  author={Joan Miquel Solé and Roger Pueyo Centelles and Felix Freitag and Roc\
+  \ Meseguer},\n  year={2022},\n  doi={10.1109/ACCESS.2022.3217215}\n}"

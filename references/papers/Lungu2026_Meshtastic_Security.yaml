@@ -1,0 +1,31 @@
+key: Lungu2026_Meshtastic_Security
+title: 'Meshtastic: Security Disclosure - Vulnerabilities in Meshtastic Radio Software'
+authors:
+- Cezar Lungu
+year: 2026
+doi: ''
+url: https://cezarlungu.com/meshtastic-security-disclosure/
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: Security Research
+source: manual
+paper_type: vulnerability_report
+categories:
+- Meshtastic
+- Vulnerability Disclosure
+- LoRa Mesh
+keywords:
+- Meshtastic
+- CVE
+- key downgrade
+- spoofing
+- vulnerability
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{Lungu2026_Meshtastic_Security,\n  title={Meshtastic: Security Disclosure\
+  \ - Vulnerabilities in Meshtastic Radio Software},\n  author={Cezar Lungu},\n  year={2026}\n\
+  }"

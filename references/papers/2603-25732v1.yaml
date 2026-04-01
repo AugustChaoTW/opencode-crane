@@ -1,0 +1,82 @@
+key: 2603-25732v1
+title: 'BizGenEval: A Systematic Benchmark for Commercial Visual Content Generation'
+authors:
+- Yan Li
+- Zezi Zeng
+- Ziwei Zhou
+- Xin Gao
+- Muzhao Tian
+- Yifan Yang
+- Mingxi Cheng
+- Qi Dai
+- Yuqing Yang
+- Lili Qiu
+- Zhendong Wang
+- Zhengyuan Yang
+- Xue Yang
+- Lijuan Wang
+- Ji Li
+- Chong Luo
+year: 2026
+doi: arxiv:2603.25732v1
+url: http://arxiv.org/abs/2603.25732v1
+pdf_url: https://arxiv.org/pdf/2603.25732v1
+pdf_path: ''
+abstract: 'Recent advances in image generation models have expanded their applications
+  beyond aesthetic imagery toward practical visual content creation. However, existing
+  benchmarks mainly focus on natural image synthesis and fail to systematically evaluate
+  models under the structured and multi-constraint requirements of real-world commercial
+  design tasks. In this work, we introduce BizGenEval, a systematic benchmark for
+  commercial visual content generation. The benchmark spans five representative document
+  types: slides, charts, webpages, posters, and scientific figures, and evaluates
+  four key capability dimensions: text rendering, layout control, attribute binding,
+  and knowledge-based reasoning, forming 20 diverse evaluation tasks. BizGenEval contains
+  400 carefully curated prompts and 8000 human-verified checklist questions to rigorously
+  assess whether generated images satisfy complex visual and semantic constraints.
+  We conduct large-scale benchmarking on 26 popular image generation systems, including
+  state-of-the-art commercial APIs and leading open-source models. The results reveal
+  substantial capability gaps between current generative models and the requirements
+  of professional visual content creation. We hope BizGenEval serves as a standardized
+  benchmark for real-world commercial visual content generation.'
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- cs.CV
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@inproceedings{2603-25732v1,\n  title={BizGenEval: A Systematic Benchmark\
+  \ for Commercial Visual Content Generation},\n  author={Yan Li and Zezi Zeng and\
+  \ Ziwei Zhou and Xin Gao and Muzhao Tian and Yifan Yang and Mingxi Cheng and Qi\
+  \ Dai and Yuqing Yang and Lili Qiu and Zhendong Wang and Zhengyuan Yang and Xue\
+  \ Yang and Lijuan Wang and Ji Li and Chong Luo},\n  booktitle={arXiv},\n  year={2026},\n\
+  \  doi={arxiv:2603.25732v1}\n}"
+ai_annotations:
+  summary: 'Recent advances in image generation models have expanded their applications
+    beyond aesthetic imagery toward practical visual content creation. However, existing
+    benchmarks mainly focus on natural image synthesis and fail to systematically
+    evaluate models under the structured and multi-constraint requirements of real-world
+    commercial design tasks. In this work, we introduce BizGenEval, a systematic benchmark
+    for commercial visual content generation. The benchmark spans five representative
+    document types: slides, charts, webpages, posters, and scientific figures, and
+    evaluates four key capability dimensions: text rendering, layout control, attribute
+    binding, and knowledge-based reasoning, forming 20 diverse evaluation tasks. BizGenEval
+    contains 400 carefully curated prompts and 8000 human-verified checklist questions
+    to rigorously assess whether generated images satisfy complex visual and semantic
+    constraints. We conduct large-scale benchmarking on 26 popular image generation
+    systems, including state-of-the-art commercial APIs and leading open-source models.
+    The results reveal substantial capability gaps between current generative models
+    and the requirements of professional visual content creation. We hope BizGenEval
+    serves as a standardized benchmark for real-world commercial visual content generation.'
+  key_contributions: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-03-28'

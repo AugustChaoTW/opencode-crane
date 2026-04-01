@@ -1,0 +1,86 @@
+key: 2603-25746v1
+title: 'ShotStream: Streaming Multi-Shot Video Generation for Interactive Storytelling'
+authors:
+- Yawen Luo
+- Xiaoyu Shi
+- Junhao Zhuang
+- Yutian Chen
+- Quande Liu
+- Xintao Wang
+- Pengfei Wan
+- Tianfan Xue
+year: 2026
+doi: arxiv:2603.25746v1
+url: http://arxiv.org/abs/2603.25746v1
+pdf_url: https://arxiv.org/pdf/2603.25746v1
+pdf_path: ''
+abstract: 'Multi-shot video generation is crucial for long narrative storytelling,
+  yet current bidirectional architectures suffer from limited interactivity and high
+  latency. We propose ShotStream, a novel causal multi-shot architecture that enables
+  interactive storytelling and efficient on-the-fly frame generation. By reformulating
+  the task as next-shot generation conditioned on historical context, ShotStream allows
+  users to dynamically instruct ongoing narratives via streaming prompts. We achieve
+  this by first fine-tuning a text-to-video model into a bidirectional next-shot generator,
+  which is then distilled into a causal student via Distribution Matching Distillation.
+  To overcome the challenges of inter-shot consistency and error accumulation inherent
+  in autoregressive generation, we introduce two key innovations. First, a dual-cache
+  memory mechanism preserves visual coherence: a global context cache retains conditional
+  frames for inter-shot consistency, while a local context cache holds generated frames
+  within the current shot for intra-shot consistency. And a RoPE discontinuity indicator
+  is employed to explicitly distinguish the two caches to eliminate ambiguity. Second,
+  to mitigate error accumulation, we propose a two-stage distillation strategy. This
+  begins with intra-shot self-forcing conditioned on ground-truth historical shots
+  and progressively extends to inter-shot self-forcing using self-generated histories,
+  effectively bridging the train-test gap. Extensive experiments demonstrate that
+  ShotStream generates coherent multi-shot videos with sub-second latency, achieving
+  16 FPS on a single GPU. It matches or exceeds the quality of slower bidirectional
+  models, paving the way for real-time interactive storytelling. Training and inference
+  code, as well as the models, are available on our'
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- cs.CV
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@inproceedings{2603-25746v1,\n  title={ShotStream: Streaming Multi-Shot Video\
+  \ Generation for Interactive Storytelling},\n  author={Yawen Luo and Xiaoyu Shi\
+  \ and Junhao Zhuang and Yutian Chen and Quande Liu and Xintao Wang and Pengfei Wan\
+  \ and Tianfan Xue},\n  booktitle={arXiv},\n  year={2026},\n  doi={arxiv:2603.25746v1}\n\
+  }"
+ai_annotations:
+  summary: 'Multi-shot video generation is crucial for long narrative storytelling,
+    yet current bidirectional architectures suffer from limited interactivity and
+    high latency. We propose ShotStream, a novel causal multi-shot architecture that
+    enables interactive storytelling and efficient on-the-fly frame generation. By
+    reformulating the task as next-shot generation conditioned on historical context,
+    ShotStream allows users to dynamically instruct ongoing narratives via streaming
+    prompts. We achieve this by first fine-tuning a text-to-video model into a bidirectional
+    next-shot generator, which is then distilled into a causal student via Distribution
+    Matching Distillation. To overcome the challenges of inter-shot consistency and
+    error accumulation inherent in autoregressive generation, we introduce two key
+    innovations. First, a dual-cache memory mechanism preserves visual coherence:
+    a global context cache retains conditional frames for inter-shot consistency,
+    while a local context cache holds generated frames within the current shot for
+    intra-shot consistency. And a RoPE discontinuity indicator is employed to explicitly
+    distinguish the two caches to eliminate ambiguity. Second, to mitigate error accumulation,
+    we propose a two-stage distillation strategy. This begins with intra-shot self-forcing
+    conditioned on ground-truth historical shots and progressively extends to inter-shot
+    self-forcing using self-generated histories, effectively bridging the train-test
+    gap. Extensive experiments demonstrate that ShotStream generates coherent multi-shot
+    videos with sub-second latency, achieving 16 FPS on a single GPU. It matches or
+    exceeds the quality of slower bidirectional models, paving the way for real-time
+    interactive storytelling. Training and inference code, as well as the models,
+    are available on our'
+  key_contributions: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-03-28'

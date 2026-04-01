@@ -1,0 +1,33 @@
+key: Norrman2021_EDHOC_FV
+title: Formal Analysis of EDHOC Key Establishment for Constrained IoT Devices
+authors:
+- Karl Norrman
+- Vaishnavi Sundararajan
+- Alessandro Bruni
+year: 2021
+doi: ''
+url: https://www.scitepress.org/Papers/2021/105540/105540.pdf
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: KTH Royal Institute, Ericsson Research, UC Santa Cruz, ITU
+source: manual
+paper_type: formal_verification
+categories:
+- Formal Verification
+- Key Establishment
+- IoT
+- Constrained Devices
+keywords:
+- EDHOC
+- formal analysis
+- IoT security
+- constrained environments
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{Norrman2021_EDHOC_FV,\n  title={Formal Analysis of EDHOC Key Establishment\
+  \ for Constrained IoT Devices},\n  author={Karl Norrman and Vaishnavi Sundararajan\
+  \ and Alessandro Bruni},\n  year={2021}\n}"

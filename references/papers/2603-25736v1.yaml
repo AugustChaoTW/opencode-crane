@@ -1,0 +1,71 @@
+key: 2603-25736v1
+title: How good was my shot? Quantifying Player Skill Level in Table Tennis
+authors:
+- Akihiro Kubota
+- Tomoya Hasegawa
+- Ryo Kawahara
+- Ko Nishino
+year: 2026
+doi: arxiv:2603.25736v1
+url: http://arxiv.org/abs/2603.25736v1
+pdf_url: https://arxiv.org/pdf/2603.25736v1
+pdf_path: ''
+abstract: Gauging an individual's skill level is crucial, as it inherently shapes
+  their behavior. Quantifying skill, however, is challenging because it is latent
+  to the observed actions. To explore skill understanding in human behavior, we focus
+  on dyadic sports -- specifically table tennis -- where skill manifests not just
+  in complex movements, but in the subtle nuances of execution conditioned on game
+  context. Our key idea is to learn a generative model of each player's tactical racket
+  strokes and jointly embed them in a common latent space that encodes individual
+  characteristics, including those pertaining to skill levels. By training these player
+  models on a large-scale dataset of 3D-reconstructed professional matches and conditioning
+  them on comprehensive game context -- including player positioning and opponent
+  behaviors -- the models capture individual tactical identities within their latent
+  space. We probe this learned player space and find that it reflects distinct play
+  styles and attributes that collectively represent skill. By training a simple relative
+  ranking network on these embeddings, we demonstrate that both relative and absolute
+  skill predictions can be achieved. These results demonstrate that the learned player
+  space effectively quantifies skill levels, providing a foundation for automated
+  skill assessment in complex, interactive behaviors.
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- cs.CV
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@inproceedings{2603-25736v1,\n  title={How good was my shot? Quantifying\
+  \ Player Skill Level in Table Tennis},\n  author={Akihiro Kubota and Tomoya Hasegawa\
+  \ and Ryo Kawahara and Ko Nishino},\n  booktitle={arXiv},\n  year={2026},\n  doi={arxiv:2603.25736v1}\n\
+  }"
+ai_annotations:
+  summary: Gauging an individual's skill level is crucial, as it inherently shapes
+    their behavior. Quantifying skill, however, is challenging because it is latent
+    to the observed actions. To explore skill understanding in human behavior, we
+    focus on dyadic sports -- specifically table tennis -- where skill manifests not
+    just in complex movements, but in the subtle nuances of execution conditioned
+    on game context. Our key idea is to learn a generative model of each player's
+    tactical racket strokes and jointly embed them in a common latent space that encodes
+    individual characteristics, including those pertaining to skill levels. By training
+    these player models on a large-scale dataset of 3D-reconstructed professional
+    matches and conditioning them on comprehensive game context -- including player
+    positioning and opponent behaviors -- the models capture individual tactical identities
+    within their latent space. We probe this learned player space and find that it
+    reflects distinct play styles and attributes that collectively represent skill.
+    By training a simple relative ranking network on these embeddings, we demonstrate
+    that both relative and absolute skill predictions can be achieved. These results
+    demonstrate that the learned player space effectively quantifies skill levels,
+    providing a foundation for automated skill assessment in complex, interactive
+    behaviors.
+  key_contributions: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-03-28'

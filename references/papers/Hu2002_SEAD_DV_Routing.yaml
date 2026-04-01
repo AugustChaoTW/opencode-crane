@@ -1,0 +1,34 @@
+key: Hu2002_SEAD_DV_Routing
+title: 'SEAD: Secure Efficient Distance Vector Routing for Mobile Wireless Ad Hoc
+  Networks'
+authors:
+- Yih-Chun Hu
+- David B. Johnson
+- Adrian Perrig
+year: 2002
+doi: ''
+url: https://netsec.ethz.ch/publications/papers/sead-journal.pdf
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: Carnegie Mellon University, Rice University
+source: manual
+paper_type: protocol_design
+categories:
+- Secure Routing
+- Distance-Vector
+- Ad Hoc Networks
+keywords:
+- SEAD
+- secure routing
+- distance vector
+- MANET
+- ad hoc
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{Hu2002_SEAD_DV_Routing,\n  title={SEAD: Secure Efficient Distance Vector\
+  \ Routing for Mobile Wireless Ad Hoc Networks},\n  author={Yih-Chun Hu and David\
+  \ B. Johnson and Adrian Perrig},\n  year={2002}\n}"

@@ -1,0 +1,32 @@
+key: Malele2025_Tamarin_IoT
+title: Tamarin-based Verification of Authentication Protocols in Smart City IoT
+authors:
+- Vusimuzi Malele
+- Godwin Mandinyenya
+year: 2025
+doi: ''
+url: https://ijirss.com/index.php/ijirss/article/download/11065/2679/18790
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: School of Computer Science and Information Systems
+source: manual
+paper_type: formal_verification
+categories:
+- Formal Verification
+- Tamarin
+- IoT Authentication
+keywords:
+- Tamarin
+- IoT
+- smart city
+- authentication
+- formal verification
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{Malele2025_Tamarin_IoT,\n  title={Tamarin-based Verification of Authentication\
+  \ Protocols in Smart City IoT},\n  author={Vusimuzi Malele and Godwin Mandinyenya},\n\
+  \  year={2025}\n}"

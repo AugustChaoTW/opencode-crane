@@ -1,0 +1,33 @@
+key: Aras2016_LoRa_Vulnerabilities
+title: Exploring The Security Vulnerabilities of LoRa
+authors:
+- Emekcan Aras
+- Gowri Sankar Ramachandran
+- Piers Lawrence
+- Danny Hughes
+year: 2016
+doi: ''
+url: https://lirias.kuleuven.be/retrieve/460994/
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: iMinds-DistriNet, KU Leuven
+source: manual
+paper_type: security_analysis
+categories:
+- LoRa Security
+- IoT Vulnerabilities
+- Physical Layer
+keywords:
+- LoRa
+- vulnerability
+- security analysis
+- IoT
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{Aras2016_LoRa_Vulnerabilities,\n  title={Exploring The Security Vulnerabilities\
+  \ of LoRa},\n  author={Emekcan Aras and Gowri Sankar Ramachandran and Piers Lawrence\
+  \ and Danny Hughes},\n  year={2016}\n}"

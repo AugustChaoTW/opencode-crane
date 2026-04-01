@@ -1,0 +1,31 @@
+key: Gunnarsson2022_WirelessHART_FV
+title: Formal Verification of the WirelessHART Protocol - Verifying Old and Finding
+  New Attacks
+authors:
+- Martin Gunnarsson
+year: 2022
+doi: ''
+url: https://www.acsac.org/2022/workshops/icss/2022-icss-gunnarsson.pdf
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: RISE Research Institutes of Sweden, ACSAC Workshop
+source: manual
+paper_type: formal_verification
+categories:
+- Formal Verification
+- Wireless Protocols
+- Tamarin
+keywords:
+- WirelessHART
+- formal verification
+- Tamarin
+- protocol analysis
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{Gunnarsson2022_WirelessHART_FV,\n  title={Formal Verification of the\
+  \ WirelessHART Protocol - Verifying Old and Finding New Attacks},\n  author={Martin\
+  \ Gunnarsson},\n  year={2022}\n}"

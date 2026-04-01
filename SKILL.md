@@ -54,6 +54,7 @@ description: >
 
 ### Workflow Orchestration
 - `run_pipeline` — Execute predefined multi-step workflows with checkpoints and recovery hints
+- `run_submission_check` — Complete pre-submission verification: literature review + experiments + framing + health check
 
 ## SECTION 2: WORKFLOW TRIGGER RULES
 
@@ -75,13 +76,57 @@ Use these rules first. Prefer `run_pipeline` for multi-step goals; prefer atomic
 - "檢查所有文獻" / "check all references metadata" -> use `check_all_references`
 - "工作區狀態" / "workspace overview" / "project status" -> use `workspace_status`
 - "進度" / "status" -> call `get_milestone_progress` + `list_tasks`
+- "投稿前檢查" / "do before submission check" / "submission check" -> `run_submission_check(paper_path, project_dir)`
 
 ### Chaining Rule (No Extra Prompt Needed)
 After a matched workflow trigger, execute all required next steps automatically in one tool-call plan:
 - literature review flow: search -> add -> download -> read -> annotate -> create task
 - full setup flow: init -> create starter tasks
 
-## SECTION 3: PIPELINE USAGE
+## SECTION 3: SUBMISSION CHECK WORKFLOW
+
+### `run_submission_check` — Complete Pre-Submission Verification
+
+Executes integrated 4-step workflow:
+1. **Literature Review** — Scan existing references library, generate checklist with PDF status
+2. **Experiment Results** — Collate experiment data (CSV/JSON/YAML) from repo
+3. **Framing Analysis** — Detect overclaiming, terminology issues, weak justification
+4. **Paper Health Check** — Q1 standards evaluation + section-level review (6 issue types)
+
+**Output**: Generates `BEFORE_SUBMISSION_RUN{n}/` directory with:
+```
+BEFORE_SUBMISSION_RUN1/
+├── reports/
+│   ├── LITERATURE_REVIEW.md            (PDF checklist)
+│   ├── EXP_RESULTS.md                  (experiment collation)
+│   ├── FRAMING_ANALYSIS.md             (overclaiming issues)
+│   └── PAPER_HEALTH_REPORT.md          (Q1 + section review)
+└── references/
+```
+
+**Parameters**:
+- `paper_path`: LaTeX main file (e.g., `papers/TMLR/TMLR-MAIN.tex`). Auto-detected if omitted.
+- `project_dir`: Project root (default: current directory)
+
+**Returns**:
+```python
+{
+    "status": "completed" | "failed",
+    "version": 1,  # Auto-incremented BEFORE_SUBMISSION_RUNn
+    "submission_dir": "/path/to/BEFORE_SUBMISSION_RUN1/",
+    "checkpoints": ["literature_review", "experiment_results", "framing_analysis", "paper_health_check"],
+    "reports": {
+        "literature": {"file": "...", "reference_count": 42, "pdf_complete": 40},
+        "experiments": {"file": "...", "experiment_count": 156, "data_sources": 5},
+        "framing": {"file": "...", "total_issues": 8, "critical": 2, "high": 3},
+        "health": {"file": "...", "overall_score": 78.5, "readiness": "ready_with_revisions"}
+    },
+    "completed_at": "2025-03-27T...",
+    "error": "..."  # if failed
+}
+```
+
+## SECTION 4: PIPELINE USAGE
 
 ### `run_pipeline` Parameters
 - `pipeline`: `"literature-review"` or `"full-setup"`

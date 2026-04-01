@@ -1,0 +1,33 @@
+key: Ruotsalainen2022_LoRaWAN_PHY_Attacks
+title: LoRaWAN Physical Layer-Based Attacks and Countermeasures, A Review
+authors:
+- Henri Ruotsalainen
+- Guanxiong Shen
+- Junqing Zhang
+year: 2022
+doi: ''
+url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9100101/
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: Sensors, MDPI, Vol. 22, Issue 9
+source: manual
+paper_type: survey
+categories:
+- LoRaWAN Security
+- Physical Layer Attacks
+- Countermeasures
+keywords:
+- LoRaWAN
+- physical layer
+- attacks
+- jamming
+- review
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{Ruotsalainen2022_LoRaWAN_PHY_Attacks,\n  title={LoRaWAN Physical Layer-Based\
+  \ Attacks and Countermeasures, A Review},\n  author={Henri Ruotsalainen and Guanxiong\
+  \ Shen and Junqing Zhang},\n  year={2022}\n}"

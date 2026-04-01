@@ -1,0 +1,35 @@
+key: Bettoumi2021_LC_DEX
+title: 'LC-DEX: Lightweight and Efficient Compressed Authentication Based Elliptic
+  Curve Cryptography in Multi-Hop 6LoWPAN Wireless Sensor Networks'
+authors:
+- Balkis Bettoumi
+- Ridha Bouallegue
+year: 2021
+doi: ''
+url: https://mdpi-res.com/d_attachment/sensors/sensors-21-07348/article_deploy/sensors-21-07348-v2.pdf
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: Sensors, MDPI
+source: manual
+paper_type: protocol_design
+categories:
+- Lightweight Authentication
+- 6LoWPAN
+- Mesh Networks
+- ECC
+keywords:
+- authentication
+- lightweight
+- 6LoWPAN
+- mesh
+- elliptic curve
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{Bettoumi2021_LC_DEX,\n  title={LC-DEX: Lightweight and Efficient Compressed\
+  \ Authentication Based Elliptic Curve Cryptography in Multi-Hop 6LoWPAN Wireless\
+  \ Sensor Networks},\n  author={Balkis Bettoumi and Ridha Bouallegue},\n  year={2021}\n\
+  }"

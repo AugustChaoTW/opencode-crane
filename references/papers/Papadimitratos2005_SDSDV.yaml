@@ -1,0 +1,31 @@
+key: Papadimitratos2005_SDSDV
+title: Secure On-Demand Distance Vector Routing in Ad Hoc Networks
+authors:
+- Panagiotis Papadimitratos
+- Zygmunt J. Haas
+year: 2005
+doi: ''
+url: https://nss.proj.kth.se/publications/fulltext/secure-distance-vector-routing-manet.pdf
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: Virginia Tech, Cornell University
+source: manual
+paper_type: protocol_design
+categories:
+- Secure Routing
+- AODV
+- Ad Hoc Networks
+keywords:
+- routing security
+- AODV
+- distance vector
+- authentication
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{Papadimitratos2005_SDSDV,\n  title={Secure On-Demand Distance Vector\
+  \ Routing in Ad Hoc Networks},\n  author={Panagiotis Papadimitratos and Zygmunt\
+  \ J. Haas},\n  year={2005}\n}"

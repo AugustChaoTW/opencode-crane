@@ -1,0 +1,54 @@
+key: 2603-25729v1
+title: $θ$ Angle and Axial Anomaly in Holographic QCD
+authors:
+- Csaba Csáki
+- Eric Kuflik
+- Wei Xue
+- Taewook Youn
+year: 2026
+doi: arxiv:2603.25729v1
+url: http://arxiv.org/abs/2603.25729v1
+pdf_url: https://arxiv.org/pdf/2603.25729v1
+pdf_path: ''
+abstract: We present a bottom-up holographic description of the QCD $θ$-vacuum and
+  the $U(1)_A$ anomaly in five dimensions. The multi-branched $θ$-vacuum structure
+  emerges geometrically from a higher-dimensional gauge field, while the axial anomaly
+  is realized through a Stückelberg coupling that is dual to a Chern-Simons term.
+  In this framework, the $η'$ meson appears as a zero mode of bulk fluctuations, and
+  its mass arises from the anomaly-induced Stückelberg term. The construction provides
+  a transparent holographic derivation of the anomaly contribution to the $η'$ mass
+  and naturally reproduces the Witten-Veneziano relation between the $η'$ mass and
+  the Yang-Mills topological susceptibility.
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- hep-ph
+- hep-th
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@inproceedings{2603-25729v1,\n  title={$θ$ Angle and Axial Anomaly in Holographic\
+  \ QCD},\n  author={Csaba Csáki and Eric Kuflik and Wei Xue and Taewook Youn},\n\
+  \  booktitle={arXiv},\n  year={2026},\n  doi={arxiv:2603.25729v1}\n}"
+ai_annotations:
+  summary: We present a bottom-up holographic description of the QCD $θ$-vacuum and
+    the $U(1)_A$ anomaly in five dimensions. The multi-branched $θ$-vacuum structure
+    emerges geometrically from a higher-dimensional gauge field, while the axial anomaly
+    is realized through a Stückelberg coupling that is dual to a Chern-Simons term.
+    In this framework, the $η'$ meson appears as a zero mode of bulk fluctuations,
+    and its mass arises from the anomaly-induced Stückelberg term. The construction
+    provides a transparent holographic derivation of the anomaly contribution to the
+    $η'$ mass and naturally reproduces the Witten-Veneziano relation between the $η'$
+    mass and the Yang-Mills topological susceptibility.
+  key_contributions: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-03-28'

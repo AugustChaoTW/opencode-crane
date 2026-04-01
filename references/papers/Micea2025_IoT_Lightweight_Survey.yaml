@@ -1,0 +1,32 @@
+key: Micea2025_IoT_Lightweight_Survey
+title: 'Securing IoT Edge: A Survey on Lightweight Cryptography, Anonymous Routing
+  and Communication Protocol Enhancements'
+authors:
+- Mihai V. Micea
+year: 2025
+doi: ''
+url: https://link.springer.com/article/10.1007/s10207-025-01071-7
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: International Journal of Information Security, Springer
+source: manual
+paper_type: survey
+categories:
+- Lightweight Cryptography
+- IoT Security
+- Anonymous Routing
+- Protocol Design
+keywords:
+- IoT security
+- lightweight cryptography
+- routing
+- constrained devices
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{Micea2025_IoT_Lightweight_Survey,\n  title={Securing IoT Edge: A Survey\
+  \ on Lightweight Cryptography, Anonymous Routing and Communication Protocol Enhancements},\n\
+  \  author={Mihai V. Micea},\n  year={2025}\n}"

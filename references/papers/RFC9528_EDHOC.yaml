@@ -1,0 +1,33 @@
+key: RFC9528_EDHOC
+title: Ephemeral Diffie-Hellman Over COSE (EDHOC)
+authors:
+- Francesca Palombini
+- Selander et al.
+year: 2024
+doi: ''
+url: https://ftp.ripe.net/rfc/rfc9528.html
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: RFC 9528, IETF Standards Track
+source: manual
+paper_type: standard
+categories:
+- Key Establishment
+- Constrained IoT
+- COSE
+- Cryptography
+keywords:
+- EDHOC
+- key establishment
+- COSE
+- IoT
+- lightweight
+- RFC
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{RFC9528_EDHOC,\n  title={Ephemeral Diffie-Hellman Over COSE (EDHOC)},\n\
+  \  author={Francesca Palombini and Selander et al.},\n  year={2024}\n}"

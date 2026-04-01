@@ -1,0 +1,65 @@
+key: 2603-25728v1
+title: 'PixelSmile: Toward Fine-Grained Facial Expression Editing'
+authors:
+- Jiabin Hua
+- Hengyuan Xu
+- Aojie Li
+- Wei Cheng
+- Gang Yu
+- Xingjun Ma
+- Yu-Gang Jiang
+year: 2026
+doi: arxiv:2603.25728v1
+url: http://arxiv.org/abs/2603.25728v1
+pdf_url: https://arxiv.org/pdf/2603.25728v1
+pdf_path: ''
+abstract: Fine-grained facial expression editing has long been limited by intrinsic
+  semantic overlap. To address this, we construct the Flex Facial Expression (FFE)
+  dataset with continuous affective annotations and establish FFE-Bench to evaluate
+  structural confusion, editing accuracy, linear controllability, and the trade-off
+  between expression editing and identity preservation. We propose PixelSmile, a diffusion
+  framework that disentangles expression semantics via fully symmetric joint training.
+  PixelSmile combines intensity supervision with contrastive learning to produce stronger
+  and more distinguishable expressions, achieving precise and stable linear expression
+  control through textual latent interpolation. Extensive experiments demonstrate
+  that PixelSmile achieves superior disentanglement and robust identity preservation,
+  confirming its effectiveness for continuous, controllable, and fine-grained expression
+  editing, while naturally supporting smooth expression blending.
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- cs.CV
+- cs.AI
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@inproceedings{2603-25728v1,\n  title={PixelSmile: Toward Fine-Grained Facial\
+  \ Expression Editing},\n  author={Jiabin Hua and Hengyuan Xu and Aojie Li and Wei\
+  \ Cheng and Gang Yu and Xingjun Ma and Yu-Gang Jiang},\n  booktitle={arXiv},\n \
+  \ year={2026},\n  doi={arxiv:2603.25728v1}\n}"
+ai_annotations:
+  summary: Fine-grained facial expression editing has long been limited by intrinsic
+    semantic overlap. To address this, we construct the Flex Facial Expression (FFE)
+    dataset with continuous affective annotations and establish FFE-Bench to evaluate
+    structural confusion, editing accuracy, linear controllability, and the trade-off
+    between expression editing and identity preservation. We propose PixelSmile, a
+    diffusion framework that disentangles expression semantics via fully symmetric
+    joint training. PixelSmile combines intensity supervision with contrastive learning
+    to produce stronger and more distinguishable expressions, achieving precise and
+    stable linear expression control through textual latent interpolation. Extensive
+    experiments demonstrate that PixelSmile achieves superior disentanglement and
+    robust identity preservation, confirming its effectiveness for continuous, controllable,
+    and fine-grained expression editing, while naturally supporting smooth expression
+    blending.
+  key_contributions: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-03-28'

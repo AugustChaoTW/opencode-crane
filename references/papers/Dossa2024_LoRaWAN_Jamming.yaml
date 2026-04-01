@@ -1,0 +1,33 @@
+key: Dossa2024_LoRaWAN_Jamming
+title: 'Impact of Reactive Jamming Attacks on LoRaWAN: a Theoretical and Experimental
+  Study'
+authors:
+- Amavi Dossa
+- Andreas Burg
+- El Mehdi Amhoud
+year: 2024
+doi: ''
+url: https://arxiv.org/html/2501.18339v2
+pdf_url: ''
+pdf_path: ''
+abstract: ''
+venue: arXiv:2501.18339
+source: manual
+paper_type: attack_analysis
+categories:
+- LoRaWAN Security
+- Jamming Attacks
+- Wireless
+keywords:
+- LoRaWAN
+- jamming
+- DoS
+- wireless attack
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+bibtex: "@misc{Dossa2024_LoRaWAN_Jamming,\n  title={Impact of Reactive Jamming Attacks\
+  \ on LoRaWAN: a Theoretical and Experimental Study},\n  author={Amavi Dossa and\
+  \ Andreas Burg and El Mehdi Amhoud},\n  year={2024}\n}"
