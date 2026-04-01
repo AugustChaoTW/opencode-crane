@@ -10,6 +10,9 @@ from crane.services.reference_service import ReferenceService
 from crane.workspace import resolve_workspace
 
 
+_ANNOTATION_UNSET = "__CRANE_ANNOTATION_UNSET__"
+
+
 def register_tools(mcp):
     """Register reference management tools with the MCP server."""
 
@@ -126,10 +129,10 @@ def register_tools(mcp):
     @mcp.tool()
     def annotate_reference(
         key: str,
-        summary: str = "",
+        summary: str | None = _ANNOTATION_UNSET,
         key_contributions: list[str] | None = None,
-        methodology: str = "",
-        relevance_notes: str = "",
+        methodology: str | None = _ANNOTATION_UNSET,
+        relevance_notes: str | None = _ANNOTATION_UNSET,
         tags: list[str] | None = None,
         related_issues: list[int] | None = None,
         refs_dir: str = "references",
@@ -140,12 +143,16 @@ def register_tools(mcp):
         Writes to the ai_annotations section of references/papers/{key}.yaml.
         """
         service = _get_service(refs_dir, project_dir)
-        return service.annotate(
-            key=key,
-            summary=summary,
-            key_contributions=key_contributions,
-            methodology=methodology,
-            relevance_notes=relevance_notes,
-            tags=tags,
-            related_issues=related_issues,
-        )
+        annotate_kwargs: dict[str, Any] = {
+            "key": key,
+            "key_contributions": key_contributions,
+            "tags": tags,
+            "related_issues": related_issues,
+        }
+        if summary != _ANNOTATION_UNSET:
+            annotate_kwargs["summary"] = summary
+        if methodology != _ANNOTATION_UNSET:
+            annotate_kwargs["methodology"] = methodology
+        if relevance_notes != _ANNOTATION_UNSET:
+            annotate_kwargs["relevance_notes"] = relevance_notes
+        return service.annotate(**annotate_kwargs)

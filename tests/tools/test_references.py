@@ -291,3 +291,22 @@ class TestAnnotateReference:
         assert data["ai_annotations"]["tags"] == ["foundational", "architecture"]
         assert data["ai_annotations"]["related_issues"] == [1, 2, 3]
         assert data["ai_annotations"]["methodology"] == "Original method"
+
+    def test_tag_only_update_does_not_clear_existing_summary(
+        self, ref_tools, tmp_project, sample_paper_dict
+    ):
+        p = Paper.from_yaml_dict(sample_paper_dict)
+        p.ai_annotations = AiAnnotations(summary="Persist me", tags=["transformer"])
+        papers_dir = str(tmp_project / "references" / "papers")
+        write_paper_yaml(papers_dir, p.key, p.to_yaml_dict())
+
+        ref_tools["annotate_reference"](
+            key=p.key,
+            tags=["nlp"],
+            refs_dir=str(tmp_project / "references"),
+        )
+
+        data = read_paper_yaml(papers_dir, p.key)
+        assert data is not None
+        assert data["ai_annotations"]["summary"] == "Persist me"
+        assert data["ai_annotations"]["tags"] == ["transformer", "nlp"]

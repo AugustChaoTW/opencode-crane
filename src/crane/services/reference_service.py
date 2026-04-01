@@ -19,6 +19,9 @@ from crane.utils.yaml_io import (
 )
 
 
+_UNSET = object()
+
+
 class ReferenceService:
     """Service for reference CRUD operations with YAML + BibTeX persistence."""
 
@@ -36,18 +39,22 @@ class ReferenceService:
 
     def _validate_annotation_inputs(
         self,
-        summary: str,
+        summary: str | None | object,
         key_contributions: list[str] | None,
-        methodology: str,
-        relevance_notes: str,
+        methodology: str | None | object,
+        relevance_notes: str | None | object,
         tags: list[str] | None,
         related_issues: list[int] | None,
     ) -> None:
-        if len(summary) > 2000:
+        if summary is not _UNSET and summary is not None and len(summary) > 2000:
             raise ValueError("summary exceeds maximum length (2000)")
-        if len(methodology) > 4000:
+        if methodology is not _UNSET and methodology is not None and len(methodology) > 4000:
             raise ValueError("methodology exceeds maximum length (4000)")
-        if len(relevance_notes) > 4000:
+        if (
+            relevance_notes is not _UNSET
+            and relevance_notes is not None
+            and len(relevance_notes) > 4000
+        ):
             raise ValueError("relevance_notes exceeds maximum length (4000)")
 
         if key_contributions is not None:
@@ -275,10 +282,10 @@ class ReferenceService:
     def annotate(
         self,
         key: str,
-        summary: str = "",
+        summary: str | None | object = _UNSET,
         key_contributions: list[str] | None = None,
-        methodology: str = "",
-        relevance_notes: str = "",
+        methodology: str | None | object = _UNSET,
+        relevance_notes: str | None | object = _UNSET,
         tags: list[str] | None = None,
         related_issues: list[int] | None = None,
     ) -> str:
@@ -314,14 +321,14 @@ class ReferenceService:
         if paper.ai_annotations is None:
             paper.ai_annotations = AiAnnotations()
 
-        if summary:
-            paper.ai_annotations.summary = summary
+        if summary is not _UNSET:
+            paper.ai_annotations.summary = summary or ""
         if key_contributions is not None:
             paper.ai_annotations.key_contributions.extend(key_contributions)
-        if methodology:
-            paper.ai_annotations.methodology = methodology
-        if relevance_notes:
-            paper.ai_annotations.relevance_notes = relevance_notes
+        if methodology is not _UNSET:
+            paper.ai_annotations.methodology = methodology or ""
+        if relevance_notes is not _UNSET:
+            paper.ai_annotations.relevance_notes = relevance_notes or ""
         if tags is not None:
             paper.ai_annotations.tags.extend(tags)
         if related_issues is not None:

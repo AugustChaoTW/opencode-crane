@@ -240,6 +240,36 @@ class TestReferenceServiceAnnotate:
                 related_issues=[0, 2],
             )
 
+    def test_annotate_clears_summary_with_empty_string(self, reference_service, sample_paper_data):
+        reference_service.add(**sample_paper_data)
+        reference_service.annotate(
+            key="vaswani2017-attention",
+            summary="Initial summary",
+        )
+
+        reference_service.annotate(
+            key="vaswani2017-attention",
+            summary="",
+        )
+
+        result = reference_service.get("vaswani2017-attention")
+        assert result["ai_annotations"]["summary"] == ""
+
+    def test_annotate_clears_methodology_with_none(self, reference_service, sample_paper_data):
+        reference_service.add(**sample_paper_data)
+        reference_service.annotate(
+            key="vaswani2017-attention",
+            methodology="Transformer encoder-decoder",
+        )
+
+        reference_service.annotate(
+            key="vaswani2017-attention",
+            methodology=None,
+        )
+
+        result = reference_service.get("vaswani2017-attention")
+        assert result["ai_annotations"]["methodology"] == ""
+
 
 class TestReferenceServiceGetAllKeys:
     """Test getting all reference keys."""
