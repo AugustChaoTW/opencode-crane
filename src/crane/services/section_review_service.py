@@ -9,6 +9,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+from crane.models.paper import Paper
 from crane.services.latex_parser import SectionLocation, parse_latex_sections
 
 
@@ -488,6 +489,7 @@ class SectionReviewService:
         paper_path: str | Path,
         sections: list[str] | None = None,
         review_types: list[ReviewType] | None = None,
+        paper: Paper | None = None,
     ) -> PaperReview:
         """Review entire paper or specific sections."""
         structure = parse_latex_sections(paper_path)
@@ -510,6 +512,30 @@ class SectionReviewService:
                 sub_review = self.review_section(subsection, review_types, structure.raw_text)
                 section_reviews.append(sub_review)
 
+        annotation_context_used = False
+        if paper and paper.ai_annotations:
+            annotation_text_parts = [
+                paper.ai_annotations.summary,
+                paper.ai_annotations.methodology,
+                paper.ai_annotations.relevance_notes,
+                " ".join(paper.ai_annotations.key_contributions),
+                " ".join(paper.ai_annotations.tags),
+            ]
+            annotation_text = "\n".join(part for part in annotation_text_parts if part)
+            if annotation_text:
+                annotation_context_used = True
+                ai_section = SectionLocation(
+                    name="AI Annotations",
+                    level=1,
+                    start_line=0,
+                    end_line=0,
+                    content=annotation_text,
+                    subsections=[],
+                )
+                section_reviews.append(
+                    self.review_section(ai_section, review_types, structure.raw_text)
+                )
+
         total_issues = sum(len(r.issues) for r in section_reviews)
         all_issues = [i for r in section_reviews for i in r.issues]
 
@@ -525,6 +551,7 @@ class SectionReviewService:
             "overall_score": round(
                 sum(r.score for r in section_reviews) / max(len(section_reviews), 1), 2
             ),
+            "annotation_context_used": annotation_context_used,
             "recommendation": self._get_recommendation(total_issues, all_issues),
         }
 

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import importlib
 
+from crane.models.paper import AiAnnotations, Paper
+
 
 def _load_parser():
     return importlib.import_module("crane.services.latex_parser")
@@ -144,6 +146,35 @@ We achieve 62.5% improvement.
         result = service.review_section(section, [review.ReviewType.SCOPE_LIMITATION])
 
         assert len(result.issues) > 0
+
+    def test_review_paper_includes_ai_annotation_context(self, tmp_path):
+        review = _load_review()
+        tex_file = tmp_path / "test.tex"
+        tex_file.write_text(r"""
+\title{Test}
+\section{Introduction}
+Baseline introduction text.
+""")
+        paper = Paper(
+            key="k",
+            title="T",
+            authors=["A"],
+            year=2026,
+            ai_annotations=AiAnnotations(
+                summary="novel breakthrough method",
+                relevance_notes="state-of-the-art claims",
+            ),
+        )
+
+        service = review.SectionReviewService()
+        result = service.review_paper(
+            tex_file,
+            review_types=[review.ReviewType.FRAMING],
+            paper=paper,
+        )
+
+        assert result.summary["annotation_context_used"] is True
+        assert any(section.name == "AI Annotations" for section in result.sections)
 
 
 class TestSectionReviewTools:

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import importlib
 
+from crane.models.paper import AiAnnotations, Paper
+
 
 def _load_eval():
     return importlib.import_module("crane.services.q1_evaluation_service")
@@ -90,3 +92,28 @@ Code is available at github.com/example.
         result = service.evaluate(tex_file)
 
         assert result.overall_score >= 0.6
+
+    def test_evaluate_uses_ai_annotations_when_paper_provided(self, tmp_path):
+        eval_mod = _load_eval()
+        tex_file = tmp_path / "test.tex"
+        tex_file.write_text(r"""
+\title{Test Paper}
+\section{Introduction}
+This section is intentionally terse.
+""")
+        paper = Paper(
+            key="k",
+            title="T",
+            authors=["A"],
+            year=2026,
+            ai_annotations=AiAnnotations(
+                summary="Our contributions are: we propose a robust method and reduce error by 10% compared to baselines."
+            ),
+        )
+
+        service = eval_mod.Q1EvaluationService()
+        result = service.evaluate(tex_file, paper=paper)
+        contribution = next(c for c in result.criteria if c.name == "Contribution Statement")
+
+        assert contribution.score != eval_mod.Q1Score.WEAK
+        assert result.summary["annotation_context_used"] is True

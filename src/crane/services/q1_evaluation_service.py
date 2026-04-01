@@ -12,6 +12,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+from crane.models.paper import Paper
 from crane.services.latex_parser import parse_latex_sections
 
 
@@ -220,10 +221,23 @@ class Q1EvaluationService:
         ],
     }
 
-    def evaluate(self, paper_path: str | Path) -> Q1Evaluation:
+    def evaluate(self, paper_path: str | Path, paper: Paper | None = None) -> Q1Evaluation:
         """Evaluate paper against Q1 standards."""
         structure = parse_latex_sections(paper_path)
         full_text = structure.raw_text
+        annotation_context_used = False
+        if paper and paper.ai_annotations:
+            annotation_parts = [
+                paper.ai_annotations.summary,
+                paper.ai_annotations.methodology,
+                paper.ai_annotations.relevance_notes,
+                " ".join(paper.ai_annotations.key_contributions),
+                " ".join(paper.ai_annotations.tags),
+            ]
+            annotation_text = "\n".join(part for part in annotation_parts if part)
+            if annotation_text:
+                full_text = f"{full_text}\n\n{annotation_text}"
+                annotation_context_used = True
 
         criteria = []
         for category, checks in self.Q1_CRITERIA.items():
@@ -254,6 +268,7 @@ class Q1EvaluationService:
                 }
                 for cat in EvaluationCategory
             },
+            "annotation_context_used": annotation_context_used,
         }
 
         return Q1Evaluation(
