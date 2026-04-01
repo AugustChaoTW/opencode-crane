@@ -270,6 +270,39 @@ class TestReferenceServiceAnnotate:
         result = reference_service.get("vaswani2017-attention")
         assert result["ai_annotations"]["methodology"] == ""
 
+    def test_annotate_auto_extracts_methodology_and_contributions_from_pdf(
+        self, reference_service, refs_dir, sample_paper_data, monkeypatch
+    ):
+        reference_service.add(**sample_paper_data)
+        (refs_dir / "pdfs" / "vaswani2017-attention.pdf").write_bytes(b"pdf")
+
+        class _MockPage:
+            def extract_text(self):
+                return (
+                    "Methodology\n"
+                    "We propose a constrained decoding strategy. "
+                    "We introduce a repair module for invalid outputs.\n"
+                    "Evaluation\n"
+                )
+
+        class _MockReader:
+            def __init__(self, _):
+                self.pages = [_MockPage()]
+
+        monkeypatch.setattr("crane.services.reference_service.PyPDF2.PdfReader", _MockReader)
+
+        reference_service.annotate(
+            key="vaswani2017-attention",
+            summary="Auto extract test",
+        )
+
+        result = reference_service.get("vaswani2017-attention")
+        assert "constrained decoding strategy" in result["ai_annotations"]["methodology"].lower()
+        assert any(
+            "repair module" in contribution.lower()
+            for contribution in result["ai_annotations"]["key_contributions"]
+        )
+
 
 class TestReferenceServiceGetAllKeys:
     """Test getting all reference keys."""

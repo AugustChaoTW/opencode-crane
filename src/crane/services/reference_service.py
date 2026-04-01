@@ -5,9 +5,12 @@ Core business logic for YAML + BibTeX reference operations.
 
 from __future__ import annotations
 
+import re
 from datetime import date
 from pathlib import Path
 from typing import Any
+
+import PyPDF2
 
 from crane.models.paper import ALLOWED_ANNOTATION_TAGS, AiAnnotations, Paper
 from crane.utils.bibtex import append_entry, remove_entry
@@ -76,6 +79,36 @@ class ReferenceService:
         if related_issues is not None:
             if any(not isinstance(issue, int) or issue <= 0 for issue in related_issues):
                 raise ValueError("related_issues must contain positive integers")
+
+    def _extract_annotation_candidates_from_pdf(self, key: str) -> tuple[str, list[str]]:
+        pdf_path = self.pdfs_dir / f"{key}.pdf"
+        if not pdf_path.exists():
+            return "", []
+
+        reader = PyPDF2.PdfReader(str(pdf_path))
+        text = "\n".join((page.extract_text() or "") for page in reader.pages)
+        if not text.strip():
+            return "", []
+
+        methodology_match = re.search(
+            r"(method(?:ology)?|approach)\s*(.*?)(?:\n[A-Z][^\n]{0,40}\n|evaluation|results|conclusion|$)",
+            text,
+            re.IGNORECASE | re.DOTALL,
+        )
+        methodology = methodology_match.group(2).strip()[:1200] if methodology_match else ""
+
+        contribution_candidates = re.findall(
+            r"([^.!?]*\b(?:we propose|we introduce|we present|our contribution)\b[^.!?]*[.!?])",
+            text,
+            re.IGNORECASE,
+        )
+        cleaned = []
+        for candidate in contribution_candidates:
+            normalized = " ".join(candidate.split()).strip()
+            if normalized and normalized not in cleaned:
+                cleaned.append(normalized)
+
+        return methodology, cleaned[:5]
 
     def add(
         self,
@@ -321,12 +354,18 @@ class ReferenceService:
         if paper.ai_annotations is None:
             paper.ai_annotations = AiAnnotations()
 
+        auto_methodology, auto_contributions = self._extract_annotation_candidates_from_pdf(key)
+
         if summary is not _UNSET:
             paper.ai_annotations.summary = summary or ""
         if key_contributions is not None:
             paper.ai_annotations.key_contributions.extend(key_contributions)
+        elif auto_contributions:
+            paper.ai_annotations.key_contributions.extend(auto_contributions)
         if methodology is not _UNSET:
             paper.ai_annotations.methodology = methodology or ""
+        elif auto_methodology and not paper.ai_annotations.methodology:
+            paper.ai_annotations.methodology = auto_methodology
         if relevance_notes is not _UNSET:
             paper.ai_annotations.relevance_notes = relevance_notes or ""
         if tags is not None:
