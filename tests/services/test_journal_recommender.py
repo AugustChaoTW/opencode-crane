@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-
 import pytest
+import yaml
 
 from crane.services.journal_recommender import JournalRecommender
 from crane.services.reference_service import ReferenceService
@@ -204,3 +204,138 @@ class TestRecommend:
         assert result[0]["abbr"] == "NIPS"
         assert len(result[0]["abbr"]) <= 5
         assert all(0.0 <= item["relevance_score"] <= 1.0 for item in result)
+
+
+class TestFindSimilarPapersInJournal:
+    def test_returns_not_found_payload_when_metrics_missing(
+        self, recommender: JournalRecommender, monkeypatch
+    ):
+        monkeypatch.setattr(recommender, "query_journal_metrics", lambda *_: {})
+
+        result = recommender.find_similar_papers_in_journal(["repair"], "Unknown Journal")
+
+        assert result["match_count"] == 0
+        assert result["recommendation"] == "Journal not found in database"
+
+    def test_returns_api_failure_payload(self, recommender: JournalRecommender, monkeypatch):
+        monkeypatch.setattr(
+            recommender,
+            "query_journal_metrics",
+            lambda *_: {"id": "https://openalex.org/S1", "full_name": "TMLR"},
+        )
+        monkeypatch.setattr(
+            "crane.services.journal_recommender.requests.get",
+            lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("api down")),
+        )
+
+        result = recommender.find_similar_papers_in_journal(["repair"], "TMLR")
+
+        assert result["journal"] == "TMLR"
+        assert result["recommendation"] == "Failed to query OpenAlex API"
+
+    def test_returns_sorted_matches_with_keywords(
+        self, recommender: JournalRecommender, monkeypatch
+    ):
+        monkeypatch.setattr(
+            recommender,
+            "query_journal_metrics",
+            lambda *_: {"id": "https://openalex.org/S1", "full_name": "TMLR"},
+        )
+
+        class Response:
+            def raise_for_status(self):
+                return None
+
+            def json(self):
+                return {
+                    "results": [
+                        {
+                            "title": "Repair validation for language models",
+                            "publication_year": 2025,
+                            "doi": "https://doi.org/10.1000/a",
+                            "id": "https://openalex.org/W1",
+                            "abstract_inverted_index": {"repair": [0], "validation": [1]},
+                            "authorships": [{"author": {"display_name": "Alice"}}],
+                        },
+                        {
+                            "title": "Repair only",
+                            "publication_year": 2024,
+                            "doi": "",
+                            "id": "https://openalex.org/W2",
+                            "abstract_inverted_index": {"repair": [0]},
+                            "authorships": [{"author": {"display_name": "Bob"}}],
+                        },
+                    ]
+                }
+
+        monkeypatch.setattr(
+            "crane.services.journal_recommender.requests.get", lambda *args, **kwargs: Response()
+        )
+
+        result = recommender.find_similar_papers_in_journal(["repair", "validation"], "TMLR")
+
+        assert result["match_count"] == 2
+        assert result["keywords_matched"] == ["repair", "validation"]
+        assert result["similar_papers"][0]["title"] == "Repair validation for language models"
+        assert result["similar_papers"][1]["url"] == "https://openalex.org/W2"
+        assert result["recommendation"].startswith("MODERATE FIT")
+
+
+class TestJournalRecommenderHelpers:
+    def test_load_candidates_raises_when_snapshot_missing(self, tmp_path: Path):
+        with pytest.raises(FileNotFoundError, match="SJR snapshot not found"):
+            JournalRecommender(tmp_path)
+
+    def test_load_candidates_merges_template_metadata(self, tmp_path: Path):
+        data_dir = tmp_path / "journals"
+        data_dir.mkdir()
+        (data_dir / "sjr_snapshot.csv").write_text(
+            "full_name,abbr,quartile,acceptance_rate,h_index,topics,aliases,venue_type\n"
+            "Test Journal,TJ,Q1,0.2,42,nlp|evaluation,Test Journal;TJ,journal\n",
+            encoding="utf-8",
+        )
+        (data_dir / "conference_templates.yaml").write_text(
+            yaml.dump(
+                {
+                    "conferences": [
+                        {
+                            "full_name": "Test Journal",
+                            "abbr": "TJX",
+                            "aliases": ["TJ Extra"],
+                            "topic_keywords": ["agents"],
+                        },
+                        {
+                            "full_name": "Brand New Conference",
+                            "abbr": "BNC",
+                            "aliases": ["BNC Alias"],
+                            "topic_keywords": ["reasoning"],
+                            "quartile": "Q1",
+                        },
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        recommender = JournalRecommender(data_dir)
+
+        merged = next(
+            item for item in recommender._candidates if item["full_name"] == "Test Journal"
+        )
+        added = next(
+            item for item in recommender._candidates if item["full_name"] == "Brand New Conference"
+        )
+        assert merged["abbr"] == "TJX"
+        assert "agents" in merged["topics"]
+        assert "TJ Extra" in merged["aliases"]
+        assert added["venue_type"] == "conference"
+
+    def test_helper_methods_cover_edge_cases(self, recommender: JournalRecommender):
+        assert recommender._extract_venue_name({}) == ""
+        assert recommender._build_topic_query("9") == "artificial intelligence computer science"
+        assert recommender._split_multi_value("") == []
+        assert (
+            recommender._name_similarity("pattern recognition", "Pattern Recognition Letters")
+            >= 0.92
+        )
+        assert recommender._citation_fit_score({"aliases": ["NeurIPS"]}, {}) == 0.0
