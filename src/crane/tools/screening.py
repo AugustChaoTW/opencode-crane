@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from crane.services.picos_screening_service import PICOSCriteria, PICOSScreeningService
 from crane.services.screening_service import ScreeningService
 
 
@@ -83,3 +84,65 @@ def register_tools(mcp):
         service = _get_service(refs_dir)
         matrix = service.compare(paper_keys, dimensions)
         return matrix.to_dict()
+
+    @mcp.tool()
+    def screen_papers_by_picos(
+        population: str = "",
+        intervention: str = "",
+        comparison: str = "",
+        outcome: str = "",
+        study_design: str = "",
+        threshold: float = 0.5,
+        refs_dir: str = "references",
+    ) -> dict[str, Any]:
+        picos_service = PICOSScreeningService(refs_dir)
+        ref_service = picos_service.ref_service
+
+        criteria = PICOSCriteria(
+            population=population,
+            intervention=intervention,
+            comparison=comparison,
+            outcome=outcome,
+            study_design=study_design,
+        )
+        paper_keys = ref_service.get_all_keys()
+        results = picos_service.screen_papers(paper_keys, criteria, threshold)
+
+        return {
+            "criteria": {
+                "population": criteria.population,
+                "intervention": criteria.intervention,
+                "comparison": criteria.comparison,
+                "outcome": criteria.outcome,
+                "study_design": criteria.study_design,
+            },
+            "threshold": threshold,
+            "total_papers": len(paper_keys),
+            "included": [item.paper_key for item in results if item.decision == "include"],
+            "maybe": [item.paper_key for item in results if item.decision == "maybe"],
+            "excluded": [item.paper_key for item in results if item.decision == "exclude"],
+            "results": [
+                {
+                    "paper_key": item.paper_key,
+                    "title": item.title,
+                    "decision": item.decision,
+                    "overall_score": item.match.overall_score,
+                    "scores": {
+                        "population": item.match.population_score,
+                        "intervention": item.match.intervention_score,
+                        "comparison": item.match.comparison_score,
+                        "outcome": item.match.outcome_score,
+                        "study_design": item.match.study_design_score,
+                    },
+                    "matched_terms": item.match.matched_terms,
+                    "extracted_picos": {
+                        "population": item.extracted_picos.population,
+                        "intervention": item.extracted_picos.intervention,
+                        "comparison": item.extracted_picos.comparison,
+                        "outcome": item.extracted_picos.outcome,
+                        "study_design": item.extracted_picos.study_design,
+                    },
+                }
+                for item in results
+            ],
+        }

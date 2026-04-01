@@ -1,0 +1,306 @@
+journals:
+  - name: "IEEE Transactions on Pattern Analysis and Machine Intelligence"
+    abbreviation: "IEEE TPAMI"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 23.6
+    scope_keywords: ["computer vision", "pattern recognition", "machine learning", "image processing"]
+    preferred_paper_types: ["empirical", "system"]
+    preferred_method_families: ["deep learning", "computer vision", "optimization"]
+    preferred_evidence_patterns: ["benchmark_heavy"]
+    typical_word_count: [6000, 10000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.15
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["no experiments", "incremental contribution", "poor baselines"]
+    citation_venues: ["CVPR", "ICCV", "ECCV", "NeurIPS"]
+
+  - name: "IEEE Transactions on Neural Networks and Learning Systems"
+    abbreviation: "IEEE TNNLS"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 14.3
+    scope_keywords: ["neural networks", "representation learning", "machine learning", "optimization"]
+    preferred_paper_types: ["empirical", "theoretical", "system"]
+    preferred_method_families: ["deep learning", "neural architecture", "optimization"]
+    preferred_evidence_patterns: ["benchmark_heavy", "ablation_heavy"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.2
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["weak novelty", "insufficient theory", "poor baselines"]
+    citation_venues: ["NeurIPS", "ICML", "ICLR", "AAAI"]
+
+  - name: "IEEE Transactions on Software Engineering"
+    abbreviation: "IEEE TSE"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 9.5
+    scope_keywords: ["software engineering", "program analysis", "software testing", "empirical software engineering"]
+    preferred_paper_types: ["empirical", "system", "survey"]
+    preferred_method_families: ["program analysis", "data mining", "formal methods"]
+    preferred_evidence_patterns: ["industrial_case", "benchmark_heavy"]
+    typical_word_count: [8000, 12000]
+    review_timeline_months: [4, 8]
+    acceptance_rate: 0.14
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["no real-world validation", "weak empirical design", "limited software engineering relevance"]
+    citation_venues: ["ICSE", "FSE", "ASE", "ISSTA"]
+
+  - name: "IEEE Transactions on Knowledge and Data Engineering"
+    abbreviation: "IEEE TKDE"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 8.9
+    scope_keywords: ["data mining", "knowledge engineering", "database systems", "machine learning"]
+    preferred_paper_types: ["empirical", "system", "theoretical"]
+    preferred_method_families: ["data mining", "graph learning", "optimization"]
+    preferred_evidence_patterns: ["benchmark_heavy", "scalability_heavy"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.22
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["limited data engineering relevance", "insufficient scalability", "weak baselines"]
+    citation_venues: ["KDD", "WWW", "VLDB", "SIGMOD"]
+
+  - name: "ACM Computing Surveys"
+    abbreviation: "ACM CSUR"
+    publisher: "ACM"
+    quartile: "Q1"
+    impact_factor: 16.6
+    scope_keywords: ["survey", "taxonomy", "systematic review", "computer science"]
+    preferred_paper_types: ["survey"]
+    preferred_method_families: ["systematic review", "meta-analysis", "taxonomy"]
+    preferred_evidence_patterns: ["coverage_heavy"]
+    typical_word_count: [12000, 22000]
+    review_timeline_months: [4, 9]
+    acceptance_rate: 0.12
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["insufficient coverage", "unclear inclusion criteria", "lack of critical synthesis"]
+    citation_venues: ["ACM", "IEEE", "Springer", "Elsevier"]
+
+  - name: "ACM Transactions on Computer Systems"
+    abbreviation: "ACM TOCS"
+    publisher: "ACM"
+    quartile: "Q1"
+    impact_factor: 4.6
+    scope_keywords: ["computer systems", "operating systems", "distributed systems", "performance evaluation"]
+    preferred_paper_types: ["system", "empirical"]
+    preferred_method_families: ["systems design", "distributed computing", "performance modeling"]
+    preferred_evidence_patterns: ["systems_benchmark", "industrial_case"]
+    typical_word_count: [9000, 14000]
+    review_timeline_months: [4, 8]
+    acceptance_rate: 0.16
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["no system implementation", "insufficient performance study", "narrow systems impact"]
+    citation_venues: ["SOSP", "OSDI", "EuroSys", "USENIX ATC"]
+
+  - name: "ACM Transactions on Software Engineering and Methodology"
+    abbreviation: "ACM TOSEM"
+    publisher: "ACM"
+    quartile: "Q1"
+    impact_factor: 6.6
+    scope_keywords: ["software engineering", "software quality", "software maintenance", "program comprehension"]
+    preferred_paper_types: ["empirical", "system", "theoretical"]
+    preferred_method_families: ["program analysis", "machine learning", "formal methods"]
+    preferred_evidence_patterns: ["empirical_study", "industrial_case"]
+    typical_word_count: [8000, 13000]
+    review_timeline_months: [4, 8]
+    acceptance_rate: 0.18
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["limited methodological rigor", "weak software engineering contribution", "small-scale evaluation"]
+    citation_venues: ["ICSE", "FSE", "ASE", "MSR"]
+
+  - name: "Nature Machine Intelligence"
+    abbreviation: "Nat Mach Intell"
+    publisher: "Springer Nature"
+    quartile: "Q1"
+    impact_factor: 25.9
+    scope_keywords: ["machine intelligence", "artificial intelligence", "responsible ai", "scientific machine learning"]
+    preferred_paper_types: ["empirical", "theoretical", "system"]
+    preferred_method_families: ["deep learning", "causal inference", "scientific computing"]
+    preferred_evidence_patterns: ["high_impact_novelty", "benchmark_heavy"]
+    typical_word_count: [3000, 5000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.08
+    apc_usd: 11990
+    open_access: true
+    desk_reject_signals: ["limited novelty", "low general impact", "insufficient validation"]
+    citation_venues: ["Nature", "Science", "NeurIPS", "ICML"]
+
+  - name: "Artificial Intelligence"
+    abbreviation: "AIJ"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 14.0
+    scope_keywords: ["artificial intelligence", "planning", "reasoning", "knowledge representation"]
+    preferred_paper_types: ["theoretical", "empirical"]
+    preferred_method_families: ["symbolic ai", "planning", "probabilistic reasoning"]
+    preferred_evidence_patterns: ["theory_plus_eval", "benchmark_heavy"]
+    typical_word_count: [8000, 14000]
+    review_timeline_months: [4, 9]
+    acceptance_rate: 0.15
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["incremental methods", "unclear ai contribution", "insufficient technical depth"]
+    citation_venues: ["IJCAI", "AAAI", "KR", "AAMAS"]
+
+  - name: "Expert Systems with Applications"
+    abbreviation: "ESWA"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 8.5
+    scope_keywords: ["expert systems", "decision support", "applied artificial intelligence", "intelligent systems"]
+    preferred_paper_types: ["empirical", "system", "application"]
+    preferred_method_families: ["machine learning", "optimization", "knowledge-based systems"]
+    preferred_evidence_patterns: ["application_validation", "benchmark_heavy"]
+    typical_word_count: [7000, 10000]
+    review_timeline_months: [2, 4]
+    acceptance_rate: 0.21
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["limited practical impact", "weak comparative evaluation", "domain mismatch"]
+    citation_venues: ["ESWA", "Applied Soft Computing", "Information Sciences", "KBS"]
+
+  - name: "Information Sciences"
+    abbreviation: "INS"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 8.1
+    scope_keywords: ["information processing", "machine learning", "signal processing", "intelligent systems"]
+    preferred_paper_types: ["empirical", "theoretical", "system"]
+    preferred_method_families: ["machine learning", "optimization", "signal analysis"]
+    preferred_evidence_patterns: ["benchmark_heavy", "ablation_heavy"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.2
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["insufficient novelty", "weak methodological rigor", "incomplete experiments"]
+    citation_venues: ["Information Sciences", "ESWA", "Neurocomputing", "Pattern Recognition"]
+
+  - name: "Knowledge-Based Systems"
+    abbreviation: "KBS"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 7.2
+    scope_keywords: ["knowledge-based systems", "knowledge representation", "data mining", "artificial intelligence"]
+    preferred_paper_types: ["empirical", "system", "application"]
+    preferred_method_families: ["knowledge graphs", "machine learning", "rule-based systems"]
+    preferred_evidence_patterns: ["application_validation", "benchmark_heavy"]
+    typical_word_count: [6500, 10000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.24
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["weak knowledge component", "limited experiments", "insufficient comparisons"]
+    citation_venues: ["KBS", "ESWA", "Information Sciences", "IJCAI"]
+
+  - name: "Neural Networks"
+    abbreviation: "NN"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 7.8
+    scope_keywords: ["neural networks", "deep learning", "representation learning", "computational neuroscience"]
+    preferred_paper_types: ["empirical", "theoretical"]
+    preferred_method_families: ["deep learning", "optimization", "representation learning"]
+    preferred_evidence_patterns: ["benchmark_heavy", "theory_plus_eval"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.2
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["limited neural relevance", "weak novelty", "insufficient experimental breadth"]
+    citation_venues: ["NeurIPS", "ICLR", "ICML", "Neural Networks"]
+
+  - name: "Pattern Recognition"
+    abbreviation: "PR"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 8.0
+    scope_keywords: ["pattern recognition", "computer vision", "image analysis", "machine learning"]
+    preferred_paper_types: ["empirical", "system"]
+    preferred_method_families: ["computer vision", "deep learning", "feature learning"]
+    preferred_evidence_patterns: ["benchmark_heavy", "ablation_heavy"]
+    typical_word_count: [6500, 10000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.21
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["weak pattern recognition framing", "insufficient baselines", "small dataset evaluation"]
+    citation_venues: ["CVPR", "ICCV", "ECCV", "Pattern Recognition"]
+
+  - name: "Computer Vision and Image Understanding"
+    abbreviation: "CVIU"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 5.6
+    scope_keywords: ["computer vision", "image understanding", "3d vision", "scene understanding"]
+    preferred_paper_types: ["empirical", "system"]
+    preferred_method_families: ["computer vision", "deep learning", "geometry"]
+    preferred_evidence_patterns: ["benchmark_heavy", "qualitative_plus_quantitative"]
+    typical_word_count: [6500, 10000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.24
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["limited vision novelty", "weak experimental protocol", "insufficient visual analysis"]
+    citation_venues: ["CVPR", "ICCV", "ECCV", "CVIU"]
+
+  - name: "Journal of Machine Learning Research"
+    abbreviation: "JMLR"
+    publisher: "JMLR"
+    quartile: "Q1"
+    impact_factor: 7.0
+    scope_keywords: ["machine learning", "statistical learning", "optimization", "generalization"]
+    preferred_paper_types: ["theoretical", "empirical"]
+    preferred_method_families: ["statistical learning", "optimization", "probabilistic modeling"]
+    preferred_evidence_patterns: ["theory_plus_eval", "ablation_heavy"]
+    typical_word_count: [9000, 18000]
+    review_timeline_months: [4, 8]
+    acceptance_rate: 0.18
+    apc_usd: 0
+    open_access: true
+    desk_reject_signals: ["insufficient technical depth", "weak theoretical grounding", "limited reproducibility"]
+    citation_venues: ["ICML", "NeurIPS", "AISTATS", "JMLR"]
+
+  - name: "Machine Learning"
+    abbreviation: "MLJ"
+    publisher: "Springer"
+    quartile: "Q1"
+    impact_factor: 7.5
+    scope_keywords: ["machine learning", "statistical learning", "representation learning", "learning theory"]
+    preferred_paper_types: ["theoretical", "empirical"]
+    preferred_method_families: ["statistical learning", "deep learning", "optimization"]
+    preferred_evidence_patterns: ["theory_plus_eval", "benchmark_heavy"]
+    typical_word_count: [7000, 13000]
+    review_timeline_months: [3, 7]
+    acceptance_rate: 0.19
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["limited novelty", "weak statistical analysis", "insufficient comparison to prior work"]
+    citation_venues: ["ICML", "NeurIPS", "AISTATS", "UAI"]
+
+  - name: "International Journal of Computer Vision"
+    abbreviation: "IJCV"
+    publisher: "Springer"
+    quartile: "Q1"
+    impact_factor: 13.4
+    scope_keywords: ["computer vision", "image understanding", "3d reconstruction", "visual recognition"]
+    preferred_paper_types: ["empirical", "theoretical", "system"]
+    preferred_method_families: ["computer vision", "deep learning", "geometric vision"]
+    preferred_evidence_patterns: ["benchmark_heavy", "theory_plus_eval"]
+    typical_word_count: [8000, 12000]
+    review_timeline_months: [4, 8]
+    acceptance_rate: 0.14
+    apc_usd: 0
+    open_access: false
+    desk_reject_signals: ["insufficient vision novelty", "weak experimental validation", "poor positioning against sota"]
+    citation_venues: ["CVPR", "ICCV", "ECCV", "IJCV"]

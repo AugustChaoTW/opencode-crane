@@ -1,0 +1,100 @@
+patterns:
+  - name: "novelty_concerns"
+    description: "Reviewer questions the novelty of the contribution"
+    severity: "major"
+    dimension: "novelty"
+    trigger_signals:
+      - "incremental improvement"
+      - "similar to prior work"
+      - "marginal contribution"
+    example_critique: "The contribution appears incremental compared to prior work. The manuscript should better isolate what is fundamentally new."
+
+  - name: "weak_baselines"
+    description: "Missing or outdated baseline comparisons"
+    severity: "major"
+    dimension: "evaluation"
+    trigger_signals:
+      - "no baseline comparison"
+      - "outdated baselines"
+      - "missing sota comparison"
+    example_critique: "The evaluation lacks strong comparisons against recent state-of-the-art baselines."
+
+  - name: "methodology_unclear"
+    description: "Method details are incomplete or hard to follow"
+    severity: "major"
+    dimension: "methodology"
+    trigger_signals:
+      - "unclear method"
+      - "insufficient implementation detail"
+      - "missing algorithmic steps"
+    example_critique: "The proposed method is not described with enough detail to fully assess correctness and scope."
+
+  - name: "insufficient_experiments"
+    description: "Experimental design lacks breadth or ablations"
+    severity: "major"
+    dimension: "evaluation"
+    trigger_signals:
+      - "limited experiments"
+      - "no ablation"
+      - "single dataset"
+    example_critique: "The experiments are limited in scope and do not provide sufficient ablations or robustness checks."
+
+  - name: "reproducibility_concerns"
+    description: "Reproduction details or artifacts are missing"
+    severity: "major"
+    dimension: "reproducibility"
+    trigger_signals:
+      - "code unavailable"
+      - "missing hyperparameters"
+      - "incomplete setup"
+    example_critique: "Reproducibility is limited because key implementation details and artifacts are not sufficiently provided."
+
+  - name: "overclaiming"
+    description: "Claims overreach the demonstrated evidence"
+    severity: "major"
+    dimension: "writing_quality"
+    trigger_signals:
+      - "state of the art everywhere"
+      - "guaranteed improvement"
+      - "universally better"
+    example_critique: "Several claims appear stronger than what the presented evidence supports."
+
+  - name: "poor_writing_quality"
+    description: "Writing clarity, structure, or grammar is weak"
+    severity: "minor"
+    dimension: "writing_quality"
+    trigger_signals:
+      - "hard to read"
+      - "grammar issues"
+      - "unclear organization"
+    example_critique: "The manuscript would benefit from stronger writing clarity and organization."
+
+  - name: "missing_limitations"
+    description: "Paper does not discuss limitations and threats"
+    severity: "minor"
+    dimension: "limitations"
+    trigger_signals:
+      - "no limitations section"
+      - "threats to validity missing"
+      - "failure cases omitted"
+    example_critique: "A clearer discussion of limitations and failure modes is needed."
+
+  - name: "statistical_rigor"
+    description: "Statistical testing and uncertainty reporting are weak"
+    severity: "major"
+    dimension: "evaluation"
+    trigger_signals:
+      - "no significance test"
+      - "no confidence intervals"
+      - "single run results"
+    example_critique: "The evaluation lacks sufficient statistical rigor (e.g., uncertainty or significance analysis)."
+
+  - name: "presentation_issues"
+    description: "Figures, tables, or formatting reduce readability"
+    severity: "minor"
+    dimension: "presentation"
+    trigger_signals:
+      - "figure unreadable"
+      - "table formatting"
+      - "caption unclear"
+    example_critique: "Presentation quality can be improved, especially figure/table readability and caption clarity."

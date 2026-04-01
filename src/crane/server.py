@@ -9,6 +9,7 @@ from mcp.server.fastmcp import FastMCP  # pyright: ignore[reportMissingImports]
 
 from .tools.citations import register_tools as register_citation_tools
 from .tools.citation_graph import register_tools as register_citation_graph_tools
+from .tools.evaluation_v2 import register_tools as register_evaluation_v2_tools
 from .tools.ask_library import register_tools as register_ask_library_tools
 from .tools.figures import register_tools as register_figure_tools
 from .tools.journal_strategy import register_tools as register_journal_strategy_tools
@@ -42,6 +43,7 @@ register_q1_evaluation_tools(mcp)
 register_journal_strategy_tools(mcp)
 register_pipeline_tools(mcp)
 register_submission_check_tools(mcp)
+register_evaluation_v2_tools(mcp)
 
 
 def main():

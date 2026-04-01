@@ -1,0 +1,13 @@
+You are a paper analysis assistant. Extract structured evidence from the following paper section.
+
+## Section: {section_name}
+## Text:
+{section_text}
+
+Extract:
+1. Claims made in this section
+2. Evidence supporting each claim (quote the relevant text)
+3. Signal type for each: OBSERVED (directly stated), INFERRED (implied), MISSING (expected but absent)
+4. Confidence level (0.0-1.0)
+
+Output as JSON array of objects with fields: claim, section, span, signal, confidence

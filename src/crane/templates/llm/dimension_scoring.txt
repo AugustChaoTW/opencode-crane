@@ -1,0 +1,19 @@
+You are a Q1 journal reviewer evaluating the {dimension} dimension of an academic paper.
+
+## Evidence for this dimension:
+{evidence_items}
+
+## Scoring rubric (0-100):
+- 90-100: Excellent — exceeds Q1 standards
+- 70-89: Good — meets Q1 standards
+- 50-69: Acceptable — borderline, needs improvement
+- 30-49: Weak — significant issues
+- 0-29: Critical — fundamental problems
+
+Score this dimension. Provide:
+1. score (0-100)
+2. confidence (0.0-1.0)
+3. reason_codes (list of short codes explaining the score)
+4. suggestions (list of improvement suggestions)
+
+Output as JSON object with fields: score, confidence, reason_codes, suggestions

@@ -10,34 +10,36 @@
 
 ## 30-Second Elevator Pitch
 
-CRANE is an **Autonomous Research Assistant MCP Server** that transforms how you conduct academic research. Built for [OpenCode](https://github.com/anomalyco/opencode), it bridges the gap between AI agents and research workflows. It doesn't just "summarize papers"—it manages your entire pipeline: from searching multi-source databases (arXiv, OpenAlex) and tracking tasks via GitHub Issues, to performing deep section-level paper audits and citation verification. CRANE keeps your research structured, traceable, and publication-ready.
+CRANE is an **Autonomous Research Assistant MCP Server** that transforms how you conduct academic research. Built for [OpenCode](https://github.com/anomalyco/opencode), it bridges the gap between AI agents and research workflows. It doesn't just "summarize papers"—it manages your entire pipeline: from searching multi-source databases (arXiv, OpenAlex) and tracking tasks via GitHub Issues, to performing **evidence-first 7-dimension Q1 evaluation**, **profile-based journal matching**, and **interactive revision planning**. CRANE keeps your research structured, traceable, and publication-ready.
 
 ---
 
 ## 5 Key Differentiators
 
-1.  **Workflow Autonomy**: Unlike static managers (Zotero), CRANE is built for AI agents to *execute* tasks, not just store them.
-2.  **Section-Level Auditing**: Automatically detects logic errors, data inconsistencies, and AI-writing patterns within your LaTeX manuscript.
-3.  **Stateless GitHub Integration**: Uses GitHub Issues as a live, collaborative backend for research task tracking.
-4.  **Evidence Traceability**: Every insight and summary is mapped back to the original source PDF, ensuring scientific rigor.
-5.  **Native OpenCode Support**: Zero-config integration with OpenCode agents, allowing you to run research pipelines via natural language.
+1.  **Evidence-First Q1 Evaluation**: 7-dimension hybrid scoring engine with gate mechanisms — not just keyword matching, but structured evidence extraction from your LaTeX manuscript.
+2.  **Profile-Based Journal Matching**: Weighted fit scoring (Scope 35%, Contribution 20%, Evaluation 20%, Citation 15%, Operational 10%) across 18 Q1 journals with desk-reject risk assessment.
+3.  **Interactive Revision Workflow**: 3-layer reports (Scorecard + Evidence View + Revision Backlog) with prioritized action items, before/after tracking, and projected score estimation.
+4.  **PICOS Systematic Screening**: Automated Population/Intervention/Comparison/Outcome/Study Design extraction and matching for systematic literature reviews.
+5.  **Domain-Aware Evaluation**: Pluggable domain packs (AI/ML included) with auto-detection, custom rubrics, and reviewer simulation for predicting likely criticisms.
 
 ---
 
 ## Feature Matrix (Workflow Phases)
 
-CRANE provides **47 MCP Tools** organized across 6 research phases:
+CRANE provides **50+ MCP Tools** organized across research phases:
 
 | Phase | Core Tools | Purpose |
 |-------|------------|---------|
 | **Initialization** | `init_research`, `get_project_info` | Set up GitHub milestones, labels, and local file structure. |
 | **Literature Review** | `search_papers`, `add_reference`, `read_paper` | Multi-source search, BibTeX sync, and AI-powered summarization. |
+| **PICOS Screening** | `screen_papers_by_picos`, `screen_reference` | Systematic screening with Population/Intervention/Comparison/Outcome/Study Design criteria. |
 | **Semantic Search** | `semantic_search`, `semantic_search_by_paper`, `build_embeddings` | Vector-based similarity search and embedding management for finding related work. |
-| **Citation Graph** | `build_citation_graph`, `find_citation_gaps`, `get_research_clusters`, `visualize_citation_graph`, `get_citation_mermaid`, `get_cluster_mermaid` | Citation relationship analysis, research gap detection, and visualization. |
+| **Citation Graph** | `build_citation_graph`, `find_citation_gaps`, `get_research_clusters`, `visualize_citation_graph` | Citation relationship analysis, research gap detection, and visualization. |
 | **Ask My Library** | `ask_library`, `chunk_papers`, `get_chunk_stats` | Conversational Q&A over your references with page-level citations. |
 | **Task Management** | `create_task`, `list_tasks`, `report_progress` | Track research goals using GitHub Issues with phase-specific labels. |
 | **Verification** | `check_citations`, `verify_reference` | Ensure every claim is cited and metadata (DOI/Year) is accurate. |
 | **Writing & Audit** | `review_paper_sections`, `verify_paper` | Automated checks for logic, framing, and AI writing traces. |
+| **Q1 Evaluation v2** | `evaluate_paper_v2`, `match_journal_v2`, `generate_revision_report` | Evidence-first 7-dimension scoring, profile-based journal matching, and 3-layer revision reports. |
 | **Submission** | `run_submission_check`, `recommend_journals` | Final Q1-standard readiness evaluation and journal strategy. |
 
 ---
@@ -93,30 +95,61 @@ cd ~/.opencode-crane && uv sync
                            |
             +--------------v--------------+
             |      CRANE MCP Server       |
-            | (FastMCP / Python Service)  |
+            |    (FastMCP / 50+ Tools)    |
             +--------------+--------------+
                            |
-      +--------------------+--------------------+
-      |                    |                    |
-+-----v-----+        +-----v-----+        +-----v-----+
-|  GitHub   |        | Local FS  |        | Academic  |
-| API (gh)  |        | (YAML/Bib)|        | APIs      |
-+-----+-----+        +-----+-----+        +-----+-----+
-      |                    |                    |
-      | - Tasks/Issues     | - Meta (YAML)      | - arXiv     |
-      | - Milestones       | - BibTeX           | - OpenAlex  |
-      | - Progress         | - PDFs             | - Crossref  |
-      +--------------------+--------------------+-------------+
+    +----------+-----------+-----------+-----------+
+    |          |           |           |           |
++---v---+ +---v---+  +----v----+ +----v----+ +----v----+
+|GitHub | |LocalFS|  |Academic | |Eval v2  | |Domain   |
+|API(gh)| |(YAML) |  |APIs     | |Engine   | |Packs    |
++---+---+ +---+---+  +----+----+ +----+----+ +----+----+
+    |         |            |           |           |
+    |Tasks    |Meta/BibTeX |arXiv      |7-dim Q1   |AI/ML
+    |Issues   |PDFs        |OpenAlex   |Journal    |Medical
+    |Progress |Rubric Vers |Crossref   |Revision   |Custom
+    +---------+------------+-----------+-----------+--------+
 ```
 
 ---
 
 ## Key Features (Detail)
 
+### Q1 Evaluation Engine (New)
+- **7-Dimension Hybrid Scoring**: Writing Quality (12%), Methodology (18%), Novelty (18%), Evaluation (20%), Presentation (8%), Limitations (10%), Reproducibility (14%) — each scored 0-100 with evidence spans and reason codes.
+- **Gate Mechanism**: Methodology, Novelty, or Evaluation scoring below 60 blocks Q1 readiness — prevents false positives.
+- **Paper Profiling**: Automatic classification of paper type (empirical/system/theoretical/survey), method family, evidence pattern, novelty shape, and reproducibility maturity.
+- **Backward Compatible**: `mode="heuristic"` preserves the original regex-based evaluation; `mode="hybrid"` activates the evidence-first engine.
+
+### Journal Matching (New)
+- **18 Q1 Journal Profiles**: Real impact factors, acceptance rates, scope keywords, desk-reject signals for IEEE TPAMI, TNNLS, ACM Computing Surveys, Nature MI, JMLR, and more.
+- **Weighted Fit Scoring**: Scope (35%) + Contribution-style (20%) + Evaluation-style (20%) + Citation-neighborhood (15%) + Operational (10%).
+- **Target/Backup/Safe Recommendations**: Not just "best match" — a 3-tier strategy with desk-reject risk assessment.
+
+### Revision Planning (New)
+- **3-Layer Reports**: Scorecard (scores + gates + readiness), Evidence View (per-dimension evidence spans), Revision Backlog (prioritized checkboxes).
+- **ROI-Sorted Actions**: Impact x Effort matrix ranks what to fix first for maximum score improvement.
+- **Before/After Tracking**: Snapshot scores, re-evaluate after changes, see delta per dimension.
+
+### Domain Packs (New)
+- **Pluggable Rubrics**: Each domain (AI/ML, medical, etc.) gets its own weight configuration, gate rules, and scoring signals.
+- **Auto-Detection**: Paper domain detected from keywords — automatically selects the right rubric pack.
+
+### Reviewer Simulation (New)
+- **10 Criticism Patterns**: Novelty concerns, weak baselines, methodology unclear, insufficient experiments, reproducibility concerns, overclaiming, poor writing, missing limitations, statistical rigor, presentation issues.
+- **Predicted Decision**: accept / minor_revisions / major_revisions / reject with confidence scoring.
+- **Mock Review Generation**: Structured review text from predicted criticisms.
+
+### Rubric Calibration (New)
+- **Version Management**: Save, compare, and rollback rubric versions as YAML.
+- **Proposal Workflow**: Propose weight updates with validation (weights sum to 1.0, reason required).
+
+### Core Features
 - **Section-level Paper Review**: Detects 6 common issues per section (logic errors, data inconsistencies, overclaiming, missing completeness, AI writing traces, figure quality).
 - **LaTeX Structure Parsing**: Automatically detects `\section{}`, `\subsection{}`, and `\appendix`.
 - **3-LLM Paper Verification**: An AI review process with Auditor, Detector, and Editor roles.
 - **AI Writing Detection**: Three-layer analysis: L1 Vocabulary, L2 Paragraph Rhythm, and L3 Academic Subjectivity.
+- **PICOS Screening**: Automated extraction of Population/Intervention/Comparison/Outcome/Study Design elements with weighted matching.
 - **Protected Zones**: Automatically protects verified content from accidental modification.
 - **Workspace Management**: Stateless design, automatically parsing workspace from git context.
 
@@ -127,10 +160,12 @@ cd ~/.opencode-crane && uv sync
 | Feature | CRANE | Zotero | Mendeley | Obsidian |
 |---------|-------|--------|----------|----------|
 | **AI Autonomy** | Native MCP | Third-party plugins | Limited | Manual setup |
-| **Workflow Tracking** | GitHub Issues | Folders/Tags | Folders/Tags | Linked Notes |
+| **Q1 Evaluation** | 7-dim evidence-first | None | None | None |
+| **Journal Matching** | Profile-based (18 Q1) | None | None | None |
+| **Revision Planning** | 3-layer + ROI sorting | None | None | None |
+| **PICOS Screening** | Automated extraction | None | None | Manual |
 | **Paper Auditing** | Section-level Logic/AI | None | None | Manual |
 | **Citation Check** | Automated (BibTeX) | Semi-automated | Semi-automated | Manual |
-| **Data Provenance** | Evidence Traceability | Manual notes | Manual notes | Manual links |
 | **Developer-First** | CLI/MCP/YAML | GUI-heavy | GUI-heavy | Note-heavy |
 
 ---
@@ -147,7 +182,12 @@ cd ~/.opencode-crane && uv sync
 - **CRANE Action**: `check_citations(manuscript_path="main.tex")` followed by `review_paper_sections()`.
 - **Result**: CRANE identifies 3 missing references and flags a data inconsistency where "Table 1" shows 85% accuracy but the "Abstract" claims 87%.
 
-### 3. The Continuous Research Monitor
+### 3. The Q1 Submission Preparation
+*Scenario*: A researcher wants to evaluate if their paper is ready for a Q1 journal.
+- **CRANE Action**: `evaluate_paper_v2(paper_path="main.tex")` followed by `match_journal_v2(paper_path="main.tex")`.
+- **Result**: CRANE scores all 7 dimensions (Methodology: 78, Evaluation: 65, ...), flags that the Evaluation gate is borderline, recommends IEEE TPAMI (target), TNNLS (backup), Pattern Recognition (safe), and generates a revision backlog: "Add ablation study (+12 impact), Include statistical significance tests (+8 impact)".
+
+### 4. The Continuous Research Monitor
 *Scenario*: A researcher wants to stay updated on "Diffusion Models" weekly.
 - **CRANE Action**: Schedule a job to run `search_papers` and `add_reference` for new hits.
 - **Result**: Every Monday, the researcher checks their GitHub Issues to see a curated list of new papers, summarized and ready for deep reading.
@@ -167,10 +207,31 @@ python3 -m venv .venv
 
 ### Running Tests
 ```bash
-# Full test suite
+# Full test suite (1000+ tests)
 uv run pytest tests/ -v
 # Coverage report
 uv run pytest tests/ --cov=crane --cov-report=term-missing
+# Benchmark integration tests only
+uv run pytest tests/benchmark/ -v
+```
+
+### Project Structure
+```
+src/crane/
+  models/          # Data models (Paper, PaperProfile, EvidenceLedger, etc.)
+  services/        # Business logic (20+ services)
+  tools/           # MCP tool registration (50+ tools)
+  config/          # Domain packs and configuration
+  templates/llm/   # Prompt templates for future LLM integration
+  providers/       # Academic data sources (arXiv, OpenAlex, etc.)
+data/
+  journals/        # Q1 journal profiles (18 journals) + conference templates
+  review_patterns.yaml  # 10 criticism patterns for reviewer simulation
+tests/
+  services/        # Unit tests per service
+  models/          # Model validation tests
+  benchmark/       # Integration tests with synthetic LaTeX papers
+  config/          # Domain pack tests
 ```
 
 ---

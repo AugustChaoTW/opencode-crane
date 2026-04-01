@@ -1,0 +1,63 @@
+name: ai_ml
+display_name: "AI & Machine Learning"
+version: "1.0.0"
+description: "Evaluation rubric optimized for AI/ML research papers targeting Q1 venues"
+
+dimension_weights:
+  writing_quality: 0.12
+  methodology: 0.18
+  novelty: 0.18
+  evaluation: 0.20
+  presentation: 0.08
+  limitations: 0.10
+  reproducibility: 0.14
+
+gate_dimensions: ["methodology", "novelty", "evaluation"]
+gate_threshold: 60.0
+
+scoring_signals:
+  writing_quality:
+    - "\\b(we show|we demonstrate|in this paper)\\b"
+    - "\\b(contribution|motivation|problem setting)\\b"
+  methodology:
+    - "\\\\section\\{.*[Mm]ethod.*\\}"
+    - "\\\\begin\\{equation\\}"
+    - "\\\\begin\\{algorithm\\}"
+    - "\\b(we propose|we introduce|we design)\\b"
+  novelty:
+    - "\\b[Cc]ontribution"
+    - "\\b(novel|new approach|first to)\\b"
+    - "\\b([Uu]nlike|[Dd]iffer from|[Ii]n contrast)\\b"
+  evaluation:
+    - "\\b[Bb]aseline\\b"
+    - "\\b(SOTA|state-of-the-art)\\b"
+    - "\\b(ablation|ablative)\\b"
+    - "\\\\begin\\{table\\}"
+  presentation:
+    - "\\\\begin\\{figure\\}"
+    - "\\\\caption\\{"
+  limitations:
+    - "\\b(limitation|threats to validity|future work)\\b"
+  reproducibility:
+    - "\\b(github\\.com|code available|repository)\\b"
+    - "\\b(hyperparameter|random seed|implementation details)\\b"
+
+recommended_journals:
+  - "IEEE TPAMI"
+  - "IEEE TNNLS"
+  - "Nature MI"
+  - "JMLR"
+  - "ML"
+  - "AI"
+
+detection_keywords:
+  - "deep learning"
+  - "neural network"
+  - "machine learning"
+  - "transformer"
+  - "attention mechanism"
+  - "reinforcement learning"
+  - "generative model"
+  - "computer vision"
+  - "natural language processing"
+detection_threshold: 0.15
