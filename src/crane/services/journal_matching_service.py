@@ -5,7 +5,14 @@ from typing import Any
 
 import yaml
 
-from crane.models.paper_profile import EvidencePattern, JournalFit, PaperProfile, PaperType
+from crane.models.paper_profile import (
+    CostAssessment,
+    EvidencePattern,
+    JournalFit,
+    PaperProfile,
+    PaperType,
+)
+from crane.services.apc_analysis_service import APCAnalysisService
 
 
 class JournalMatchingService:
@@ -26,6 +33,8 @@ class JournalMatchingService:
         "acceptance_rate",
         "apc_usd",
         "open_access",
+        "open_access_type",
+        "waiver_available",
         "desk_reject_signals",
         "citation_venues",
     }
@@ -39,6 +48,7 @@ class JournalMatchingService:
             else root / "data" / "journals" / "q1_journal_profiles.yaml"
         )
         self.journals = self._load_profiles(self.profiles_path)
+        self.apc_service = APCAnalysisService(self.profiles_path)
 
     def _load_profiles(self, path: Path) -> list[dict[str, Any]]:
         if not path.exists():
@@ -79,9 +89,10 @@ class JournalMatchingService:
             validated.append(journal)
         return validated
 
-    def match(self, profile: PaperProfile) -> list[JournalFit]:
+    def match(self, profile: PaperProfile, budget_usd: float | None = None) -> list[JournalFit]:
         """Match paper profile against all journals and sort by overall_fit."""
         fits: list[JournalFit] = []
+        costs: list[CostAssessment] = []
 
         for journal in self.journals:
             scope_fit = self.calculate_scope_fit(profile, journal)
@@ -102,9 +113,22 @@ class JournalMatchingService:
                 risk_factors=risk_factors,
             )
             fit.calculate_overall()
+            if budget_usd is not None:
+                fit.cost_assessment = self.apc_service.assess_cost(journal, budget_usd=budget_usd)
+                costs.append(fit.cost_assessment)
             fits.append(fit)
 
-        fits.sort(key=lambda item: (-item.overall_fit, item.desk_reject_risk, item.journal_name))
+        if budget_usd is not None:
+            ranked_pairs = self.apc_service.rank_by_affordability(
+                fits,
+                costs,
+                budget_usd=budget_usd,
+            )
+            fits = [fit for fit, _ in ranked_pairs]
+        else:
+            fits.sort(
+                key=lambda item: (-item.overall_fit, item.desk_reject_risk, item.journal_name)
+            )
 
         labels = ["target", "backup", "safe"]
         for idx, fit in enumerate(fits):
@@ -112,9 +136,13 @@ class JournalMatchingService:
 
         return fits
 
-    def recommend_top3(self, profile: PaperProfile) -> dict[str, JournalFit | None]:
+    def recommend_top3(
+        self,
+        profile: PaperProfile,
+        budget_usd: float | None = None,
+    ) -> dict[str, JournalFit | None]:
         """Return target/backup/safe recommendations."""
-        fits = self.match(profile)
+        fits = self.match(profile, budget_usd=budget_usd)
         return {
             "target": fits[0] if len(fits) > 0 else None,
             "backup": fits[1] if len(fits) > 1 else None,

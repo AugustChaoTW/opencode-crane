@@ -98,10 +98,13 @@ class PaperProfile:
     num_tables: int = 0
     num_equations: int = 0
     num_references: int = 0
+    budget_usd: float | None = None
 
     def __post_init__(self):
         if not 0.0 <= self.reproducibility_maturity <= 1.0:
             raise ValueError("reproducibility_maturity must be between 0.0 and 1.0")
+        if self.budget_usd is not None and self.budget_usd < 0:
+            raise ValueError("budget_usd must be >= 0")
 
 
 @dataclass
@@ -135,6 +138,7 @@ class JournalFit:
     desk_reject_risk: float = 0.0
     risk_factors: list[str] = field(default_factory=list)
     recommendation: str = ""
+    cost_assessment: CostAssessment | None = None
 
     def __post_init__(self):
         if not self.journal_name:
@@ -149,6 +153,34 @@ class JournalFit:
             + 0.10 * self.operational_fit
         )
         return self.overall_fit
+
+
+@dataclass
+class CostAssessment:
+    """APC cost assessment for a journal, separate from fit scoring."""
+
+    apc_usd: float
+    publication_model: str
+    affordability_status: str
+    budget_delta_usd: float
+    apc_stale: bool = False
+    waiver_available: bool = False
+
+    def __post_init__(self):
+        if self.apc_usd < 0:
+            raise ValueError("apc_usd must be >= 0")
+        valid_models = {"subscription", "gold_oa", "hybrid", "diamond_oa", "unknown"}
+        if self.publication_model not in valid_models:
+            raise ValueError(f"publication_model must be one of {valid_models}")
+        valid_statuses = {
+            "within_budget",
+            "near_budget",
+            "over_budget",
+            "no_budget",
+            "waiver_possible",
+        }
+        if self.affordability_status not in valid_statuses:
+            raise ValueError(f"affordability_status must be one of {valid_statuses}")
 
 
 @dataclass

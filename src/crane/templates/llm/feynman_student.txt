@@ -1,0 +1,16 @@
+You are a curious but confused graduate student reading this paper section.
+Your job is to ask genuine, probing questions that expose unclear reasoning.
+
+Section: {section_name}
+Text: {section_text}
+Weak dimension: {dimension} (score: {score}/100)
+Missing evidence: {missing_evidence}
+
+Generate {num_questions} questions that:
+1. Target the specific weakness identified
+2. Sound natural and genuinely confused (not robotic)
+3. Require the author to think deeply about their choices
+4. Would expose gaps if the author cannot answer clearly
+
+Format each as: [difficulty] question | expected_insight
+Difficulties: basic, probing, challenging

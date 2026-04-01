@@ -11,8 +11,10 @@ journals:
     typical_word_count: [6000, 10000]
     review_timeline_months: [3, 6]
     acceptance_rate: 0.15
-    apc_usd: 0
+    apc_usd: 2800
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["no experiments", "incremental contribution", "poor baselines"]
     citation_venues: ["CVPR", "ICCV", "ECCV", "NeurIPS"]
 
@@ -28,8 +30,10 @@ journals:
     typical_word_count: [7000, 11000]
     review_timeline_months: [3, 6]
     acceptance_rate: 0.2
-    apc_usd: 0
+    apc_usd: 2800
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["weak novelty", "insufficient theory", "poor baselines"]
     citation_venues: ["NeurIPS", "ICML", "ICLR", "AAAI"]
 
@@ -45,8 +49,10 @@ journals:
     typical_word_count: [8000, 12000]
     review_timeline_months: [4, 8]
     acceptance_rate: 0.14
-    apc_usd: 0
+    apc_usd: 2800
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["no real-world validation", "weak empirical design", "limited software engineering relevance"]
     citation_venues: ["ICSE", "FSE", "ASE", "ISSTA"]
 
@@ -62,8 +68,10 @@ journals:
     typical_word_count: [7000, 11000]
     review_timeline_months: [3, 6]
     acceptance_rate: 0.22
-    apc_usd: 0
+    apc_usd: 2800
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["limited data engineering relevance", "insufficient scalability", "weak baselines"]
     citation_venues: ["KDD", "WWW", "VLDB", "SIGMOD"]
 
@@ -81,6 +89,8 @@ journals:
     acceptance_rate: 0.12
     apc_usd: 0
     open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
     desk_reject_signals: ["insufficient coverage", "unclear inclusion criteria", "lack of critical synthesis"]
     citation_venues: ["ACM", "IEEE", "Springer", "Elsevier"]
 
@@ -98,6 +108,8 @@ journals:
     acceptance_rate: 0.16
     apc_usd: 0
     open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
     desk_reject_signals: ["no system implementation", "insufficient performance study", "narrow systems impact"]
     citation_venues: ["SOSP", "OSDI", "EuroSys", "USENIX ATC"]
 
@@ -115,6 +127,8 @@ journals:
     acceptance_rate: 0.18
     apc_usd: 0
     open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
     desk_reject_signals: ["limited methodological rigor", "weak software engineering contribution", "small-scale evaluation"]
     citation_venues: ["ICSE", "FSE", "ASE", "MSR"]
 
@@ -132,6 +146,8 @@ journals:
     acceptance_rate: 0.08
     apc_usd: 11990
     open_access: true
+    open_access_type: "gold_oa"
+    waiver_available: true
     desk_reject_signals: ["limited novelty", "low general impact", "insufficient validation"]
     citation_venues: ["Nature", "Science", "NeurIPS", "ICML"]
 
@@ -147,8 +163,10 @@ journals:
     typical_word_count: [8000, 14000]
     review_timeline_months: [4, 9]
     acceptance_rate: 0.15
-    apc_usd: 0
+    apc_usd: 3400
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["incremental methods", "unclear ai contribution", "insufficient technical depth"]
     citation_venues: ["IJCAI", "AAAI", "KR", "AAMAS"]
 
@@ -164,8 +182,10 @@ journals:
     typical_word_count: [7000, 10000]
     review_timeline_months: [2, 4]
     acceptance_rate: 0.21
-    apc_usd: 0
+    apc_usd: 3200
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["limited practical impact", "weak comparative evaluation", "domain mismatch"]
     citation_venues: ["ESWA", "Applied Soft Computing", "Information Sciences", "KBS"]
 
@@ -181,8 +201,10 @@ journals:
     typical_word_count: [7000, 11000]
     review_timeline_months: [3, 6]
     acceptance_rate: 0.2
-    apc_usd: 0
+    apc_usd: 3300
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["insufficient novelty", "weak methodological rigor", "incomplete experiments"]
     citation_venues: ["Information Sciences", "ESWA", "Neurocomputing", "Pattern Recognition"]
 
@@ -198,8 +220,10 @@ journals:
     typical_word_count: [6500, 10000]
     review_timeline_months: [2, 5]
     acceptance_rate: 0.24
-    apc_usd: 0
+    apc_usd: 3200
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["weak knowledge component", "limited experiments", "insufficient comparisons"]
     citation_venues: ["KBS", "ESWA", "Information Sciences", "IJCAI"]
 
@@ -215,8 +239,10 @@ journals:
     typical_word_count: [7000, 11000]
     review_timeline_months: [3, 6]
     acceptance_rate: 0.2
-    apc_usd: 0
+    apc_usd: 3300
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["limited neural relevance", "weak novelty", "insufficient experimental breadth"]
     citation_venues: ["NeurIPS", "ICLR", "ICML", "Neural Networks"]
 
@@ -232,8 +258,10 @@ journals:
     typical_word_count: [6500, 10000]
     review_timeline_months: [2, 5]
     acceptance_rate: 0.21
-    apc_usd: 0
+    apc_usd: 3300
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["weak pattern recognition framing", "insufficient baselines", "small dataset evaluation"]
     citation_venues: ["CVPR", "ICCV", "ECCV", "Pattern Recognition"]
 
@@ -249,8 +277,10 @@ journals:
     typical_word_count: [6500, 10000]
     review_timeline_months: [3, 6]
     acceptance_rate: 0.24
-    apc_usd: 0
+    apc_usd: 3200
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["limited vision novelty", "weak experimental protocol", "insufficient visual analysis"]
     citation_venues: ["CVPR", "ICCV", "ECCV", "CVIU"]
 
@@ -268,6 +298,8 @@ journals:
     acceptance_rate: 0.18
     apc_usd: 0
     open_access: true
+    open_access_type: "diamond_oa"
+    waiver_available: false
     desk_reject_signals: ["insufficient technical depth", "weak theoretical grounding", "limited reproducibility"]
     citation_venues: ["ICML", "NeurIPS", "AISTATS", "JMLR"]
 
@@ -283,8 +315,10 @@ journals:
     typical_word_count: [7000, 13000]
     review_timeline_months: [3, 7]
     acceptance_rate: 0.19
-    apc_usd: 0
+    apc_usd: 3390
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["limited novelty", "weak statistical analysis", "insufficient comparison to prior work"]
     citation_venues: ["ICML", "NeurIPS", "AISTATS", "UAI"]
 
@@ -300,7 +334,9 @@ journals:
     typical_word_count: [8000, 12000]
     review_timeline_months: [4, 8]
     acceptance_rate: 0.14
-    apc_usd: 0
+    apc_usd: 3490
     open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
     desk_reject_signals: ["insufficient vision novelty", "weak experimental validation", "poor positioning against sota"]
     citation_venues: ["CVPR", "ICCV", "ECCV", "IJCV"]

@@ -111,3 +111,29 @@ class PaperService:
         reader = PyPDF2.PdfReader(str(pdf_path))
         extracted_pages = [(page.extract_text() or "") for page in reader.pages]
         return "\n".join(extracted_pages).strip()
+
+    def read_structured(
+        self,
+        paper_id: str,
+        language: str = "en",
+        save_dir: str | Path = "references/pdfs",
+    ) -> str:
+        """Read paper with alphaXiv structured overview first, PDF fallback."""
+        cache_path = Path(save_dir).parent / "overviews" / f"{paper_id.replace('/', '_')}.md"
+        if cache_path.exists():
+            return cache_path.read_text(encoding="utf-8")
+
+        try:
+            from crane.providers.alphaxiv import AlphaXivProvider
+
+            provider = AlphaXivProvider()
+            overview = provider.get_overview(paper_id, language)
+            if overview:
+                markdown = overview.to_markdown()
+                cache_path.parent.mkdir(parents=True, exist_ok=True)
+                cache_path.write_text(markdown, encoding="utf-8")
+                return markdown
+        except Exception:
+            pass
+
+        return self.read(paper_id, save_dir)

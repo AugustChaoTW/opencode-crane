@@ -66,6 +66,8 @@ def _base_journal(name: str = "J1") -> dict:
         "acceptance_rate": 0.2,
         "apc_usd": 0,
         "open_access": False,
+        "open_access_type": "subscription",
+        "waiver_available": False,
         "desk_reject_signals": ["no experiments", "incremental contribution", "poor baselines"],
         "citation_venues": ["NeurIPS", "ICML", "ICLR"],
     }
@@ -467,3 +469,68 @@ class TestMatchAndTop3:
             "International Journal of Computer Vision",
             "Pattern Recognition",
         }
+
+    def test_match_with_budget_prioritizes_affordable_journals(self, tmp_path: Path):
+        expensive = _base_journal("Expensive")
+        expensive["apc_usd"] = 3500
+        expensive["open_access_type"] = "hybrid"
+        free = _base_journal("Free")
+        free["apc_usd"] = 0
+        free["open_access_type"] = "subscription"
+        svc = JournalMatchingService(_write_profiles(tmp_path, [expensive, free]))
+
+        fits = svc.match(_profile(), budget_usd=1000)
+
+        assert fits[0].journal_name == "Free"
+        assert fits[0].cost_assessment is not None
+        assert fits[0].cost_assessment.affordability_status == "within_budget"
+        assert fits[1].cost_assessment is not None
+        assert fits[1].cost_assessment.affordability_status in {"over_budget", "waiver_possible"}
+
+    def test_match_without_budget_keeps_legacy_ordering(self, tmp_path: Path):
+        a = _base_journal("A")
+        b = _base_journal("B")
+        b["scope_keywords"] = ["other"]
+        svc = JournalMatchingService(_write_profiles(tmp_path, [b, a]))
+
+        legacy = svc.match(_profile())
+        budgeted = svc.match(_profile(), budget_usd=1000)
+
+        assert legacy[0].journal_name == "A"
+        assert budgeted[0].journal_name == "A"
+        assert legacy[0].overall_fit >= legacy[1].overall_fit
+
+    def test_recommend_top3_with_budget(self, tmp_path: Path):
+        j1 = _base_journal("J1")
+        j1["apc_usd"] = 5000
+        j1["open_access_type"] = "hybrid"
+        j2 = _base_journal("J2")
+        j2["apc_usd"] = 900
+        j2["open_access_type"] = "hybrid"
+        j3 = _base_journal("J3")
+        j3["apc_usd"] = 0
+        j3["open_access_type"] = "subscription"
+        svc = JournalMatchingService(_write_profiles(tmp_path, [j1, j2, j3]))
+
+        rec = svc.recommend_top3(_profile(), budget_usd=1000)
+
+        assert rec["target"] is not None
+        assert rec["target"].journal_name in {"J2", "J3"}
+        assert rec["safe"] is not None
+
+    def test_budget_zero_marks_non_free_as_over_budget(self, tmp_path: Path):
+        free = _base_journal("Free")
+        free["apc_usd"] = 0
+        free["open_access_type"] = "subscription"
+        paid = _base_journal("Paid")
+        paid["apc_usd"] = 100
+        paid["open_access_type"] = "hybrid"
+        svc = JournalMatchingService(_write_profiles(tmp_path, [paid, free]))
+
+        fits = svc.match(_profile(), budget_usd=0)
+
+        assert fits[0].journal_name == "Free"
+        assert fits[0].cost_assessment is not None
+        assert fits[0].cost_assessment.affordability_status == "within_budget"
+        assert fits[1].cost_assessment is not None
+        assert fits[1].cost_assessment.affordability_status in {"over_budget", "waiver_possible"}

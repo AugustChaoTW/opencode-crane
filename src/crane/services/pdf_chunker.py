@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from importlib import import_module
 from pathlib import Path
+import re
 from typing import Any
 
-import PyPDF2
 import yaml
+
+PyPDF2 = import_module("PyPDF2")
 
 
 @dataclass
@@ -105,6 +108,33 @@ class PDFChunker:
             global_offset += len(text)
 
         return all_chunks
+
+    def chunk_structured(self, paper_key: str, markdown_text: str) -> list[dict[str, Any]]:
+        """Chunk structured markdown by section headings."""
+        chunks: list[dict[str, Any]] = []
+        sections = re.split(r"\n(?=## )", markdown_text)
+        for index, section in enumerate(sections):
+            section = section.strip()
+            if not section:
+                continue
+
+            lines = section.split("\n", 1)
+            title = lines[0].lstrip("# ").strip()
+            text = lines[1].strip() if len(lines) > 1 else ""
+            if not text:
+                continue
+
+            chunks.append(
+                {
+                    "paper_key": paper_key,
+                    "chunk_index": index,
+                    "text": section,
+                    "page": 0,
+                    "section_title": title,
+                    "word_count": len(text.split()),
+                }
+            )
+        return chunks
 
     def _split_text(
         self,
