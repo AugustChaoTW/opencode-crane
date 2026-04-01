@@ -9,7 +9,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from crane.models.paper import AiAnnotations, Paper
+from crane.models.paper import ALLOWED_ANNOTATION_TAGS, AiAnnotations, Paper
 from crane.utils.bibtex import append_entry, remove_entry
 from crane.utils.yaml_io import (
     delete_paper_yaml,
@@ -33,6 +33,42 @@ class ReferenceService:
         self.pdfs_dir.mkdir(parents=True, exist_ok=True)
         self.bib_path.parent.mkdir(parents=True, exist_ok=True)
         self.bib_path.touch(exist_ok=True)
+
+    def _validate_annotation_inputs(
+        self,
+        summary: str,
+        key_contributions: list[str] | None,
+        methodology: str,
+        relevance_notes: str,
+        tags: list[str] | None,
+        related_issues: list[int] | None,
+    ) -> None:
+        if len(summary) > 2000:
+            raise ValueError("summary exceeds maximum length (2000)")
+        if len(methodology) > 4000:
+            raise ValueError("methodology exceeds maximum length (4000)")
+        if len(relevance_notes) > 4000:
+            raise ValueError("relevance_notes exceeds maximum length (4000)")
+
+        if key_contributions is not None:
+            if not isinstance(key_contributions, list):
+                raise ValueError("key_contributions must be a list of strings")
+            for contribution in key_contributions:
+                if not isinstance(contribution, str):
+                    raise ValueError("key_contributions must be a list of strings")
+                if len(contribution) > 300:
+                    raise ValueError("Each key contribution exceeds maximum length (300)")
+
+        if tags is not None:
+            invalid_tags = [tag for tag in tags if tag not in ALLOWED_ANNOTATION_TAGS]
+            if invalid_tags:
+                raise ValueError(
+                    f"Invalid tags: {', '.join(invalid_tags)}. Allowed tags: {', '.join(sorted(ALLOWED_ANNOTATION_TAGS))}"
+                )
+
+        if related_issues is not None:
+            if any(not isinstance(issue, int) or issue <= 0 for issue in related_issues):
+                raise ValueError("related_issues must contain positive integers")
 
     def add(
         self,
@@ -264,6 +300,15 @@ class ReferenceService:
         data = read_paper_yaml(str(self.papers_dir), key)
         if data is None:
             raise ValueError(f"Reference not found: {key}")
+
+        self._validate_annotation_inputs(
+            summary=summary,
+            key_contributions=key_contributions,
+            methodology=methodology,
+            relevance_notes=relevance_notes,
+            tags=tags,
+            related_issues=related_issues,
+        )
 
         paper = Paper.from_yaml_dict(data)
         if paper.ai_annotations is None:

@@ -271,7 +271,7 @@ class TestAnnotateReference:
         p.ai_annotations = AiAnnotations(
             summary="Old summary",
             methodology="Original method",
-            tags=["old-tag"],
+            tags=["foundational"],
             related_issues=[1],
         )
         papers_dir = str(tmp_project / "references" / "papers")
@@ -280,7 +280,7 @@ class TestAnnotateReference:
         ref_tools["annotate_reference"](
             key=p.key,
             summary="Updated summary",
-            tags=["updated-tag"],
+            tags=["architecture"],
             related_issues=[2, 3],
             refs_dir=str(tmp_project / "references"),
         )
@@ -288,6 +288,6 @@ class TestAnnotateReference:
         data = read_paper_yaml(papers_dir, p.key)
         assert data is not None
         assert data["ai_annotations"]["summary"] == "Updated summary"
-        assert data["ai_annotations"]["tags"] == ["old-tag", "updated-tag"]
+        assert data["ai_annotations"]["tags"] == ["foundational", "architecture"]
         assert data["ai_annotations"]["related_issues"] == [1, 2, 3]
         assert data["ai_annotations"]["methodology"] == "Original method"

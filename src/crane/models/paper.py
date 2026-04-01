@@ -9,6 +9,23 @@ Redesigned from gscientist/references/paper.py:
 """
 
 from dataclasses import dataclass, field
+from enum import Enum
+
+
+class AnnotationTag(str, Enum):
+    TRANSFORMER = "transformer"
+    NLP = "nlp"
+    LLM = "llm"
+    FOUNDATIONAL = "foundational"
+    ARCHITECTURE = "architecture"
+    THEORY = "theory"
+    EMPIRICAL = "empirical"
+    METHOD = "method"
+    SOFTWARE = "software"
+    DATASET = "dataset"
+
+
+ALLOWED_ANNOTATION_TAGS = {tag.value for tag in AnnotationTag}
 
 
 @dataclass

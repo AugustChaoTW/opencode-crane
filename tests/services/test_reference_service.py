@@ -211,6 +211,35 @@ class TestReferenceServiceAnnotate:
         assert result["ai_annotations"]["tags"] == ["transformer", "nlp", "architecture"]
         assert result["ai_annotations"]["related_issues"] == [11, 12, 13]
 
+    def test_annotate_rejects_unknown_tag(self, reference_service, sample_paper_data):
+        reference_service.add(**sample_paper_data)
+
+        with pytest.raises(ValueError, match="Invalid tags"):
+            reference_service.annotate(
+                key="vaswani2017-attention",
+                tags=["unknown-tag"],
+            )
+
+    def test_annotate_rejects_overlong_summary(self, reference_service, sample_paper_data):
+        reference_service.add(**sample_paper_data)
+
+        with pytest.raises(ValueError, match="summary exceeds"):
+            reference_service.annotate(
+                key="vaswani2017-attention",
+                summary="x" * 2001,
+            )
+
+    def test_annotate_rejects_non_positive_related_issue(
+        self, reference_service, sample_paper_data
+    ):
+        reference_service.add(**sample_paper_data)
+
+        with pytest.raises(ValueError, match="related_issues must contain positive integers"):
+            reference_service.annotate(
+                key="vaswani2017-attention",
+                related_issues=[0, 2],
+            )
+
 
 class TestReferenceServiceGetAllKeys:
     """Test getting all reference keys."""
