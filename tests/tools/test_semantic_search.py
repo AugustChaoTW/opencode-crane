@@ -108,7 +108,15 @@ class TestSemanticSearchTool:
         """Test that semantic_search respects k parameter."""
         tool = registered_tools["semantic_search"]
 
-        with patch("os.getenv", return_value="test-key"):
+        with (
+            patch("os.getenv", return_value="test-key"),
+            patch("crane.services.semantic_search_service.requests.post") as mock_post,
+        ):
+            mock_response = MagicMock()
+            mock_response.json.return_value = {"data": [{"embedding": [0.1] * 1536}]}
+            mock_response.raise_for_status = MagicMock()
+            mock_post.return_value = mock_response
+
             result = tool(
                 query="test",
                 k=1,
