@@ -139,6 +139,35 @@ def test_generate_literature_review(temp_project_with_paper):
     assert "文獻回顧" in content
 
 
+def test_generate_literature_review_includes_ai_annotation_summary(temp_project_with_paper):
+    repo, _ = temp_project_with_paper
+    paper_yaml = repo / "references" / "papers" / "test2020-example.yaml"
+    paper_yaml.write_text(
+        """
+key: test2020-example
+title: Example Paper
+authors:
+  - Test Author
+year: 2020
+ai_annotations:
+  summary: "Annotation summary"
+  key_contributions:
+    - "Contribution A"
+""",
+        encoding="utf-8",
+    )
+
+    svc = SubmissionPipelineService(repo)
+    workspace, _ = svc.create_submission_workspace()
+    result = svc.generate_literature_review(workspace)
+
+    report_path = Path(result["file"])
+    content = report_path.read_text(encoding="utf-8")
+    assert "AI 註解摘要" in content
+    assert "Annotation summary" in content
+    assert result["annotated_references"] == 1
+
+
 def test_generate_experiment_results(temp_project_with_paper):
     """測試實驗結果報告生成"""
     repo, _ = temp_project_with_paper

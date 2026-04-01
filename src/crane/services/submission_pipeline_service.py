@@ -106,6 +106,26 @@ class SubmissionPipelineService:
 
         md += f"\n**PDF 完整度**：{pdf_count}/{len(references)} ({100 * pdf_count // len(references)}%)\n\n"
 
+        annotated_references = []
+        for ref in references:
+            annotations = ref.get("ai_annotations") or {}
+            if annotations.get("summary") or annotations.get("key_contributions"):
+                annotated_references.append(ref)
+
+        md += "## AI 註解摘要\n\n"
+        if not annotated_references:
+            md += "- 無 ai_annotations 摘要可用\n\n"
+        else:
+            for ref in annotated_references:
+                annotations = ref.get("ai_annotations") or {}
+                md += f"### {ref['title']}\n"
+                if annotations.get("summary"):
+                    md += f"- **摘要**：{annotations['summary']}\n"
+                contributions = annotations.get("key_contributions") or []
+                if contributions:
+                    md += f"- **貢獻**：{'; '.join(str(c) for c in contributions)}\n"
+                md += "\n"
+
         md += "## 文獻詳細清單\n\n"
         for ref in references:
             md += f"### {ref['title']}\n"
@@ -123,6 +143,7 @@ class SubmissionPipelineService:
             "file": str(report_path),
             "reference_count": len(references),
             "pdf_complete": pdf_count,
+            "annotated_references": len(annotated_references),
         }
 
     def generate_experiment_results(self, submission_dir: Path) -> dict[str, Any]:
