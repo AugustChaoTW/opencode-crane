@@ -10,7 +10,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-import PyPDF2
+import PyPDF2  # pyright: ignore[reportMissingImports]
 
 from crane.models.paper import (
     ALLOWED_ANNOTATION_TAGS,
@@ -27,7 +27,11 @@ from crane.utils.yaml_io import (
 )
 
 
-_UNSET = object()
+class _UnsetType:
+    pass
+
+
+_UNSET = _UnsetType()
 
 
 class ReferenceService:
@@ -47,22 +51,18 @@ class ReferenceService:
 
     def _validate_annotation_inputs(
         self,
-        summary: str | None | object,
+        summary: str | None | _UnsetType,
         key_contributions: list[str] | None,
-        methodology: str | None | object,
-        relevance_notes: str | None | object,
+        methodology: str | None | _UnsetType,
+        relevance_notes: str | None | _UnsetType,
         tags: list[str] | None,
         related_issues: list[int] | None,
     ) -> None:
-        if summary is not _UNSET and summary is not None and len(summary) > 2000:
+        if isinstance(summary, str) and len(summary) > 2000:
             raise ValueError("summary exceeds maximum length (2000)")
-        if methodology is not _UNSET and methodology is not None and len(methodology) > 4000:
+        if isinstance(methodology, str) and len(methodology) > 4000:
             raise ValueError("methodology exceeds maximum length (4000)")
-        if (
-            relevance_notes is not _UNSET
-            and relevance_notes is not None
-            and len(relevance_notes) > 4000
-        ):
+        if isinstance(relevance_notes, str) and len(relevance_notes) > 4000:
             raise ValueError("relevance_notes exceeds maximum length (4000)")
 
         if key_contributions is not None:
@@ -346,10 +346,10 @@ class ReferenceService:
     def annotate(
         self,
         key: str,
-        summary: str | None | object = _UNSET,
+        summary: str | None | _UnsetType = _UNSET,
         key_contributions: list[str] | None = None,
-        methodology: str | None | object = _UNSET,
-        relevance_notes: str | None | object = _UNSET,
+        methodology: str | None | _UnsetType = _UNSET,
+        relevance_notes: str | None | _UnsetType = _UNSET,
         tags: list[str] | None = None,
         related_issues: list[int] | None = None,
     ) -> str:
@@ -387,17 +387,17 @@ class ReferenceService:
 
         auto_methodology, auto_contributions = self._extract_annotation_candidates_from_pdf(key)
 
-        if summary is not _UNSET:
+        if not isinstance(summary, _UnsetType):
             paper.ai_annotations.summary = summary or ""
         if key_contributions is not None:
             paper.ai_annotations.key_contributions.extend(key_contributions)
         elif auto_contributions:
             paper.ai_annotations.key_contributions.extend(auto_contributions)
-        if methodology is not _UNSET:
+        if not isinstance(methodology, _UnsetType):
             paper.ai_annotations.methodology = methodology or ""
         elif auto_methodology and not paper.ai_annotations.methodology:
             paper.ai_annotations.methodology = auto_methodology
-        if relevance_notes is not _UNSET:
+        if not isinstance(relevance_notes, _UnsetType):
             paper.ai_annotations.relevance_notes = relevance_notes or ""
         if tags is not None:
             paper.ai_annotations.tags.extend(tags)
