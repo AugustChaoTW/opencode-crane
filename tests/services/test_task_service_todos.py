@@ -71,6 +71,24 @@ class TestTaskServiceLabels:
         assert "crane" not in labels
         assert "kind:task" not in labels
 
+    def test_create_with_explicit_kind_label(self, task_service, mock_gh):
+        with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
+            task_service.create(title="Test", kind="todo")
+
+        cmd = mock_gh.calls[0]
+        label_idx = cmd.index("--label") + 1
+        labels = cmd[label_idx].split(",")
+        assert "kind:todo" in labels
+
+    def test_list_with_explicit_kind_filter(self, task_service, mock_gh):
+        with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
+            task_service.list(kind="todo")
+
+        cmd = mock_gh.calls[0]
+        label_idx = cmd.index("--label") + 1
+        labels = cmd[label_idx].split(",")
+        assert "kind:todo" in labels
+
 
 class TestTaskServiceBuildLabels:
     def test_build_labels_excludes_nonexistent(self):

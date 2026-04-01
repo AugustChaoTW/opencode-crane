@@ -22,6 +22,7 @@ def register_tools(mcp):
         phase: str = "",
         task_type: str = "",
         priority: str = "",
+        kind: str = "",
         milestone: str = "",
         assignee: str = "@me",
         project_dir: str | None = None,
@@ -43,6 +44,7 @@ def register_tools(mcp):
             phase=phase,
             task_type=task_type,
             priority=priority,
+            kind=kind,
             milestone=milestone,
             assignee=assignee,
         )
@@ -54,10 +56,11 @@ def register_tools(mcp):
         task_type: str = "",
         milestone: str = "",
         limit: int = 30,
+        kind: str = "",
         project_dir: str | None = None,
     ) -> list[dict[str, object]]:
         service = _get_service(project_dir)
-        return service.list(phase, state, task_type, milestone, limit)
+        return service.list(phase, state, task_type, milestone, limit, kind=kind)
 
     @mcp.tool()
     def view_task(

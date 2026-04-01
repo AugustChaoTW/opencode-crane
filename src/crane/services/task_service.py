@@ -32,8 +32,11 @@ class TaskService:
         task_type: str = "",
         priority: str = "",
         item_type: str = "task",
+        include_kind: bool = False,
     ) -> list[str]:
         labels: list[str] = []
+        if include_kind:
+            labels.append(f"kind:{self._normalize_kind(item_type)}")
         if phase:
             labels.append(f"phase:{phase}")
         if task_type:
@@ -52,6 +55,7 @@ class TaskService:
         milestone: str = "",
         assignee: str = "@me",
         type: str = "task",
+        kind: str = "",
     ) -> dict[str, Any]:
         """
         Create a research task (GitHub Issue).
@@ -64,16 +68,19 @@ class TaskService:
             priority: Priority level (high, medium, low)
             milestone: Milestone name
             assignee: Assignee (default "@me")
-            type: CRANE issue kind ("task" or "todo")
+            type: Backward-compatible default issue kind
+            kind: Optional CRANE issue kind label ("task" or "todo")
 
         Returns:
             Dict with "number" and "url" keys.
         """
+        issue_kind = kind or type
         labels = self._build_labels(
             phase=phase,
             task_type=task_type,
             priority=priority,
-            item_type=type,
+            item_type=issue_kind,
+            include_kind=bool(kind),
         )
 
         args = ["issue", "create", "--title", title, "--body", body]
@@ -96,6 +103,7 @@ class TaskService:
         milestone: str = "",
         limit: int = 30,
         type: str = "task",
+        kind: str = "",
     ) -> list[dict[str, Any]]:
         """
         List research tasks with filtering.
@@ -106,7 +114,8 @@ class TaskService:
             task_type: Filter by task type
             milestone: Filter by milestone name
             limit: Maximum results
-            type: CRANE issue kind filter ("task" or "todo")
+            type: Backward-compatible default issue kind filter
+            kind: Optional CRANE issue kind filter ("task" or "todo")
 
         Returns:
             List of task dicts.
@@ -122,10 +131,12 @@ class TaskService:
             str(limit),
         ]
 
+        issue_kind = kind or type
         labels = self._build_labels(
             phase=phase,
             task_type=task_type,
-            item_type=type,
+            item_type=issue_kind,
+            include_kind=bool(kind),
         )
         if labels:
             args.extend(["--label", ",".join(labels)])

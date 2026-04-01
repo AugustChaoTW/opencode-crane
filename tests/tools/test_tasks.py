@@ -106,6 +106,14 @@ class TestCreateTask:
         assignee_idx = mock_gh.calls[0].index("--assignee")
         assert mock_gh.calls[0][assignee_idx + 1] == "alice"
 
+    def test_supports_explicit_kind_label(self, task_tools, mock_gh):
+        with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
+            task_tools["create_task"](title="Task", kind="todo")
+
+        label_idx = mock_gh.calls[0].index("--label")
+        labels = mock_gh.calls[0][label_idx + 1].split(",")
+        assert "kind:todo" in labels
+
 
 class TestListTasks:
     def test_registered(self, task_tools):
@@ -143,6 +151,14 @@ class TestListTasks:
         assert "--milestone" in mock_gh.calls[0]
         ms_idx = mock_gh.calls[0].index("--milestone")
         assert mock_gh.calls[0][ms_idx + 1] == "M1"
+
+    def test_filters_by_kind(self, task_tools, mock_gh):
+        with patch("crane.utils.gh.subprocess.run", side_effect=mock_gh.run):
+            task_tools["list_tasks"](kind="todo")
+
+        label_idx = mock_gh.calls[0].index("--label")
+        labels = mock_gh.calls[0][label_idx + 1].split(",")
+        assert "kind:todo" in labels
 
 
 class TestViewTask:

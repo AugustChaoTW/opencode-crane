@@ -103,6 +103,18 @@ class TestInitResearch:
         for priority in ["high", "medium", "low"]:
             assert any(f"label create priority:{priority}" in cmd for cmd in calls_as_str)
 
+    def test_creates_kind_labels(self, project_tools, tmp_project, mock_gh, mock_git):
+        dispatcher = _mock_subprocess_dispatch(mock_gh, mock_git)
+        with (
+            patch("crane.utils.gh.subprocess.run", side_effect=dispatcher),
+            patch("crane.utils.git.subprocess.run", side_effect=dispatcher),
+        ):
+            project_tools["init_research"](project_dir=str(tmp_project))
+
+        calls_as_str = [" ".join(cmd) for cmd in mock_gh.calls]
+        assert any("label create kind:task" in cmd for cmd in calls_as_str)
+        assert any("label create kind:todo" in cmd for cmd in calls_as_str)
+
     def test_creates_milestones(self, project_tools, tmp_project, mock_gh, mock_git):
         dispatcher = _mock_subprocess_dispatch(mock_gh, mock_git)
         with (

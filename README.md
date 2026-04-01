@@ -26,7 +26,7 @@ CRANE is an **Autonomous Research Assistant MCP Server** that transforms how you
 
 ## Feature Matrix (Workflow Phases)
 
-CRANE provides **23+ MCP Tools** organized across 6 research phases:
+CRANE provides **35 MCP Tools** organized across 6 research phases:
 
 | Phase | Core Tools | Purpose |
 |-------|------------|---------|

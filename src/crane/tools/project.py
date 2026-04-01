@@ -39,6 +39,11 @@ PRIORITY_LABEL_COLORS = {
     "low": "0E8A16",
 }
 
+KIND_LABEL_COLORS = {
+    "task": "5319E7",
+    "todo": "1D76DB",
+}
+
 
 def _phase_display_name(phase: str) -> str:
     return phase.replace("-", " ").title()
@@ -95,7 +100,7 @@ def register_tools(mcp):
     ) -> str:
         """
         Initialize the current GitHub repo as a research project.
-        Creates phase/type/priority labels, milestones, references/ directory,
+        Creates phase/type/priority/kind labels, milestones, references/ directory,
         and .github/ISSUE_TEMPLATE/research-task.yml.
         """
         selected_phases = phases or DEFAULT_PHASES
@@ -132,6 +137,19 @@ def register_tools(mcp):
                     "label",
                     "create",
                     f"priority:{priority}",
+                    "--color",
+                    color,
+                    "--force",
+                ],
+                cwd=project_dir,
+            )
+
+        for kind, color in KIND_LABEL_COLORS.items():
+            gh(
+                [
+                    "label",
+                    "create",
+                    f"kind:{kind}",
                     "--color",
                     color,
                     "--force",
