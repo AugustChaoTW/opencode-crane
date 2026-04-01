@@ -157,7 +157,7 @@ class TestScreeningService:
             ("venue", "TMLR"),
             ("doi", "10.1234/example"),
             ("methodology", "Prompting"),
-            ("key_contributions", "one; two; three"),
+            ("key_contributions", "one; two; three; four"),
             ("dataset", "MTEB"),
         ],
     )
@@ -184,3 +184,14 @@ class TestScreeningService:
 
         assert svc._extract_dimension({"authors": "Solo Author"}, "authors") == "Solo Author"
         assert svc._extract_dimension({"ai_annotations": {}}, "key_contributions") == ""
+
+    def test_extract_dimension_returns_all_key_contributions(self):
+        mod = _load()
+        svc = mod.ScreeningService(Path("references"))
+        data = {
+            "ai_annotations": {
+                "key_contributions": ["one", "two", "three", "four", "five"],
+            }
+        }
+
+        assert svc._extract_dimension(data, "key_contributions") == "one; two; three; four; five"

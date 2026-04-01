@@ -174,7 +174,7 @@ class ScreeningService:
         elif dimension == "key_contributions":
             contributions = annotations.get("key_contributions", [])
             if isinstance(contributions, list):
-                return "; ".join(str(c) for c in contributions[:3])
+                return "; ".join(str(c) for c in contributions)
             return str(contributions)
 
         return str(data.get(dimension, ""))
