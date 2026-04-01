@@ -16,6 +16,12 @@ from crane.workspace import resolve_workspace
 
 LITERATURE_REVIEW_STEPS = ["search", "add", "download", "read", "annotate", "create_task"]
 FULL_SETUP_STEPS = ["init", "create_starter_tasks"]
+SUBMISSION_CHECK_STEPS = [
+    "literature_review",
+    "experiment_results",
+    "framing_analysis",
+    "paper_health_check",
+]
 
 
 def _phase_display_name(phase: str) -> str:

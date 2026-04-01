@@ -17,6 +17,7 @@ from .tools.q1_evaluation import register_tools as register_q1_evaluation_tools
 from .tools.references import register_tools as register_reference_tools
 from .tools.screening import register_tools as register_screening_tools
 from .tools.section_review import register_tools as register_section_review_tools
+from .tools.submission_check import register_tools as register_submission_check_tools
 from .tools.tasks import register_tools as register_task_tools
 from .tools.workspace import register_tools as register_workspace_tools
 
@@ -34,6 +35,7 @@ register_section_review_tools(mcp)
 register_q1_evaluation_tools(mcp)
 register_journal_strategy_tools(mcp)
 register_pipeline_tools(mcp)
+register_submission_check_tools(mcp)
 
 
 def main():
