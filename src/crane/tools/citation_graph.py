@@ -125,3 +125,89 @@ def register_tools(mcp):
             "cluster_count": len(clusters),
             "clusters": clusters,
         }
+
+    @mcp.tool()
+    def visualize_citation_graph(
+        output_path: str = "figures/citation_graph.pdf",
+        refs_dir: str = "references",
+        project_dir: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Generate citation network visualization as PDF/PNG figure.
+
+        Creates a circular network diagram showing citation relationships
+        between your references.
+
+        Args:
+            output_path: Output file path (PDF or PNG)
+            refs_dir: References directory path
+            project_dir: Project root directory
+
+        Returns:
+            Dict with output_path and stats
+        """
+        service = _get_service(refs_dir, project_dir)
+        result = service.generate_citation_figure(output_path=output_path)
+
+        if result["status"] == "success":
+            result["message"] = (
+                f"Citation graph saved to {output_path}. "
+                f"{result['in_library']} in-library, {result['missing']} missing."
+            )
+
+        return result
+
+    @mcp.tool()
+    def get_citation_mermaid(
+        refs_dir: str = "references",
+        project_dir: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Generate Mermaid diagram for citation relationships.
+
+        Returns Mermaid syntax that can be rendered in markdown,
+        GitHub, or any Mermaid-compatible viewer.
+
+        Args:
+            refs_dir: References directory path
+            project_dir: Project root directory
+
+        Returns:
+            Dict with Mermaid diagram string
+        """
+        service = _get_service(refs_dir, project_dir)
+        mermaid = service.generate_citation_mermaid()
+
+        return {
+            "status": "success",
+            "mermaid": mermaid,
+            "message": "Paste the mermaid string into any Mermaid viewer (GitHub, mermaid.live, etc.)",
+        }
+
+    @mcp.tool()
+    def get_cluster_mermaid(
+        k_clusters: int = 5,
+        refs_dir: str = "references",
+        project_dir: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Generate Mermaid diagram for research clusters.
+
+        Returns Mermaid syntax showing how your papers cluster by topic.
+
+        Args:
+            k_clusters: Number of clusters to create
+            refs_dir: References directory path
+            project_dir: Project root directory
+
+        Returns:
+            Dict with Mermaid diagram string
+        """
+        service = _get_service(refs_dir, project_dir)
+        mermaid = service.generate_cluster_mermaid(k_clusters=k_clusters)
+
+        return {
+            "status": "success",
+            "mermaid": mermaid,
+            "message": "Paste the mermaid string into any Mermaid viewer.",
+        }

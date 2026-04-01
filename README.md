@@ -26,14 +26,14 @@ CRANE is an **Autonomous Research Assistant MCP Server** that transforms how you
 
 ## Feature Matrix (Workflow Phases)
 
-CRANE provides **41 MCP Tools** organized across 6 research phases:
+CRANE provides **44 MCP Tools** organized across 6 research phases:
 
 | Phase | Core Tools | Purpose |
 |-------|------------|---------|
 | **Initialization** | `init_research`, `get_project_info` | Set up GitHub milestones, labels, and local file structure. |
 | **Literature Review** | `search_papers`, `add_reference`, `read_paper` | Multi-source search, BibTeX sync, and AI-powered summarization. |
 | **Semantic Search** | `semantic_search`, `semantic_search_by_paper`, `build_embeddings` | Vector-based similarity search and embedding management for finding related work. |
-| **Citation Graph** | `build_citation_graph`, `find_citation_gaps`, `get_research_clusters` | Citation relationship analysis and research gap detection. |
+| **Citation Graph** | `build_citation_graph`, `find_citation_gaps`, `get_research_clusters`, `visualize_citation_graph`, `get_citation_mermaid`, `get_cluster_mermaid` | Citation relationship analysis, research gap detection, and visualization. |
 | **Task Management** | `create_task`, `list_tasks`, `report_progress` | Track research goals using GitHub Issues with phase-specific labels. |
 | **Verification** | `check_citations`, `verify_reference` | Ensure every claim is cited and metadata (DOI/Year) is accurate. |
 | **Writing & Audit** | `review_paper_sections`, `verify_paper` | Automated checks for logic, framing, and AI writing traces. |

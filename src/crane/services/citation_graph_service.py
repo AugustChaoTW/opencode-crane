@@ -276,3 +276,170 @@ class CitationGraphService:
 
         clusters.sort(key=lambda x: x["size"], reverse=True)
         return clusters
+
+    def generate_citation_mermaid(
+        self,
+        graph: dict[str, list[str]] | None = None,
+    ) -> str:
+        """Generate Mermaid diagram for citation relationships.
+
+        Args:
+            graph: Citation graph dict (build_citation_graph output).
+                   If None, builds from stored cites data.
+
+        Returns:
+            Mermaid diagram string
+        """
+        if graph is None:
+            graph = {}
+            for key, ref_data in self._references.items():
+                graph[key] = ref_data.get("cites", [])
+
+        lines = ["graph TD"]
+
+        for paper_key, cited_keys in graph.items():
+            if not cited_keys:
+                continue
+
+            title = self._references.get(paper_key, {}).get("title", paper_key)
+            short_title = title[:30] + "..." if len(title) > 30 else title
+            label = f"{paper_key}\\n({short_title})"
+
+            for cited_key in cited_keys:
+                if cited_key in self._references:
+                    cited_title = self._references[cited_key].get("title", cited_key)
+                    short_cited = cited_title[:30] + "..." if len(cited_title) > 30 else cited_title
+                    cited_label = f"{cited_key}\\n({short_cited})"
+                else:
+                    cited_label = f"{cited_key}\\n(MISSING)"
+                lines.append(f'    "{paper_key}"["{label}"] --> "{cited_key}"["{cited_label}"]')
+
+        if len(lines) == 1:
+            lines.append('    "No citation data"["Run build_citation_graph first"]')
+
+        return "\n".join(lines)
+
+    def generate_cluster_mermaid(
+        self,
+        clusters: list[dict[str, Any]] | None = None,
+        k_clusters: int = 5,
+    ) -> str:
+        """Generate Mermaid diagram for research clusters.
+
+        Args:
+            clusters: Cluster list (get_research_clusters output).
+                      If None, computes clusters.
+            k_clusters: Number of clusters if computing
+
+        Returns:
+            Mermaid diagram string
+        """
+        if clusters is None:
+            clusters = self.get_research_clusters(k_clusters=k_clusters)
+
+        if not clusters:
+            return "graph TD\n    A[No clusters available - run build_embeddings first]"
+
+        lines = ["graph TD"]
+
+        for cluster in clusters:
+            cluster_id = cluster["cluster_id"]
+            size = cluster["size"]
+            papers = cluster.get("papers", [])
+
+            lines.append(f'    subgraph C{cluster_id}["Cluster {cluster_id} ({size} papers)"]')
+
+            for paper in papers:
+                key = paper["key"]
+                title = paper.get("title", key)
+                short_title = title[:25] + "..." if len(title) > 25 else title
+                lines.append(f'        {key}["{key}\\n({short_title})"]')
+
+            lines.append("    end")
+
+        return "\n".join(lines)
+
+    def generate_citation_figure(
+        self,
+        output_path: str = "figures/citation_graph.pdf",
+    ) -> dict[str, Any]:
+        """Generate matplotlib citation network visualization.
+
+        Args:
+            output_path: Output file path
+
+        Returns:
+            Dict with output_path and status
+        """
+        import matplotlib
+
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+
+        graph = {}
+        for key, ref_data in self._references.items():
+            graph[key] = ref_data.get("cites", [])
+
+        if not graph:
+            return {
+                "status": "no_data",
+                "message": "No citation data found. Run build_citation_graph first.",
+                "output_path": "",
+            }
+
+        fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+
+        all_keys = set(graph.keys())
+        for cited in graph.values():
+            all_keys.update(cited)
+
+        n = len(all_keys)
+        import numpy as np
+
+        angles = np.linspace(0, 2 * np.pi, n, endpoint=False)
+        positions = {key: (np.cos(a), np.sin(a)) for key, a in zip(all_keys, angles)}
+
+        for paper_key, cited_keys in graph.items():
+            if paper_key not in positions:
+                continue
+            x1, y1 = positions[paper_key]
+            for cited_key in cited_keys:
+                if cited_key in positions:
+                    x2, y2 = positions[cited_key]
+                    ax.annotate(
+                        "",
+                        xy=(x2, y2),
+                        xytext=(x1, y1),
+                        arrowprops=dict(arrowstyle="->", color="gray", alpha=0.5),
+                    )
+
+        for key, (x, y) in positions.items():
+            color = "steelblue" if key in graph else "coral"
+            ax.plot(x, y, "o", color=color, markersize=10, zorder=5)
+            ax.annotate(
+                key,
+                (x, y),
+                textcoords="offset points",
+                xytext=(5, 5),
+                fontsize=6,
+                ha="left",
+            )
+
+        ax.set_xlim(-1.5, 1.5)
+        ax.set_ylim(-1.5, 1.5)
+        ax.set_aspect("equal")
+        ax.set_title("Citation Network")
+        ax.axis("off")
+
+        output = Path(output_path)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(output, bbox_inches="tight")
+        plt.close(fig)
+
+        return {
+            "status": "success",
+            "output_path": str(output),
+            "paper_count": len(graph),
+            "in_library": sum(1 for k in all_keys if k in graph),
+            "missing": sum(1 for k in all_keys if k not in graph),
+        }
