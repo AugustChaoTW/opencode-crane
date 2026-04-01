@@ -28,12 +28,21 @@ class AnnotationTag(str, Enum):
 ALLOWED_ANNOTATION_TAGS = {tag.value for tag in AnnotationTag}
 
 
+class ContributionType(str, Enum):
+    THEORY = "theory"
+    EMPIRICAL = "empirical"
+    METHOD = "method"
+    SOFTWARE = "software"
+    DATASET = "dataset"
+
+
 @dataclass
 class AiAnnotations:
     """AI-generated annotations for a paper."""
 
     summary: str = ""
     key_contributions: list[str] = field(default_factory=list)
+    contribution_types: list[str] = field(default_factory=list)
     methodology: str = ""
     relevance_notes: str = ""
     tags: list[str] = field(default_factory=list)
@@ -118,6 +127,7 @@ class Paper:
             data["ai_annotations"] = {
                 "summary": self.ai_annotations.summary,
                 "key_contributions": self.ai_annotations.key_contributions,
+                "contribution_types": self.ai_annotations.contribution_types,
                 "methodology": self.ai_annotations.methodology,
                 "relevance_notes": self.ai_annotations.relevance_notes,
                 "tags": self.ai_annotations.tags,

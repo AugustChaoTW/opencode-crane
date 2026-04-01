@@ -303,6 +303,26 @@ class TestReferenceServiceAnnotate:
             for contribution in result["ai_annotations"]["key_contributions"]
         )
 
+    def test_annotate_classifies_contribution_taxonomy(self, reference_service, sample_paper_data):
+        reference_service.add(**sample_paper_data)
+        reference_service.annotate(
+            key="vaswani2017-attention",
+            key_contributions=[
+                "We prove a theorem for convergence",
+                "We run empirical benchmarks across tasks",
+                "We release software implementation",
+                "We introduce a new dataset",
+            ],
+        )
+
+        result = reference_service.get("vaswani2017-attention")
+        contribution_types = result["ai_annotations"]["contribution_types"]
+
+        assert "theory" in contribution_types
+        assert "empirical" in contribution_types
+        assert "software" in contribution_types
+        assert "dataset" in contribution_types
+
 
 class TestReferenceServiceGetAllKeys:
     """Test getting all reference keys."""

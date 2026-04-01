@@ -111,6 +111,7 @@ class TestPaperYamlSerialization:
             "ai_annotations": {
                 "summary": "test summary",
                 "key_contributions": ["c1"],
+                "contribution_types": ["method"],
                 "tags": ["t1"],
             },
         }
@@ -118,6 +119,7 @@ class TestPaperYamlSerialization:
         assert p.ai_annotations is not None
         assert p.ai_annotations.summary == "test summary"
         assert p.ai_annotations.key_contributions == ["c1"]
+        assert p.ai_annotations.contribution_types == ["method"]
 
 
 class TestPaperBibtex:
@@ -158,6 +160,7 @@ class TestAiAnnotations:
         a = AiAnnotations(
             summary="test",
             key_contributions=["c1", "c2"],
+            contribution_types=["method"],
             methodology="method",
             relevance_notes="relevant",
             tags=["t1"],
@@ -166,4 +169,5 @@ class TestAiAnnotations:
         )
         assert a.summary == "test"
         assert len(a.key_contributions) == 2
+        assert a.contribution_types == ["method"]
         assert a.added_date == "2026-03-14"

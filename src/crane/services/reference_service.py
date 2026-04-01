@@ -12,7 +12,12 @@ from typing import Any
 
 import PyPDF2
 
-from crane.models.paper import ALLOWED_ANNOTATION_TAGS, AiAnnotations, Paper
+from crane.models.paper import (
+    ALLOWED_ANNOTATION_TAGS,
+    AiAnnotations,
+    ContributionType,
+    Paper,
+)
 from crane.utils.bibtex import append_entry, remove_entry
 from crane.utils.yaml_io import (
     delete_paper_yaml,
@@ -109,6 +114,32 @@ class ReferenceService:
                 cleaned.append(normalized)
 
         return methodology, cleaned[:5]
+
+    def _classify_contribution_types(
+        self,
+        key_contributions: list[str],
+        methodology: str,
+    ) -> list[str]:
+        detected: list[str] = []
+        text = " ".join(key_contributions + [methodology]).lower()
+
+        if re.search(r"\b(theorem|proof|lemma|corollary|bound|convergence)\b", text):
+            detected.append(ContributionType.THEORY.value)
+        if re.search(
+            r"\b(experiment|benchmark|ablation|evaluation|empirical|dataset split)\b", text
+        ):
+            detected.append(ContributionType.EMPIRICAL.value)
+        if re.search(r"\b(algorithm|method|approach|framework|decoder|pipeline)\b", text):
+            detected.append(ContributionType.METHOD.value)
+        if re.search(r"\b(code|software|library|tool|implementation|package|repository)\b", text):
+            detected.append(ContributionType.SOFTWARE.value)
+        if re.search(r"\b(dataset|corpus|benchmark set|annotation set)\b", text):
+            detected.append(ContributionType.DATASET.value)
+
+        if not detected and (key_contributions or methodology):
+            detected.append(ContributionType.METHOD.value)
+
+        return list(dict.fromkeys(detected))
 
     def add(
         self,
@@ -372,6 +403,13 @@ class ReferenceService:
             paper.ai_annotations.tags.extend(tags)
         if related_issues is not None:
             paper.ai_annotations.related_issues.extend(related_issues)
+
+        inferred_types = self._classify_contribution_types(
+            paper.ai_annotations.key_contributions,
+            paper.ai_annotations.methodology,
+        )
+        if inferred_types:
+            paper.ai_annotations.contribution_types = inferred_types
 
         paper.ai_annotations.added_date = date.today().isoformat()
         write_paper_yaml(str(self.papers_dir), key, paper.to_yaml_dict())
