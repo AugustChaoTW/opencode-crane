@@ -299,6 +299,29 @@ class Q1EvaluationService:
             score = Q1Score.WEAK
             suggestions = [check_config["checks"][0][1]]
 
+        if (
+            category == EvaluationCategory.NOVELTY
+            and check_config["name"] == "Contribution Statement"
+        ):
+            quality_patterns = [
+                r"\b(we propose|we introduce|we present|we design)\b",
+                r"\b(contributions?\s+are|our contributions?:)\b",
+                r"\b\(?[1-3]\)|first|second|third\b",
+                r"\b\d+\s*%|compared to|compared with|versus|vs\.\b",
+            ]
+            quality_hits = sum(
+                1
+                for pattern_text in quality_patterns
+                if re.search(pattern_text, text, re.IGNORECASE)
+            )
+            if len(matches) > 0 and quality_hits < 2:
+                score = Q1Score.WEAK
+                suggestions = [
+                    "Contribution statement is present but lacks specific, verifiable novelty details"
+                ]
+            elif len(matches) > 0 and quality_hits >= 3:
+                score = Q1Score.EXCELLENT
+
         return EvaluationCriterion(
             category=category,
             name=check_config["name"],

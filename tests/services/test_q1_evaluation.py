@@ -117,3 +117,34 @@ This section is intentionally terse.
 
         assert contribution.score != eval_mod.Q1Score.WEAK
         assert result.summary["annotation_context_used"] is True
+
+    def test_novelty_contribution_requires_quality_signals(self, tmp_path):
+        eval_mod = _load_eval()
+        tex_file = tmp_path / "test.tex"
+        tex_file.write_text(r"""
+\title{Test Paper}
+\section{Introduction}
+Our contribution is interesting.
+""")
+
+        service = eval_mod.Q1EvaluationService()
+        result = service.evaluate(tex_file)
+        contribution = next(c for c in result.criteria if c.name == "Contribution Statement")
+
+        assert contribution.score == eval_mod.Q1Score.WEAK
+
+    def test_novelty_contribution_rewards_specific_evidence(self, tmp_path):
+        eval_mod = _load_eval()
+        tex_file = tmp_path / "test.tex"
+        tex_file.write_text(r"""
+\title{Test Paper}
+\section{Introduction}
+Our contributions are: (1) we propose a constrained decoder,
+(2) we introduce a repair layer, and (3) we reduce failure by 12% compared to prior work.
+""")
+
+        service = eval_mod.Q1EvaluationService()
+        result = service.evaluate(tex_file)
+        contribution = next(c for c in result.criteria if c.name == "Contribution Statement")
+
+        assert contribution.score != eval_mod.Q1Score.WEAK
