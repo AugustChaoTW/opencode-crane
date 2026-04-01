@@ -119,6 +119,38 @@ cd ~/.opencode-crane && uv sync
 
 ---
 
+## Comparison: CRANE vs. Alternatives
+
+| Feature | CRANE | Zotero | Mendeley | Obsidian |
+|---------|-------|--------|----------|----------|
+| **AI Autonomy** | Native MCP | Third-party plugins | Limited | Manual setup |
+| **Workflow Tracking** | GitHub Issues | Folders/Tags | Folders/Tags | Linked Notes |
+| **Paper Auditing** | Section-level Logic/AI | None | None | Manual |
+| **Citation Check** | Automated (BibTeX) | Semi-automated | Semi-automated | Manual |
+| **Data Provenance** | Evidence Traceability | Manual notes | Manual notes | Manual links |
+| **Developer-First** | CLI/MCP/YAML | GUI-heavy | GUI-heavy | Note-heavy |
+
+---
+
+## Real-World Use Cases
+
+### 1. The Systematic Literature Review
+*Scenario*: A PhD student needs to screen 500 papers on "LoRa Security".
+- **CRANE Action**: Run `run_pipeline(topic="LoRa Security", max_papers=500)`.
+- **Result**: CRANE searches arXiv/OpenAlex, downloads PDFs, extracts abstracts, and creates a GitHub project board with milestones for screening, while annotating each YAML file with AI-extracted methodology.
+
+### 2. The Collaborative Paper Drafting
+*Scenario*: A team is writing a NeurIPS submission and wants to ensure consistency.
+- **CRANE Action**: `check_citations(manuscript_path="main.tex")` followed by `review_paper_sections()`.
+- **Result**: CRANE identifies 3 missing references and flags a data inconsistency where "Table 1" shows 85% accuracy but the "Abstract" claims 87%.
+
+### 3. The Continuous Research Monitor
+*Scenario*: A researcher wants to stay updated on "Diffusion Models" weekly.
+- **CRANE Action**: Schedule a job to run `search_papers` and `add_reference` for new hits.
+- **Result**: Every Monday, the researcher checks their GitHub Issues to see a curated list of new papers, summarized and ready for deep reading.
+
+---
+
 ## Development
 
 CRANE is built for researchers who code.
