@@ -269,7 +269,7 @@ tools = mcp._tool_manager._tools if hasattr(mcp, '_tool_manager') else {}
 print(len(tools))
 " 2>/dev/null)
 
-EXPECTED_TOOLS=53
+EXPECTED_TOOLS=56
 if [ "$TOOL_COUNT" = "$EXPECTED_TOOLS" ]; then
     success "✓ Tool count verified ($TOOL_COUNT)."
 else

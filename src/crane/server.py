@@ -24,6 +24,7 @@ from .tools.semantic_search import register_tools as register_semantic_search_to
 from .tools.submission_check import register_tools as register_submission_check_tools
 from .tools.tasks import register_tools as register_task_tools
 from .tools.workspace import register_tools as register_workspace_tools
+from .tools.version_tools import register_tools as register_version_tools
 
 mcp = FastMCP("crane", json_response=True)
 
@@ -44,6 +45,7 @@ register_journal_strategy_tools(mcp)
 register_pipeline_tools(mcp)
 register_submission_check_tools(mcp)
 register_evaluation_v2_tools(mcp)
+register_version_tools(mcp)
 
 
 def main():
