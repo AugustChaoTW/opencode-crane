@@ -6,6 +6,7 @@ scope filtering, impact analysis, and submission strategy.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -224,24 +225,154 @@ class JournalRecommendationService:
             checklist=checklist,
         )
 
+    # ------------------------------------------------------------------
+    # Paper-type detection helpers
+    # ------------------------------------------------------------------
+
+    # Patterns that strongly indicate a SURVEY paper (title/abstract level)
+    _SURVEY_TITLE_PATTERNS = [
+        r"survey\s+of",
+        r"comprehensive\s+(review|survey|overview)",
+        r"systematic\s+review",
+        r"literature\s+review",
+        r"taxonomy\s+of",
+        r"state\s+of\s+the\s+art\s+in",
+        r"recent\s+advances\s+in\s+\w+\s*(survey|review)?",
+        r"this\s+(paper|article|work)\s+(is|presents|provides)\s+(a\s+)?(survey|review|overview)",
+        r"we\s+(survey|review)\s+(the\s+)?(literature|existing|methods|approaches)",
+    ]
+
+    # Patterns that indicate an EMPIRICAL or APPLICATION paper even when
+    # "review" appears (these should NOT trigger SURVEY_REVIEW)
+    _NOT_SURVEY_PATTERNS = [
+        r"we\s+review\s+(related\s+)?work",
+        r"review\s+of\s+(related|previous|existing)\s+work",
+        r"related\s+work",
+        r"literature\s+review\s+section",
+        r"section\s+\d+\s*[:.]?\s+(related\s+work|background|literature\s+review)",
+    ]
+
     def _detect_paper_type(self, content: str) -> PaperType:
+        """Detect paper type using context-aware pattern matching.
+
+        Strategy:
+        1. Check for strong survey signals in title/abstract first
+        2. If "review" appears, verify it's not just a related-work section
+        3. Use weighted scoring across the full document
+        4. Fall back to EMPIRICAL_STUDY when uncertain
+        """
         content_lower = content.lower()
 
-        if any(
-            w in content_lower for w in ["survey", "review", "taxonomy", "comprehensive overview"]
-        ):
+        # --- Step 1: Extract title and abstract for higher-weight analysis ---
+        title = self._extract_title(content)
+        abstract = self._extract_abstract(content)
+        title_lower = title.lower()
+        abstract_lower = abstract.lower() if abstract else ""
+
+        # --- Step 2: Check for strong survey signals in title/abstract ---
+        survey_in_title = any(re.search(p, title_lower) for p in self._SURVEY_TITLE_PATTERNS)
+        survey_in_abstract = any(re.search(p, abstract_lower) for p in self._SURVEY_TITLE_PATTERNS)
+
+        # If title strongly indicates survey → immediate classification
+        if survey_in_title:
             return PaperType.SURVEY_REVIEW
-        elif any(
-            w in content_lower
-            for w in ["theorem", "proof", "well-posed", "hadamard", "theoretical"]
+
+        # --- Step 3: Check for "not survey" patterns ---
+        has_not_survey = any(re.search(p, content_lower) for p in self._NOT_SURVEY_PATTERNS)
+
+        # --- Step 4: Weighted scoring for survey ---
+        survey_score = 0.0
+
+        # Title matches (high weight)
+        if survey_in_abstract:
+            survey_score += 3.0
+
+        # Full-text survey keywords (lower weight, context-checked)
+        survey_keywords = ["survey", "taxonomy"]
+        for kw in survey_keywords:
+            # Count occurrences but cap at 5 to avoid runaway scoring
+            count = min(len(re.findall(rf"\b{kw}\b", content_lower)), 5)
+            survey_score += count * 0.5
+
+        # "review" keyword — only count if NOT in a not-survey context
+        if not has_not_survey:
+            review_count = min(len(re.findall(r"\breview\b", content_lower)), 5)
+            survey_score += review_count * 0.3
+        else:
+            # "review" appears but in related-work context → small penalty
+            survey_score -= 1.0
+
+        # Positive signals for OTHER paper types reduce survey confidence
+        # Theoretical signals
+        theoretical_signals = len(
+            re.findall(
+                r"\b(theorem|proof|lemma|well-posed|hadamard|convergence\s+bound)\b",
+                content_lower,
+            )
+        )
+        if theoretical_signals >= 2:
+            survey_score -= 3.0
+
+        # Empirical/experimental signals
+        empirical_signals = len(
+            re.findall(
+                r"\b(experiment|dataset|benchmark|ablation|baseline|accuracy|f1|auc)\b",
+                content_lower,
+            )
+        )
+        if empirical_signals >= 3:
+            survey_score -= 2.0
+
+        # System/engineering signals
+        system_signals = len(
+            re.findall(
+                r"\b(system|architecture|deployment|latency|throughput|qps|microservice)\b",
+                content_lower,
+            )
+        )
+        if system_signals >= 2:
+            survey_score -= 2.0
+
+        # Threshold: need strong evidence to classify as survey
+        if survey_score >= 3.0:
+            return PaperType.SURVEY_REVIEW
+
+        # --- Step 5: Check other paper types ---
+        if theoretical_signals >= 2 or any(
+            w in content_lower for w in ["theorem", "proof", "well-posed", "hadamard"]
         ):
             return PaperType.THEORETICAL_DIAGNOSTIC
-        elif any(
+
+        if system_signals >= 2 or any(
             w in content_lower for w in ["system", "production", "qps", "latency", "engineering"]
         ):
             return PaperType.APPLICATION_SYSTEM
-        else:
-            return PaperType.EMPIRICAL_STUDY
+
+        # Default: empirical study (most common paper type)
+        return PaperType.EMPIRICAL_STUDY
+
+    @staticmethod
+    def _extract_title(content: str) -> str:
+        """Extract paper title from LaTeX content."""
+        # Try \title{...} pattern
+        match = re.search(r"\\title\{([^}]*)\}", content)
+        if match:
+            return match.group(1).strip()
+        # Fallback: first non-empty line that looks like a title
+        lines = content.strip().split("\n")
+        for line in lines[:10]:
+            stripped = line.strip()
+            if stripped and not stripped.startswith(("%", "\\", "{", "}")):
+                return stripped
+        return ""
+
+    @staticmethod
+    def _extract_abstract(content: str) -> str:
+        """Extract abstract text from LaTeX content."""
+        match = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", content, re.DOTALL)
+        if match:
+            return match.group(1).strip()
+        return ""
 
     def _extract_research_focus(self, content: str) -> str:
         content_lower = content.lower()

@@ -52,6 +52,132 @@ This survey provides a comprehensive taxonomy of methods.
 
         assert attrs.paper_type == svc.PaperType.SURVEY_REVIEW
 
+    def test_detect_survey_from_abstract(self, tmp_path):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        tex_file = tmp_path / "test.tex"
+        tex_file.write_text(r"""
+\title{Recent Advances in Deep Learning}
+\begin{abstract}
+This paper provides a comprehensive survey of deep learning methods
+from 2015 to 2025. We review the literature and provide a taxonomy.
+\end{abstract}
+""")
+        attrs = service.analyze_paper_attributes(tex_file)
+
+        assert attrs.paper_type == svc.PaperType.SURVEY_REVIEW
+
+    def test_empirical_with_related_work_not_survey(self, tmp_path):
+        """Papers with 'related work' sections should NOT be classified as survey."""
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        tex_file = tmp_path / "test.tex"
+        tex_file.write_text(r"""
+\title{A Novel Approach for Sentiment Analysis}
+\begin{abstract}
+We propose a new method for sentiment analysis using transformer models.
+Our approach achieves state-of-the-art results on three benchmarks.
+\end{abstract}
+\section{Introduction}
+We review related work in sentiment analysis and propose improvements.
+\section{Related Work}
+A comprehensive review of existing methods shows gaps in current approaches.
+\section{Method}
+Our model uses attention mechanisms with 12 layers.
+\section{Experiments}
+We evaluate on SST-2, IMDB, and Yelp datasets with 85.3\% accuracy.
+Our ablation study confirms each component's contribution.
+\section{Results}
+Table 1 shows baselines and our method. F1 score improved by 3.2\%.
+""")
+        attrs = service.analyze_paper_attributes(tex_file)
+
+        assert attrs.paper_type != svc.PaperType.SURVEY_REVIEW
+        assert attrs.paper_type == svc.PaperType.EMPIRICAL_STUDY
+
+    def test_system_paper_not_survey(self, tmp_path):
+        """System papers with 'review' in text should still be APPLICATION_SYSTEM."""
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        tex_file = tmp_path / "test.tex"
+        tex_file.write_text(r"""
+\title{Distributed Training System for Large Models}
+\begin{abstract}
+We present a distributed training system achieving 10000 QPS
+with 0.3ms P99 latency across 64 GPUs.
+\end{abstract}
+\section{Introduction}
+We review the current landscape of distributed training frameworks.
+\section{System Architecture}
+Our microservice architecture uses Kubernetes deployment.
+The engineering challenges include latency optimization and throughput scaling.
+\section{Evaluation}
+Production deployment handles 1M requests per hour.
+""")
+        attrs = service.analyze_paper_attributes(tex_file)
+
+        assert attrs.paper_type != svc.PaperType.SURVEY_REVIEW
+        assert attrs.paper_type == svc.PaperType.APPLICATION_SYSTEM
+
+    def test_theoretical_not_survey(self, tmp_path):
+        """Theoretical papers should not be misclassified as survey."""
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        tex_file = tmp_path / "test.tex"
+        tex_file.write_text(r"""
+\title{Convergence Bounds for Non-Convex Optimization}
+\begin{abstract}
+We prove a theorem about convergence rates under Hadamard conditions.
+Our proof establishes well-posedness for the gradient flow.
+\end{abstract}
+\section{Related Work}
+We review existing theoretical results in optimization.
+\section{Theorem}
+Theorem 1: Under assumptions A1-A3, the algorithm converges.
+Proof: By induction on the iteration count...
+Lemma 2: The gradient norm is bounded.
+""")
+        attrs = service.analyze_paper_attributes(tex_file)
+
+        assert attrs.paper_type != svc.PaperType.SURVEY_REVIEW
+        assert attrs.paper_type == svc.PaperType.THEORETICAL_DIAGNOSTIC
+
+    def test_detect_survey_from_title_pattern(self, tmp_path):
+        """Title patterns like 'This paper is a survey' should trigger survey."""
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        tex_file = tmp_path / "test.tex"
+        tex_file.write_text(r"""
+\title{A Survey of Reinforcement Learning Methods}
+\begin{abstract}
+This paper is a survey of reinforcement learning methods.
+\end{abstract}
+""")
+        attrs = service.analyze_paper_attributes(tex_file)
+
+        assert attrs.paper_type == svc.PaperType.SURVEY_REVIEW
+
+    def test_detect_survey_systematic_review(self, tmp_path):
+        """'Systematic review' in title should trigger survey."""
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        tex_file = tmp_path / "test.tex"
+        tex_file.write_text(r"""
+\title{A Systematic Review of Federated Learning}
+\begin{abstract}
+We conduct a systematic review of federated learning approaches.
+\end{abstract}
+""")
+        attrs = service.analyze_paper_attributes(tex_file)
+
+        assert attrs.paper_type == svc.PaperType.SURVEY_REVIEW
+
 
 class TestJournalFiltering:
     def test_filter_by_scope(self):
