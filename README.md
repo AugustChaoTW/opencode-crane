@@ -41,6 +41,7 @@ CRANE provides **56 MCP Tools** organized across research phases:
 | **Writing & Audit** | `review_paper_sections`, `verify_paper` | Automated checks for logic, framing, and AI writing traces. |
 | **Q1 Evaluation v2** | `evaluate_paper_v2`, `match_journal_v2`, `generate_revision_report` | Evidence-first 7-dimension scoring, profile-based journal matching, and 3-layer revision reports. |
 | **Submission** | `run_submission_check`, `recommend_journals` | Final Q1-standard readiness evaluation and journal strategy. |
+| **Version Management** | `check_crane_version`, `upgrade_crane`, `rollback_crane` | Check for updates, upgrade with backup, and rollback on failure. |
 
 ---
 
@@ -95,20 +96,20 @@ cd ~/.opencode-crane && uv sync
                            |
             +--------------v--------------+
             |      CRANE MCP Server       |
-            |    (FastMCP / 50+ Tools)    |
+            |    (FastMCP / 56 Tools)     |
             +--------------+--------------+
                            |
-    +----------+-----------+-----------+-----------+
-    |          |           |           |           |
-+---v---+ +---v---+  +----v----+ +----v----+ +----v----+
-|GitHub | |LocalFS|  |Academic | |Eval v2  | |Domain   |
-|API(gh)| |(YAML) |  |APIs     | |Engine   | |Packs    |
-+---+---+ +---+---+  +----+----+ +----+----+ +----+----+
-    |         |            |           |           |
-    |Tasks    |Meta/BibTeX |arXiv      |7-dim Q1   |AI/ML
-    |Issues   |PDFs        |OpenAlex   |Journal    |Medical
-    |Progress |Rubric Vers |Crossref   |Revision   |Custom
-    +---------+------------+-----------+-----------+--------+
+    +----------+-----------+-----------+-----------+----------+
+    |          |           |           |           |          |
++---v---+ +---v---+  +----v----+ +----v----+ +----v----+ +---v---+
+|GitHub | |LocalFS|  |Academic | |Eval v2  | |Domain   |Version|
+|API(gh)| |(YAML) |  |APIs     | |Engine   | |Packs    |Manager|
++---+---+ +---+---+  +----+----+ +----+----+ +----v----+ +---v---+
+    |         |            |           |           |         |
+    |Tasks    |Meta/BibTeX |arXiv      |7-dim Q1   |AI/ML    |Upgrade
+    |Issues   |PDFs        |OpenAlex   |Journal    |Medical  |Rollback
+    |Progress |Rubric Vers |alphaXiv   |Revision   |Custom   |Migrate
+    +---------+------------+-----------+-----------+---------+------+
 ```
 
 ---
@@ -143,6 +144,31 @@ cd ~/.opencode-crane && uv sync
 ### Rubric Calibration (New)
 - **Version Management**: Save, compare, and rollback rubric versions as YAML.
 - **Proposal Workflow**: Propose weight updates with validation (weights sum to 1.0, reason required).
+
+### APC Cost-Benefit Analysis (New)
+- **Budget-Aware Journal Ranking**: Journals sorted by affordability first, then fit score.
+- **18 Journal APC Profiles**: IEEE ~$2,800, Elsevier ~$3,200-3,400, Nature MI $11,990, JMLR $0 (diamond OA).
+- **CostAssessment Model**: Tracks APC, publication model, waiver availability, and affordability status.
+- **analyze_apc MCP Tool**: One-click APC comparison report across all Q1 journals.
+
+### Feynman Method Interactive Coach (New)
+- **30+ Probing Questions**: Per-dimension question banks targeting methodology, novelty, evaluation, writing, reproducibility, and limitations.
+- **Auto-Targeting Weak Dimensions**: Generates questions for dimensions scoring below 70.
+- **Difficulty Mixing**: Basic, probing, and challenging questions per weak dimension.
+- **generate_feynman_session MCP Tool**: Forces you to articulate and defend your work before submission.
+
+### alphaXiv Structured Paper Summaries (New)
+- **AlphaXivProvider**: Fetches AI-generated structured markdown overviews instead of parsing raw PDFs.
+- **Dual-Source Reading**: alphaXiv first → cache → PyPDF2 fallback.
+- **Structured Chunking**: Section-aware markdown splitting preserves equations and tables.
+- **Rate Limit Handling**: Automatic retry with exponential backoff on 429 errors.
+
+### Version Management (New)
+- **check_crane_version**: Compare local version against GitHub Releases, get compatibility assessment.
+- **upgrade_crane**: Automated upgrade with backup, git pull, uv sync, and verification.
+- **rollback_crane**: Restore from backup directory or git tag on failure.
+- **Startup Auto-Check**: CRANE checks for updates on launch (configurable via `CRANE_CHECK_VERSION_ON_START`).
+- **Migration Framework**: Apply/skip/unskip version migrations with persistent state tracking.
 
 ### Core Features
 - **Section-level Paper Review**: Detects 6 common issues per section (logic errors, data inconsistencies, overclaiming, missing completeness, AI writing traces, figure quality).
@@ -192,6 +218,16 @@ cd ~/.opencode-crane && uv sync
 - **CRANE Action**: Schedule a job to run `search_papers` and `add_reference` for new hits.
 - **Result**: Every Monday, the researcher checks their GitHub Issues to see a curated list of new papers, summarized and ready for deep reading.
 
+### 5. The Pre-Submission Feynman Rehearsal
+*Scenario*: A researcher wants to test their understanding before submitting to a Q1 journal.
+- **CRANE Action**: `generate_feynman_session(paper_path="main.tex", mode="pre_submission")`.
+- **Result**: CRANE generates 5-10 probing questions targeting weak dimensions (e.g., "Your evaluation shows 2% improvement — is that statistically significant?"), forcing the researcher to articulate and defend their work. Unanswerable questions become revision items.
+
+### 6. The APC-Aware Journal Selection
+*Scenario*: A researcher has a $3,000 publication budget and needs to choose a Q1 journal.
+- **CRANE Action**: `analyze_apc(paper_path="main.tex", budget_usd=3000)`.
+- **Result**: CRANE ranks 18 Q1 journals by affordability: 12 within budget (IEEE TPAMI $2,800), 3 near budget, 3 over budget (Nature MI $11,990). Recommends the highest-fit journal within budget with desk-reject risk assessment.
+
 ---
 
 ## Development
@@ -207,7 +243,7 @@ python3 -m venv .venv
 
 ### Running Tests
 ```bash
-# Full test suite (1000+ tests)
+# Full test suite (1300+ tests)
 uv run pytest tests/ -v
 # Coverage report
 uv run pytest tests/ --cov=crane --cov-report=term-missing
@@ -220,7 +256,7 @@ uv run pytest tests/benchmark/ -v
 src/crane/
   models/          # Data models (Paper, PaperProfile, EvidenceLedger, etc.)
   services/        # Business logic (20+ services)
-  tools/           # MCP tool registration (50+ tools)
+  tools/           # MCP tool registration (56 tools)
   config/          # Domain packs and configuration
   templates/llm/   # Prompt templates for future LLM integration
   providers/       # Academic data sources (arXiv, OpenAlex, etc.)
