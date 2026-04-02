@@ -5,6 +5,9 @@ Usage:
     python -m crane.server
 """
 
+import os
+import warnings
+
 from mcp.server.fastmcp import FastMCP  # pyright: ignore[reportMissingImports]
 
 from .tools.citations import register_tools as register_citation_tools
@@ -46,6 +49,28 @@ register_pipeline_tools(mcp)
 register_submission_check_tools(mcp)
 register_evaluation_v2_tools(mcp)
 register_version_tools(mcp)
+
+
+def _check_version_on_startup():
+    """Check for updates on startup if CRANE_CHECK_VERSION_ON_START is set."""
+    if os.environ.get("CRANE_CHECK_VERSION_ON_START", "true").lower() != "true":
+        return
+    try:
+        from .services.version_check_service import VersionCheckService
+
+        service = VersionCheckService()
+        info = service.check_update()
+        if info.is_update_available:
+            warnings.warn(
+                f"CRANE update available: {info.local_version} → {info.latest_version} "
+                f"({info.update_type}). Run check_crane_version for details.",
+                UserWarning,
+            )
+    except Exception:
+        pass  # Never block startup on version check failures
+
+
+_check_version_on_startup()
 
 
 def main():
