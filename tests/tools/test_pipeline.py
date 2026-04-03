@@ -1,5 +1,6 @@
 """TDD tests for run_pipeline tool."""
 
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -279,3 +280,183 @@ class TestResultStructure:
         assert "failed_step" in result
         assert "error" in result
         assert "next_recommended_action" in result
+
+
+class TestLecunEnhancedReviewPipeline:
+    def test_dry_run_returns_lecun_steps(self, pipe):
+        result = pipe(
+            pipeline="lecun-enhanced-review",
+            paper_path="papers/main.tex",
+            dry_run=True,
+        )
+        assert result["status"] == "dry_run"
+        assert result["planned_steps"] == [
+            "evaluate_paper",
+            "check_citations_enhanced",
+            "review_sections_adversarial",
+            "generate_enhanced_report",
+            "simulate_outcome",
+            "analyze_positioning",
+        ]
+
+    def test_pipeline_completes_and_accumulates_step_outputs(self, pipe, tmp_project):
+        paper_path = tmp_project / "paper.tex"
+        paper_path.write_text("\\section{Intro} Test.", encoding="utf-8")
+
+        score = SimpleNamespace(
+            dimension="evaluation",
+            score=78.0,
+            confidence=0.8,
+            reason_codes=["r1"],
+            evidence_spans=["span"],
+            missing_evidence=[],
+            suggestions=["Add stronger baselines"],
+        )
+        plan_item = SimpleNamespace(
+            dimension="evaluation",
+            suggestion="Add stronger baselines",
+            priority=SimpleNamespace(value="medium_term"),
+            effort=SimpleNamespace(value="medium"),
+            expected_impact=8.0,
+            depends_on=[],
+            status="pending",
+        )
+        evaluation = SimpleNamespace(
+            dimension_scores=[score],
+            overall_score=78.0,
+            gates_passed=True,
+            readiness="ready_with_revisions",
+            revision_plan=SimpleNamespace(
+                current_score=78.0, projected_score=84.0, items=[plan_item]
+            ),
+        )
+
+        with (
+            patch("crane.tools.pipeline.EvidenceEvaluationService") as eval_cls,
+            patch("crane.tools.pipeline.CitationService") as citation_cls,
+            patch("crane.tools.pipeline.SectionReviewService") as section_cls,
+            patch("crane.tools.pipeline.RevisionPlanningService") as planning_cls,
+            patch("crane.tools.pipeline.SubmissionSimulationService") as simulation_cls,
+            patch("crane.tools.pipeline.ResearchPositioningService") as positioning_cls,
+        ):
+            eval_cls.return_value.evaluate.return_value = evaluation
+            citation_cls.return_value.check_local_consistency.return_value = {
+                "valid": True,
+                "total_citations": 1,
+                "found": ["k1"],
+                "missing": [],
+                "unused": [],
+                "claims": [{"text": "x", "evidence_level": "VERIFIED"}],
+                "unverified_count": 0,
+                "contradictions": [],
+            }
+            section_cls.return_value.review_paper.return_value = object()
+            section_cls.return_value.to_dict.return_value = {
+                "summary": {"by_severity": {"critical": 2}},
+                "sections": [],
+            }
+            planning_cls.return_value.generate_report.return_value = "# report"
+            planning_cls.return_value.generate_execution_plan.return_value = {
+                "dependency_graph": {"dependencies": [{"from": 0, "to": 1}]}
+            }
+            simulation_cls.return_value.simulate_outcomes.return_value = {
+                "scenarios": [
+                    {"name": "Direct Accept", "probability": 0.4},
+                    {"name": "Major Revision", "probability": 0.6},
+                ],
+                "world_model_analysis": {},
+            }
+            positioning_cls.return_value.analyze_positioning.return_value = {
+                "levels": {"civilizational": {"relevance": "high"}}
+            }
+
+            result = pipe(
+                pipeline="lecun-enhanced-review",
+                paper_path=str(paper_path),
+                refs_dir=str(tmp_project / "references"),
+            )
+
+        assert result["status"] == "completed"
+        assert result["paper_path"] == str(paper_path)
+        assert "evaluate_paper" in result["steps"]
+        assert "check_citations" in result["steps"]
+        assert "section_review" in result["steps"]
+        assert "revision_report" in result["steps"]
+        assert "submission_simulation" in result["steps"]
+        assert "research_positioning" in result["steps"]
+        assert result["overall_assessment"]["q1_readiness"] == "ready_with_revisions"
+        assert result["overall_assessment"]["acceptance_probability"] == 0.4
+        assert result["overall_assessment"]["critical_issues"] == 2
+        assert result["overall_assessment"]["estimated_revision_effort"] == "medium"
+
+    def test_pipeline_keeps_running_when_one_step_fails(self, pipe, tmp_project):
+        paper_path = tmp_project / "paper.tex"
+        paper_path.write_text("\\section{Intro} Test.", encoding="utf-8")
+
+        score = SimpleNamespace(
+            dimension="methodology",
+            score=82.0,
+            confidence=0.9,
+            reason_codes=[],
+            evidence_spans=[],
+            missing_evidence=[],
+            suggestions=["Refine setup"],
+        )
+        plan_item = SimpleNamespace(
+            dimension="methodology",
+            suggestion="Refine setup",
+            priority=SimpleNamespace(value="medium_term"),
+            effort=SimpleNamespace(value="low"),
+            expected_impact=3.0,
+            depends_on=[],
+            status="pending",
+        )
+        evaluation = SimpleNamespace(
+            dimension_scores=[score],
+            overall_score=82.0,
+            gates_passed=True,
+            readiness="ready",
+            revision_plan=SimpleNamespace(
+                current_score=82.0, projected_score=85.0, items=[plan_item]
+            ),
+        )
+
+        with (
+            patch("crane.tools.pipeline.EvidenceEvaluationService") as eval_cls,
+            patch("crane.tools.pipeline.CitationService") as citation_cls,
+            patch("crane.tools.pipeline.SectionReviewService") as section_cls,
+            patch("crane.tools.pipeline.RevisionPlanningService") as planning_cls,
+            patch("crane.tools.pipeline.SubmissionSimulationService") as simulation_cls,
+            patch("crane.tools.pipeline.ResearchPositioningService") as positioning_cls,
+        ):
+            eval_cls.return_value.evaluate.return_value = evaluation
+            citation_cls.return_value.check_local_consistency.side_effect = RuntimeError(
+                "citation boom"
+            )
+            section_cls.return_value.review_paper.return_value = object()
+            section_cls.return_value.to_dict.return_value = {
+                "summary": {"by_severity": {"critical": 0}},
+                "sections": [],
+            }
+            planning_cls.return_value.generate_report.return_value = "# report"
+            planning_cls.return_value.generate_execution_plan.return_value = {
+                "dependency_graph": {"dependencies": []}
+            }
+            simulation_cls.return_value.simulate_outcomes.return_value = {
+                "scenarios": [{"name": "Direct Accept", "probability": 0.3}],
+                "world_model_analysis": {},
+            }
+            positioning_cls.return_value.analyze_positioning.return_value = {
+                "levels": {"operational": {"immediate_actions": []}}
+            }
+
+            result = pipe(
+                pipeline="lecun-enhanced-review",
+                paper_path=str(paper_path),
+                refs_dir=str(tmp_project / "references"),
+            )
+
+        assert result["status"] == "completed"
+        assert result["steps"]["check_citations"]["error"] == "citation boom"
+        assert "submission_simulation" in result["steps"]
+        assert "analyze_positioning" in result["completed_steps"]

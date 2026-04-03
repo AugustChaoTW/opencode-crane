@@ -475,3 +475,316 @@ def test_generate_full_report_works_for_empty_dimensions_and_plan() -> None:
     report = svc.generate_full_report([], gates_passed=True, readiness="ready", plan=plan)
     assert "No dimensions to evaluate." in report
     assert "- [ ] None" in report
+
+
+def test_build_dependency_graph_detects_methodology_to_evaluation_dependency() -> None:
+    svc = _service()
+    graph = svc.build_dependency_graph(
+        [
+            {"dimension": "Methodology", "description": "Refine method details"},
+            {"dimension": "Evaluation", "description": "Update evaluation protocol"},
+        ]
+    )
+
+    assert graph["dependencies"] == [
+        {
+            "from": 0,
+            "to": 1,
+            "reason": "Methodology fixes should land before evaluation updates",
+        }
+    ]
+
+
+def test_build_dependency_graph_detects_experiment_to_figure_dependency() -> None:
+    svc = _service()
+    graph = svc.build_dependency_graph(
+        [
+            {"dimension": "evaluation", "description": "Add experiment for robustness"},
+            {"dimension": "presentation", "description": "Update figure 2 with new curves"},
+        ]
+    )
+
+    assert graph["dependencies"] == [
+        {
+            "from": 0,
+            "to": 1,
+            "reason": "Table/figure updates depend on newly added experiments",
+        }
+    ]
+
+
+def test_build_dependency_graph_writing_quality_has_no_cross_dimension_dependencies() -> None:
+    svc = _service()
+    graph = svc.build_dependency_graph(
+        [
+            {"dimension": "writing quality", "description": "Improve language clarity"},
+            {"dimension": "methodology", "description": "Clarify architecture"},
+            {"dimension": "evaluation", "description": "Add stronger evaluation"},
+        ]
+    )
+
+    deps = {(dep["from"], dep["to"]) for dep in graph["dependencies"]}
+    assert (1, 2) in deps
+    assert all(0 not in edge for edge in deps)
+
+
+def test_build_dependency_graph_returns_longest_critical_path() -> None:
+    svc = _service()
+    graph = svc.build_dependency_graph(
+        [
+            {"dimension": "methodology", "description": "Method cleanup"},
+            {"dimension": "evaluation", "description": "Add experiment for new setting"},
+            {"dimension": "presentation", "description": "Update table with new experiment"},
+        ]
+    )
+
+    assert graph["critical_path"] == [0, 1, 2]
+
+
+def test_build_dependency_graph_returns_topological_parallel_groups() -> None:
+    svc = _service()
+    graph = svc.build_dependency_graph(
+        [
+            {"dimension": "methodology", "description": "Tune methodology"},
+            {"dimension": "evaluation", "description": "Re-run benchmarks"},
+            {"dimension": "writing quality", "description": "Polish writing"},
+        ]
+    )
+
+    assert graph["parallel_groups"] == [[0, 2], [1]]
+
+
+def test_build_dependency_graph_empty_input_returns_empty_graph() -> None:
+    svc = _service()
+    graph = svc.build_dependency_graph([])
+
+    assert graph == {"dependencies": [], "critical_path": [], "parallel_groups": []}
+
+
+def test_build_dependency_graph_single_item_has_no_dependencies() -> None:
+    svc = _service()
+    graph = svc.build_dependency_graph(
+        [{"dimension": "evaluation", "description": "Tighten metrics"}]
+    )
+
+    assert graph["dependencies"] == []
+    assert graph["critical_path"] == [0]
+    assert graph["parallel_groups"] == [[0]]
+
+
+def test_build_dependency_graph_cycle_falls_back_to_safe_outputs() -> None:
+    svc = _service()
+    graph = svc.build_dependency_graph(
+        [
+            {"dimension": "evaluation", "description": "Add experiment and update figure"},
+            {"dimension": "presentation", "description": "Add experiment and update table"},
+        ]
+    )
+
+    assert {(d["from"], d["to"]) for d in graph["dependencies"]} == {(0, 1), (1, 0)}
+    assert graph["critical_path"] == [0]
+    assert graph["parallel_groups"] == [[0, 1]]
+
+
+def test_define_quality_criteria_methodology_missing_ablation() -> None:
+    svc = _service()
+    criteria = svc.define_quality_criteria(
+        {"dimension": "methodology", "issue_type": "missing_ablation"}
+    )
+    assert "Ablation study" in criteria
+    assert "≥3 variants" in criteria
+
+
+def test_define_quality_criteria_evaluation_weak_baseline() -> None:
+    svc = _service()
+    criteria = svc.define_quality_criteria(
+        {"dimension": "evaluation", "issue_type": "weak_baseline"}
+    )
+    assert "3 state-of-the-art baselines" in criteria
+
+
+def test_define_quality_criteria_writing_quality_unclear_language() -> None:
+    svc = _service()
+    criteria = svc.define_quality_criteria(
+        {"dimension": "writing quality", "issue_type": "unclear_language"}
+    )
+    assert "Argument flow is coherent" in criteria
+
+
+def test_define_quality_criteria_novelty_insufficient_comparison() -> None:
+    svc = _service()
+    criteria = svc.define_quality_criteria(
+        {"dimension": "novelty", "issue_type": "insufficient_comparison"}
+    )
+    assert "comparison" in criteria.lower()
+    assert "closest papers" in criteria.lower()
+
+
+def test_define_quality_criteria_unknown_dimension_returns_generic_criteria() -> None:
+    svc = _service()
+    criteria = svc.define_quality_criteria({"dimension": "security", "issue_type": "unknown_gap"})
+    assert "objective evidence" in criteria
+    assert "+5" in criteria
+
+
+def test_define_quality_criteria_without_issue_type_uses_fallback() -> None:
+    svc = _service()
+    criteria = svc.define_quality_criteria({"dimension": "unknown"})
+    assert "objective evidence" in criteria
+
+
+def test_generate_execution_plan_returns_expected_phase_structure() -> None:
+    svc = _service()
+    items = [
+        {"dimension": "methodology", "description": "Fix method", "effort": "high"},
+        {"dimension": "evaluation", "description": "Re-run tests", "effort": "medium"},
+        {"dimension": "writing quality", "description": "Polish language", "effort": "low"},
+    ]
+    plan = svc.generate_execution_plan(items)
+
+    assert plan["phases"] == [
+        {"phase": 1, "items": [0, 2], "estimated_effort": "medium"},
+        {"phase": 2, "items": [1], "estimated_effort": "medium"},
+    ]
+
+
+def test_generate_execution_plan_critical_path_length_matches_graph() -> None:
+    svc = _service()
+    items = [
+        {"dimension": "methodology", "description": "Method update"},
+        {"dimension": "evaluation", "description": "Add experiment for transfer"},
+        {"dimension": "presentation", "description": "Update figure with transfer results"},
+    ]
+    plan = svc.generate_execution_plan(items)
+
+    assert plan["critical_path_length"] == len(plan["dependency_graph"]["critical_path"])
+    assert plan["critical_path_length"] == 3
+
+
+def test_generate_execution_plan_parallelizable_true_without_dependencies() -> None:
+    svc = _service()
+    items = [
+        {"dimension": "novelty", "description": "Clarify claims"},
+        {"dimension": "reproducibility", "description": "Add environment details"},
+    ]
+    plan = svc.generate_execution_plan(items)
+
+    assert plan["dependency_graph"]["dependencies"] == []
+    assert plan["parallelizable"] is True
+
+
+def test_generate_execution_plan_generates_risks_for_long_chain_and_low_impact_items() -> None:
+    svc = _service()
+    items = [
+        {
+            "dimension": "methodology",
+            "description": "Refine method",
+            "before_score": 70,
+            "projected_after": 72,
+        },
+        {
+            "dimension": "evaluation",
+            "description": "Add experiment for unseen domain",
+            "before_score": 75,
+            "projected_after": 77,
+        },
+        {
+            "dimension": "presentation",
+            "description": "Update table with unseen-domain results",
+            "before_score": 80,
+            "projected_after": 82,
+        },
+    ]
+    plan = svc.generate_execution_plan(items)
+
+    assert "Long dependency chain may delay downstream revisions" in plan["risks"]
+    assert "Multiple low-impact items may not move readiness enough" in plan["risks"]
+
+
+def test_generate_execution_plan_quality_criteria_has_entry_for_each_item() -> None:
+    svc = _service()
+    items = [
+        {"dimension": "methodology", "issue_type": "missing_ablation"},
+        {"dimension": "evaluation", "issue_type": "weak_baseline"},
+        {"dimension": "unknown"},
+    ]
+    plan = svc.generate_execution_plan(items)
+
+    assert set(plan["quality_criteria"].keys()) == {0, 1, 2}
+    assert "Ablation study" in plan["quality_criteria"][0]
+
+
+def test_generate_execution_plan_empty_input_returns_valid_structure() -> None:
+    svc = _service()
+    plan = svc.generate_execution_plan([])
+
+    assert plan == {
+        "phases": [],
+        "critical_path_length": 0,
+        "parallelizable": False,
+        "risks": [],
+        "quality_criteria": {},
+        "dependency_graph": {"dependencies": [], "critical_path": [], "parallel_groups": []},
+    }
+
+
+def test_generate_execution_plan_cycle_input_keeps_structure_consistent() -> None:
+    svc = _service()
+    items = [
+        {"dimension": "evaluation", "description": "Add experiment and update figure"},
+        {"dimension": "presentation", "description": "Add experiment and update table"},
+    ]
+    plan = svc.generate_execution_plan(items)
+
+    assert plan["dependency_graph"]["critical_path"] == [0]
+    assert plan["dependency_graph"]["parallel_groups"] == [[0, 1]]
+    assert plan["parallelizable"] is True
+
+
+def test_generate_report_contains_all_four_sections() -> None:
+    svc = _service()
+    dims = [_dim("methodology", 50), _dim("evaluation", 55), _dim("writing quality", 75)]
+    plan = svc.generate_plan(dims, current_overall=60)
+    report = svc.generate_report(dims, gates_passed=False, readiness="needs work", plan=plan)
+
+    assert "# Q1 Readiness Scorecard" in report
+    assert "# Evidence View" in report
+    assert "# Revision Backlog" in report
+    assert "## 4. Execution Plan" in report
+
+
+def test_generate_report_execution_plan_shows_phases_and_quality_criteria() -> None:
+    svc = _service()
+    dims = [
+        _dim("methodology", 50, suggestions=["Add ablation experiment"]),
+        _dim("evaluation", 55, suggestions=["Update table with baseline comparison"]),
+    ]
+    plan = svc.generate_plan(dims, current_overall=58)
+    report = svc.generate_report(dims, gates_passed=False, readiness="not ready", plan=plan)
+
+    assert "### Phased Execution" in report
+    assert "- Phase" in report
+    assert "### Quality Criteria by Item" in report
+    assert "Completion criteria:" in report
+
+
+def test_generate_report_execution_plan_shows_dependency_graph_info() -> None:
+    svc = _service()
+    dims = [_dim("methodology", 50), _dim("evaluation", 55)]
+    plan = svc.generate_plan(dims, current_overall=57)
+    report = svc.generate_report(dims, gates_passed=False, readiness="not ready", plan=plan)
+
+    assert "- Critical path length:" in report
+    assert "### Dependencies" in report
+    assert "#0 → #1" in report
+
+
+def test_generate_report_works_with_empty_dimensions_and_plan() -> None:
+    svc = _service()
+    empty_plan = RevisionPlan(items=[], current_score=0, projected_score=0)
+    report = svc.generate_report([], gates_passed=True, readiness="ready", plan=empty_plan)
+
+    assert "No dimensions to evaluate." in report
+    assert "- No revision items to schedule" in report
+    assert "### Dependencies" in report
+    assert "- None" in report

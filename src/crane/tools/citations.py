@@ -42,6 +42,7 @@ def register_tools(mcp):
     def check_citations(
         manuscript_path: str = "",
         manuscript_text: str = "",
+        include_claim_analysis: bool = False,
         refs_dir: str = "references",
         project_dir: str | None = None,
     ) -> dict[str, Any]:
@@ -54,6 +55,7 @@ def register_tools(mcp):
         Args:
             manuscript_path: Path to LaTeX manuscript file
             manuscript_text: Direct text content (alternative to path)
+            include_claim_analysis: Include claim evidence + contradiction analysis
             refs_dir: References directory path
 
         Returns:
@@ -63,6 +65,9 @@ def register_tools(mcp):
             - found: list[str] (keys that exist)
             - missing: list[str] (keys NOT found - ERROR)
             - unused: list[str] (references not cited)
+            - claims: list[dict], optional when include_claim_analysis=True
+            - unverified_count: int, optional when include_claim_analysis=True
+            - contradictions: list[dict], optional when include_claim_analysis=True
         """
         if not manuscript_path and not manuscript_text:
             raise ValueError("Provide either manuscript_path or manuscript_text")
@@ -70,15 +75,24 @@ def register_tools(mcp):
         service = _get_service(refs_dir, project_dir)
 
         if manuscript_path:
-            return service.check_local_consistency(
+            result = service.check_local_consistency(
                 _resolve_manuscript_path(manuscript_path, project_dir),
                 manuscript_text,
             )
         else:
-            return service.check_local_consistency(
+            result = service.check_local_consistency(
                 manuscript_path="<inline>",
                 manuscript_text=manuscript_text,
             )
+
+        if include_claim_analysis:
+            return result
+
+        sanitized = dict(result)
+        sanitized.pop("claims", None)
+        sanitized.pop("unverified_count", None)
+        sanitized.pop("contradictions", None)
+        return sanitized
 
     @mcp.tool()
     def verify_reference(

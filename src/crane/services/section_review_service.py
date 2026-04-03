@@ -484,6 +484,275 @@ class SectionReviewService:
             issues_count=issues_count,
         )
 
+    def analyze_black_swans(
+        self,
+        issues: list[dict[str, Any]],
+        paper_context: dict[str, Any] | None = None,
+    ) -> list[dict[str, str]]:
+        """Generate three low-probability, high-impact invalidation scenarios."""
+        context = paper_context or {}
+        domain = str(context.get("domain") or "the target domain")
+        paper_type = str(context.get("paper_type") or "empirical study")
+        key_claims = context.get("key_claims") or []
+        primary_claim = key_claims[0] if key_claims else "your core contribution"
+
+        issue_types = {str(issue.get("type", "")).lower() for issue in issues}
+        has_baseline_risk = bool(
+            {"framing", "baseline_completeness", "scope_limitation"} & issue_types
+        )
+        has_data_risk = bool({"data", "evaluation_rigor"} & issue_types)
+        has_repro_risk = bool({"methodology", "completeness", "length"} & issue_types)
+
+        scenario_1 = {
+            "scenario": (
+                f"A stronger method is published in {domain} before review, making "
+                f"comparisons behind {primary_claim} appear obsolete."
+            ),
+            "probability": "low",
+            "impact": "critical" if has_baseline_risk else "high",
+            "mitigation": (
+                "Add a camera-ready fallback benchmark plan, include stronger and "
+                "newer baselines, and frame contribution as a robust trade-off "
+                "(quality/latency/cost) rather than pure SOTA."
+            ),
+        }
+        scenario_2 = {
+            "scenario": (
+                f"A latent annotation or split-leakage flaw is discovered in a key {domain} "
+                "dataset, invalidating headline improvements."
+            ),
+            "probability": "very-low" if has_data_risk else "low",
+            "impact": "critical",
+            "mitigation": (
+                "Pre-register alternate datasets, run contamination checks, and report "
+                "sensitivity analyses showing whether conclusions hold after relabeling "
+                "or dataset replacement."
+            ),
+        }
+        scenario_3 = {
+            "scenario": (
+                f"Under independent reproduction, the {paper_type} pipeline shows unstable "
+                "behavior outside tuned conditions, collapsing practical gains."
+            ),
+            "probability": "low" if has_repro_risk else "very-low",
+            "impact": "high",
+            "mitigation": (
+                "Ship deterministic settings, ablations over sensitive parameters, and "
+                "multi-seed confidence intervals to prove robustness under distribution shift."
+            ),
+        }
+
+        return [scenario_1, scenario_2, scenario_3]
+
+    def simulate_competitor_response(
+        self,
+        issues: list[dict[str, Any]],
+        paper_context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Simulate how a capable competitor would exploit identified weaknesses."""
+        context = paper_context or {}
+        domain = str(context.get("domain") or "this domain")
+
+        exploitable_weaknesses: list[str] = []
+        counter_measures: list[str] = []
+
+        for issue in issues:
+            severity = str(issue.get("severity", "")).lower()
+            issue_type = str(issue.get("type", "")).lower()
+            issue_text = str(issue.get("issue", "")).strip()
+
+            if severity in {"critical", "high"} and issue_text:
+                exploitable_weaknesses.append(issue_text)
+
+            if issue_type in {"baseline_completeness", "framing", "evaluation_rigor"}:
+                counter_measures.append(
+                    "Expand baseline suite and include the newest strong competitor methods."
+                )
+            if issue_type in {"data", "methodology"}:
+                counter_measures.append(
+                    "Add robustness checks (multi-seed, alternate splits, and error analysis)."
+                )
+            if issue_type in {"scope_limitation", "completeness"}:
+                counter_measures.append(
+                    "Narrow claims and explicitly delimit where the method should not be used."
+                )
+
+        if not exploitable_weaknesses:
+            exploitable_weaknesses = [
+                "Comparative advantage may be challenged by stronger baseline framing.",
+                "Evidence depth may be attacked if failure modes are under-reported.",
+            ]
+
+        if not counter_measures:
+            counter_measures = [
+                "Preempt reviewer concerns with stronger ablations and stress tests.",
+                "Convert broad claims into scoped, evidence-backed statements.",
+            ]
+
+        competitor_strategy = (
+            f"A smart competitor in {domain} would replicate your setup on stronger baselines, "
+            "highlight failure cases where gains disappear, and reposition your contribution as "
+            "incremental unless your evidence and scope boundaries are tightened."
+        )
+
+        return {
+            "competitor_strategy": competitor_strategy,
+            "exploitable_weaknesses": list(dict.fromkeys(exploitable_weaknesses))[:6],
+            "counter_measures": list(dict.fromkeys(counter_measures))[:6],
+        }
+
+    def check_survivor_bias(
+        self,
+        issues: list[dict[str, Any]],
+        paper_context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Detect likely survivor-bias patterns from issue and context signals."""
+        _ = paper_context or {}
+
+        evidence: list[str] = []
+        issue_text_blob = " ".join(
+            f"{issue.get('issue', '')} {issue.get('suggestion', '')}" for issue in issues
+        ).lower()
+        issue_types = {str(issue.get("type", "")).lower() for issue in issues}
+
+        if "overclaim" in issue_text_blob or "state-of-the-art" in issue_text_blob:
+            evidence.append(
+                "Strong success framing appears without sufficient conservative framing."
+            )
+        if "strawman" in issue_text_blob or "missing" in issue_text_blob:
+            evidence.append(
+                "Baseline design may emphasize wins while underrepresenting hard comparisons."
+            )
+        if "failure" not in issue_text_blob and "evaluation_rigor" in issue_types:
+            evidence.append(
+                "Failure-mode reporting appears limited relative to performance claims."
+            )
+        if "limitations" not in issue_text_blob and "completeness" in issue_types:
+            evidence.append("Limitations discussion appears weak, raising survivorship concern.")
+
+        has_survivor_bias = len(evidence) >= 2
+        recommendation = (
+            "Add explicit negative results, failed variants, and boundary conditions. "
+            "Report where the method underperforms and compare against difficult baselines "
+            "to avoid survivorship bias."
+            if has_survivor_bias
+            else "Current draft shows no strong survivor-bias signal; preserve this by retaining "
+            "failure analyses and explicit limitations."
+        )
+
+        return {
+            "has_survivor_bias": has_survivor_bias,
+            "evidence": evidence,
+            "recommendation": recommendation,
+        }
+
+    def generate_strengthened_version(
+        self,
+        issues: list[dict[str, Any]],
+        black_swans: list[dict[str, str]],
+        competitor_analysis: dict[str, Any],
+    ) -> str:
+        """Generate a markdown strengthened version from adversarial findings."""
+        top_issues = [
+            str(issue.get("issue", "")).strip()
+            for issue in issues
+            if str(issue.get("severity", "")).lower() in {"critical", "high"}
+        ]
+        top_issues = [issue for issue in top_issues if issue]
+
+        weakness_points = [
+            f"- {item}"
+            for item in competitor_analysis.get("exploitable_weaknesses", [])[:4]
+            if item
+        ]
+        counter_points = [
+            f"- {item}" for item in competitor_analysis.get("counter_measures", [])[:4] if item
+        ]
+        swan_points = [
+            f"- **{swan.get('scenario', 'Unknown scenario')}** → {swan.get('mitigation', '')}"
+            for swan in black_swans[:3]
+        ]
+        priority_points = [f"- {issue}" for issue in top_issues[:4]]
+
+        if not priority_points:
+            priority_points = ["- No critical/high issues detected; focus on robustness hardening."]
+        if not weakness_points:
+            weakness_points = ["- No explicit exploitable weaknesses identified."]
+        if not counter_points:
+            counter_points = ["- Add stronger evidence depth and scoped claims."]
+
+        return "\n".join(
+            [
+                "## Strengthened Version (Adversarially Hardened)",
+                "",
+                "### 1) Priority Weaknesses to Fix First",
+                *priority_points,
+                "",
+                "### 2) Competitor Attack Surface",
+                *weakness_points,
+                "",
+                "### 3) Counter-Measures to Preempt Criticism",
+                *counter_points,
+                "",
+                "### 4) Black Swan Preparedness",
+                *swan_points,
+                "",
+                "### 5) Revised Positioning",
+                (
+                    "Reframe contributions as robust and scoped rather than universally superior. "
+                    "Back every strong claim with stronger baselines, failure analyses, and "
+                    "reproducibility evidence so the paper remains credible under adversarial review."
+                ),
+            ]
+        )
+
+    def _build_paper_context(
+        self, paper: Paper | None, issues: list[ReviewIssue]
+    ) -> dict[str, Any]:
+        """Build heuristic paper context for adversarial analysis."""
+        default_context: dict[str, Any] = {
+            "domain": "AI/ML",
+            "paper_type": "empirical study",
+            "key_claims": [],
+        }
+        if not paper:
+            return default_context
+
+        context = dict(default_context)
+        if paper.ai_annotations:
+            tags = paper.ai_annotations.tags or []
+            context["domain"] = tags[0] if tags else default_context["domain"]
+            context["paper_type"] = (
+                "theoretical/diagnostic"
+                if "theoretical" in {tag.lower() for tag in tags}
+                else default_context["paper_type"]
+            )
+            context["key_claims"] = paper.ai_annotations.key_contributions or []
+
+        if not context["key_claims"]:
+            high_issues = [
+                i.issue for i in issues if i.severity in {Severity.CRITICAL, Severity.HIGH}
+            ]
+            context["key_claims"] = high_issues[:2]
+
+        return context
+
+    def _issues_to_dict(self, issues: list[ReviewIssue]) -> list[dict[str, Any]]:
+        """Convert ReviewIssue models to dictionary payloads."""
+        return [
+            {
+                "id": issue.id,
+                "type": issue.type.value,
+                "severity": issue.severity.value,
+                "location": issue.location,
+                "original": issue.original,
+                "issue": issue.issue,
+                "suggestion": issue.suggestion,
+                "status": issue.status,
+            }
+            for issue in issues
+        ]
+
     def review_paper(
         self,
         paper_path: str | Path,
@@ -538,6 +807,16 @@ class SectionReviewService:
 
         total_issues = sum(len(r.issues) for r in section_reviews)
         all_issues = [i for r in section_reviews for i in r.issues]
+        issue_dicts = self._issues_to_dict(all_issues)
+        paper_context = self._build_paper_context(paper, all_issues)
+        black_swans = self.analyze_black_swans(issue_dicts, paper_context)
+        competitor_analysis = self.simulate_competitor_response(issue_dicts, paper_context)
+        survivor_bias = self.check_survivor_bias(issue_dicts, paper_context)
+        strengthened_version = self.generate_strengthened_version(
+            issue_dicts,
+            black_swans,
+            competitor_analysis,
+        )
 
         summary = {
             "total_issues": total_issues,
@@ -553,6 +832,12 @@ class SectionReviewService:
             ),
             "annotation_context_used": annotation_context_used,
             "recommendation": self._get_recommendation(total_issues, all_issues),
+            "adversarial_analysis": {
+                "black_swans": black_swans,
+                "competitor_response": competitor_analysis,
+                "survivor_bias": survivor_bias,
+                "strengthened_version": strengthened_version,
+            },
         }
 
         return PaperReview(

@@ -1,3 +1,5 @@
+# pyright: reportMissingImports=false
+
 """
 TDD tests for citation verification tools.
 Tests both the service layer and MCP tool layer.
@@ -257,6 +259,29 @@ class TestCheckCitationsTool:
         assert result["valid"] is False
         assert "nonexistent2024" in result["missing"]
 
+    def test_claim_analysis_excluded_by_default(self, citation_tools, sample_refs_dir):
+        text = r"Model A improves robustness \cite{vaswani2017-attention}."
+        result = citation_tools["check_citations"](
+            manuscript_text=text,
+            refs_dir=str(sample_refs_dir),
+        )
+
+        assert "claims" not in result
+        assert "unverified_count" not in result
+        assert "contradictions" not in result
+
+    def test_claim_analysis_included_when_requested(self, citation_tools, sample_refs_dir):
+        text = r"Model A improves robustness \cite{vaswani2017-attention}."
+        result = citation_tools["check_citations"](
+            manuscript_text=text,
+            include_claim_analysis=True,
+            refs_dir=str(sample_refs_dir),
+        )
+
+        assert "claims" in result
+        assert "unverified_count" in result
+        assert "contradictions" in result
+
     def test_no_input_raises(self, citation_tools, sample_refs_dir):
         with pytest.raises(ValueError):
             citation_tools["check_citations"](refs_dir=str(sample_refs_dir))
@@ -311,3 +336,74 @@ class TestCheckAllReferencesTool:
 
         assert len(result) == 1
         assert result[0]["key"] == "vaswani2017-attention"
+
+
+class TestCheckCitationsToolClaimAnalysisToggle:
+    def test_include_claim_analysis_false_strips_enhanced_fields(
+        self, citation_tools, sample_refs_dir
+    ):
+        text = (
+            r"Model A improves robustness \cite{vaswani2017-attention}. "
+            r"Model A worsens robustness \cite{brown2020-gpt3}."
+        )
+        result = citation_tools["check_citations"](
+            manuscript_text=text,
+            include_claim_analysis=False,
+            refs_dir=str(sample_refs_dir),
+        )
+
+        assert result["valid"] is True
+        assert result["total_citations"] == 2
+        assert "claims" not in result
+        assert "unverified_count" not in result
+        assert "contradictions" not in result
+
+    def test_include_claim_analysis_true_includes_values(self, citation_tools, sample_refs_dir):
+        text = (
+            r"Model A improves robustness \cite{vaswani2017-attention}. "
+            "Therefore, the model generalizes broadly. "
+            "This might fail on long-tail domains."
+        )
+        result = citation_tools["check_citations"](
+            manuscript_text=text,
+            include_claim_analysis=True,
+            refs_dir=str(sample_refs_dir),
+        )
+
+        assert result["valid"] is True
+        assert len(result["claims"]) == 3
+        assert result["claims"][0]["evidence_level"] == "VERIFIED"
+        assert result["unverified_count"] == 2
+        assert result["contradictions"] == []
+
+    def test_include_claim_analysis_false_preserves_legacy_field_values(
+        self, citation_tools, sample_refs_dir
+    ):
+        text = r"Use known \cite{vaswani2017-attention} and unknown \cite{missing-key}."
+        result = citation_tools["check_citations"](
+            manuscript_text=text,
+            include_claim_analysis=False,
+            refs_dir=str(sample_refs_dir),
+        )
+
+        assert result == {
+            "valid": False,
+            "total_citations": 2,
+            "found": ["vaswani2017-attention"],
+            "missing": ["missing-key"],
+            "unused": ["brown2020-gpt3"],
+        }
+
+    def test_include_claim_analysis_true_includes_empty_claim_collections(
+        self, citation_tools, sample_refs_dir
+    ):
+        text = "Pure narrative introduction without any factual claim markers."
+        result = citation_tools["check_citations"](
+            manuscript_text=text,
+            include_claim_analysis=True,
+            refs_dir=str(sample_refs_dir),
+        )
+
+        assert result["claims"] == []
+        assert result["unverified_count"] == 0
+        assert result["contradictions"] == []
