@@ -1,0 +1,62 @@
+key: shete2025-iot-ensemble
+title: IoT-driven ensemble machine learning model for accurate dissolved oxygen prediction
+  in aquaculture
+authors:
+- Rupali P. Shete
+- Amith Shekhar C.
+- Yogeshwari V. Mahajan
+- Anupkumar M. Bongale
+- Deepak Dharrao
+year: 2025
+doi: 10.1007/s43926-025-00201-w
+url: https://link.springer.com/article/10.1007/s43926-025-00201-w
+pdf_url: ''
+pdf_path: ''
+abstract: This study developed an IoT-driven ensemble machine learning model that
+  achieved high prediction accuracy for DO and Water Quality Index (WQI), with R²
+  values ranging from 0.84 to 0.91, thereby enabling timely interventions to enhance
+  aquaculture sustainability and operational efficiency.
+venue: Discover Internet of Things
+source: manual
+paper_type: unknown
+categories: []
+keywords:
+- IoT
+- aquaculture
+- dissolved oxygen
+- water quality
+- ensemble learning
+- machine learning
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+cited_by: []
+cites: []
+bibtex: "@misc{shete2025-iot-ensemble,\n  title={IoT-driven ensemble machine learning\
+  \ model for accurate dissolved oxygen prediction in aquaculture},\n  author={Rupali\
+  \ P. Shete and Amith Shekhar C. and Yogeshwari V. Mahajan and Anupkumar M. Bongale\
+  \ and Deepak Dharrao},\n  year={2025},\n  doi={10.1007/s43926-025-00201-w}\n}"
+ai_annotations:
+  summary: Demonstrates IoT-driven ensemble ML for dissolved oxygen prediction in
+    aquaculture with R² values 0.84-0.91. Uses Arduino Uno, GSM modules, and ensemble
+    of Random Forest, XGBoost, Gradient Boosting for real-time water quality monitoring.
+  key_contributions:
+  - IoT sensor integration for aquaculture monitoring
+  - Ensemble ML approach for DO prediction
+  - Real-time water quality assessment
+  - 15-minute interval data collection
+  contribution_types:
+  - method
+  methodology: IoT sensors (DO, pH, temperature) → Arduino Uno → GSM transmission
+    → Cloud storage → Ensemble ML (RF, XGBoost, GB) → Prediction
+  relevance_notes: Directly relevant for Tier 1 ESP32 design and Tier 2 multimodal
+    strategy. Shows practical IoT implementation for aquaculture water quality monitoring.
+    Provides baseline ensemble approach for comparison.
+  tags:
+  - architecture
+  - method
+  - empirical
+  related_issues: []
+  added_date: '2026-04-03'

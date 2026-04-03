@@ -1,0 +1,66 @@
+key: liu2025-gae-yolo
+title: 'GAE-YOLO: a lightweight multimodal detection framework for tomato smart agriculture
+  with edge computing'
+authors:
+- Xiaoke Liu
+- Wenjie Teng
+- Haoran Yu
+- Zhuoyi Yao
+- Chengzhen Wang
+- Yuzhong Peng
+- Xiaoqing Han
+- Jianming Liu
+year: 2025
+doi: 10.3389/fpls.2025.1712432
+url: https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2025.1712432/full
+pdf_url: ''
+pdf_path: ''
+abstract: A lightweight architecture GAE-YOLO framework achieved through replacement
+  of standard convolutional layers with Ghost Convolution modules, implemented on
+  Jetson TX2 embedded platform, achieving 93.5% mAP@50 at 10.2 FPS for tomato detection
+  and management.
+venue: Frontiers in Plant Science
+source: manual
+paper_type: unknown
+categories: []
+keywords:
+- edge computing
+- lightweight models
+- YOLO
+- agriculture
+- Jetson
+- multimodal detection
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+cited_by: []
+cites: []
+bibtex: "@misc{liu2025-gae-yolo,\n  title={GAE-YOLO: a lightweight multimodal detection\
+  \ framework for tomato smart agriculture with edge computing},\n  author={Xiaoke\
+  \ Liu and Wenjie Teng and Haoran Yu and Zhuoyi Yao and Chengzhen Wang and Yuzhong\
+  \ Peng and Xiaoqing Han and Jianming Liu},\n  year={2025},\n  doi={10.3389/fpls.2025.1712432}\n\
+  }"
+ai_annotations:
+  summary: GAE-YOLO lightweight framework using Ghost Convolution modules for edge
+    computing on Jetson TX2. Achieves 93.5% mAP@50 at 10.2 FPS, optimizable to 27
+    FPS with TensorRT. Integrates ZED stereo vision for 3D localization.
+  key_contributions:
+  - Ghost Convolution for lightweight architecture
+  - Jetson TX2 edge deployment
+  - TensorRT optimization
+  - 3D localization with stereo vision
+  contribution_types:
+  - method
+  methodology: Standard Conv → GhostConv replacement + AReLU activation + E-IoU loss
+    + ZED stereo vision + PyQt6 visualization
+  relevance_notes: Highly relevant for Tier 2 Jetson Nano implementation. Demonstrates
+    lightweight model optimization, edge deployment strategies, and multimodal sensor
+    integration (vision + depth).
+  tags:
+  - architecture
+  - method
+  - software
+  related_issues: []
+  added_date: '2026-04-03'

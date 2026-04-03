@@ -1,0 +1,34 @@
+key: nature2026-intelligent-water-quality
+title: An Intelligent, low-cost water quality monitoring system with on-device machine
+  learning and cloud integration
+authors:
+- Unknown Authors
+year: 2026
+doi: 10.1038/s41598-026-37287-3
+url: https://nature.com/articles/s41598-026-37287-3
+pdf_url: ''
+pdf_path: ''
+abstract: Intelligent, low-cost water quality monitoring system integrating on-device
+  machine learning with cloud connectivity, demonstrating practical deployment of
+  lightweight AI models for water quality assessment.
+venue: Scientific Reports
+source: manual
+paper_type: unknown
+categories: []
+keywords:
+- water quality monitoring
+- on-device machine learning
+- low-cost sensors
+- cloud integration
+- IoT
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+cited_by: []
+cites: []
+bibtex: "@misc{nature2026-intelligent-water-quality,\n  title={An Intelligent, low-cost\
+  \ water quality monitoring system with on-device machine learning and cloud integration},\n\
+  \  author={Unknown Authors},\n  year={2026},\n  doi={10.1038/s41598-026-37287-3}\n\
+  }"

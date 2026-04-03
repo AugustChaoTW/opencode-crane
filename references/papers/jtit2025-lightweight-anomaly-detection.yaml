@@ -1,0 +1,54 @@
+key: jtit2025-lightweight-anomaly-detection
+title: 'Lightweight Flow-based Anomaly Detection for IoT Using HC-MTDNN: A Hierarchically
+  Cascaded Multitask Deep Neural Network'
+authors:
+- Unknown Authors
+year: 2025
+doi: ''
+url: https://jtit.pl/jtit/article/view/2311
+pdf_url: ''
+pdf_path: ''
+abstract: Hierarchically cascaded multitask deep neural network (HC-MTDNN) for lightweight
+  flow-based anomaly detection in IoT systems, demonstrating hierarchical architecture
+  for efficient anomaly detection.
+venue: Journal of Telecommunications and Information Technology
+source: manual
+paper_type: unknown
+categories: []
+keywords:
+- hierarchical cascaded
+- multitask learning
+- anomaly detection
+- IoT
+- lightweight neural networks
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+cited_by: []
+cites: []
+bibtex: "@misc{jtit2025-lightweight-anomaly-detection,\n  title={Lightweight Flow-based\
+  \ Anomaly Detection for IoT Using HC-MTDNN: A Hierarchically Cascaded Multitask\
+  \ Deep Neural Network},\n  author={Unknown Authors},\n  year={2025}\n}"
+ai_annotations:
+  summary: Hierarchically Cascaded Multitask Deep Neural Network (HC-MTDNN) for lightweight
+    anomaly detection in IoT systems. Demonstrates hierarchical architecture with
+    cascaded processing for efficient anomaly detection.
+  key_contributions:
+  - Hierarchical cascaded architecture
+  - Multitask learning for anomaly detection
+  - Lightweight design for IoT
+  - Flow-based anomaly detection
+  contribution_types:
+  - method
+  methodology: Hierarchical cascade → Multitask learning → Flow-based feature extraction
+    → Lightweight neural network
+  relevance_notes: Directly relevant for hierarchical architecture design. Shows how
+    to implement cascaded processing for efficient anomaly detection, applicable to
+    your 3-tier risk-aware system.
+  tags:
+  - architecture
+  - method
+  related_issues: []
+  added_date: '2026-04-03'

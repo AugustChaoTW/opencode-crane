@@ -1,0 +1,55 @@
+key: nature2025-blockchain-risk-adaptive
+title: Secure blockchain integrated deep learning framework for federated risk-adaptive
+  and privacy-preserving IoT edge intelligence sets
+authors:
+- Unknown Authors
+year: 2025
+doi: 10.1038/s41598-025-24895-8
+url: https://preview-www.nature.com/articles/s41598-025-24895-8
+pdf_url: ''
+pdf_path: ''
+abstract: Secure blockchain integrated deep learning framework for federated risk-adaptive
+  and privacy-preserving IoT edge intelligence, demonstrating risk-aware architectures
+  for IoT systems.
+venue: Scientific Reports
+source: manual
+paper_type: unknown
+categories: []
+keywords:
+- blockchain
+- risk-adaptive
+- federated learning
+- IoT edge intelligence
+- privacy-preserving
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+cited_by: []
+cites: []
+bibtex: "@misc{nature2025-blockchain-risk-adaptive,\n  title={Secure blockchain integrated\
+  \ deep learning framework for federated risk-adaptive and privacy-preserving IoT\
+  \ edge intelligence sets},\n  author={Unknown Authors},\n  year={2025},\n  doi={10.1038/s41598-025-24895-8}\n\
+  }"
+ai_annotations:
+  summary: Risk-adaptive framework for IoT edge intelligence using blockchain integration
+    and federated learning. Demonstrates risk-aware architectures with privacy-preserving
+    capabilities for IoT systems.
+  key_contributions:
+  - Risk-adaptive architecture
+  - Federated learning for IoT
+  - Privacy-preserving edge intelligence
+  - Blockchain integration
+  contribution_types:
+  - method
+  methodology: Blockchain + Federated Learning + Risk-adaptive algorithms + Edge intelligence
+  relevance_notes: Provides theoretical foundation for risk-aware system design. Shows
+    how to implement adaptive risk assessment in IoT edge systems, relevant for your
+    risk-aware hierarchical approach.
+  tags:
+  - architecture
+  - method
+  - theory
+  related_issues: []
+  added_date: '2026-04-03'

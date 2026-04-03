@@ -1,0 +1,33 @@
+key: srichan2025-rag-llm-fish-control
+title: An integrating RAG-LLM and deep Q-network framework for intelligent fish control
+  systems
+authors:
+- Chavis Srichan
+year: 2025
+doi: 10.1038/s41598-025-05892-3
+url: https://www.nature.com/articles/s41598-025-05892-3
+pdf_url: ''
+pdf_path: ''
+abstract: Integration of RAG-LLM with deep Q-network framework for intelligent automated
+  control systems in fish farming, demonstrating advanced AI approaches for aquaculture
+  automation and decision-making.
+venue: Scientific Reports
+source: manual
+paper_type: unknown
+categories: []
+keywords:
+- RAG-LLM
+- deep Q-network
+- fish control
+- automated systems
+- aquaculture automation
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+cited_by: []
+cites: []
+bibtex: "@misc{srichan2025-rag-llm-fish-control,\n  title={An integrating RAG-LLM\
+  \ and deep Q-network framework for intelligent fish control systems},\n  author={Chavis\
+  \ Srichan},\n  year={2025},\n  doi={10.1038/s41598-025-05892-3}\n}"

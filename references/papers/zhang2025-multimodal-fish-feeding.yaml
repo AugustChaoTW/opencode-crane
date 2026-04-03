@@ -1,0 +1,40 @@
+key: zhang2025-multimodal-fish-feeding
+title: A Multi-Stage Augmented Multimodal Interaction Network for Quantifying Fish
+  Feeding Intensity Using Feeding Image, Audio and Water Wave
+authors:
+- Shulong Zhang
+- Mingyuan Yao
+- Jiayin Zhao
+- Daoliang Li
+- Yingyi Chen
+- Haihua Wang
+year: 2025
+doi: ''
+url: https://www.arxiv.org/pdf/2506.14170
+pdf_url: ''
+pdf_path: ''
+abstract: Multi-stage augmented multimodal interaction network that quantifies fish
+  feeding intensity using feeding images, audio signals, and water wave patterns,
+  demonstrating advanced multimodal sensor fusion for aquaculture monitoring.
+venue: arXiv
+source: manual
+paper_type: unknown
+categories: []
+keywords:
+- multimodal interaction
+- fish feeding
+- sensor fusion
+- image processing
+- audio analysis
+- water wave analysis
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+cited_by: []
+cites: []
+bibtex: "@misc{zhang2025-multimodal-fish-feeding,\n  title={A Multi-Stage Augmented\
+  \ Multimodal Interaction Network for Quantifying Fish Feeding Intensity Using Feeding\
+  \ Image, Audio and Water Wave},\n  author={Shulong Zhang and Mingyuan Yao and Jiayin\
+  \ Zhao and Daoliang Li and Yingyi Chen and Haihua Wang},\n  year={2025}\n}"

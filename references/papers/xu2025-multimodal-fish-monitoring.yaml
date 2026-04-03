@@ -1,0 +1,33 @@
+key: xu2025-multimodal-fish-monitoring
+title: A Multimodal Vision-Based Fish Environment and Growth Monitoring in an Aquaculture
+  Cage
+authors:
+- Zhiqiang Xu
+year: 2025
+doi: 10.3390/jmse13091700
+url: https://www.mdpi.com/2077-1312/13/9/1700
+pdf_url: ''
+pdf_path: ''
+abstract: Multimodal vision-based system for monitoring fish environment and growth
+  in aquaculture cages, integrating multiple sensor modalities for comprehensive aquaculture
+  monitoring and management.
+venue: Journal of Marine Science and Engineering
+source: manual
+paper_type: unknown
+categories: []
+keywords:
+- multimodal vision
+- fish monitoring
+- aquaculture cage
+- growth monitoring
+- sensor fusion
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+cited_by: []
+cites: []
+bibtex: "@misc{xu2025-multimodal-fish-monitoring,\n  title={A Multimodal Vision-Based\
+  \ Fish Environment and Growth Monitoring in an Aquaculture Cage},\n  author={Zhiqiang\
+  \ Xu},\n  year={2025},\n  doi={10.3390/jmse13091700}\n}"
