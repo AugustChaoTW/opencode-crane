@@ -1,6 +1,6 @@
-# CRANE: Autonomous AI Research Assistant
+# CRANE: 自主研究助理系統
 
-**Your AI-powered researcher that handles literature, tasks, and paper verification.**
+**AI 驅動的研究助理，自動化論文寫作全流程——從文獻搜索到期刊投稿。**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -8,274 +8,420 @@
 
 ---
 
-## 30-Second Elevator Pitch
+## 30 秒了解 CRANE
 
-CRANE is an **Autonomous Research Assistant MCP Server** that transforms how you conduct academic research. Built for [OpenCode](https://github.com/anomalyco/opencode), it bridges the gap between AI agents and research workflows. It doesn't just "summarize papers"—it manages your entire pipeline: from searching multi-source databases (arXiv, OpenAlex) and tracking tasks via GitHub Issues, to performing **evidence-first 7-dimension Q1 evaluation**, **profile-based journal matching**, and **interactive revision planning**. CRANE keeps your research structured, traceable, and publication-ready.
-
----
-
-## 5 Key Differentiators
-
-1.  **Evidence-First Q1 Evaluation**: 7-dimension hybrid scoring engine with gate mechanisms — not just keyword matching, but structured evidence extraction from your LaTeX manuscript.
-2.  **Profile-Based Journal Matching**: Weighted fit scoring (Scope 35%, Contribution 20%, Evaluation 20%, Citation 15%, Operational 10%) across 18 Q1 journals with desk-reject risk assessment.
-3.  **Interactive Revision Workflow**: 3-layer reports (Scorecard + Evidence View + Revision Backlog) with prioritized action items, before/after tracking, and projected score estimation.
-4.  **PICOS Systematic Screening**: Automated Population/Intervention/Comparison/Outcome/Study Design extraction and matching for systematic literature reviews.
-5.  **Domain-Aware Evaluation**: Pluggable domain packs (AI/ML included) with auto-detection, custom rubrics, and reviewer simulation for predicting likely criticisms.
+CRANE 是為 [OpenCode](https://github.com/anomalyco/opencode) 構建的**自主研究助理 MCP 伺服器**，重新定義學術研究的工作流程。它不僅是一個「論文摘要器」，而是管理整個研究流程的完整系統：從多源資料庫搜索（arXiv、OpenAlex）到 GitHub Issues 任務追蹤，再到**證據優先的 Q1 期刊評估**、**個性化期刊匹配**與**互動式修改規劃**。CRANE 確保您的研究結構清晰、可追蹤、發表就緒。
 
 ---
 
-## Feature Matrix (Workflow Phases)
+## 5 個核心優勢
 
-CRANE provides **83 MCP Tools** organized across research phases:
-
-| Phase | Core Tools | Purpose |
-|-------|------------|---------|
-| **Initialization** | `init_research`, `get_project_info` | Set up GitHub milestones, labels, and local file structure. |
-| **Literature Review** | `search_papers`, `add_reference`, `read_paper` | Multi-source search, BibTeX sync, and AI-powered summarization. |
-| **PICOS Screening** | `screen_papers_by_picos`, `screen_reference` | Systematic screening with Population/Intervention/Comparison/Outcome/Study Design criteria. |
-| **Semantic Search** | `semantic_search`, `semantic_search_by_paper`, `build_embeddings` | Vector-based similarity search and embedding management for finding related work. |
-| **Citation Graph** | `build_citation_graph`, `find_citation_gaps`, `get_research_clusters`, `visualize_citation_graph` | Citation relationship analysis, research gap detection, and visualization. |
-| **Ask My Library** | `ask_library`, `chunk_papers`, `get_chunk_stats` | Conversational Q&A over your references with page-level citations. |
-| **Task Management** | `create_task`, `list_tasks`, `report_progress` | Track research goals using GitHub Issues with phase-specific labels. |
-| **Verification** | `check_citations`, `verify_reference` | Ensure every claim is cited and metadata (DOI/Year) is accurate. |
-| **Writing & Audit** | `review_paper_sections`, `verify_paper` | Automated checks for logic, framing, and AI writing traces. |
-| **Q1 Evaluation v2** | `evaluate_paper_v2`, `match_journal_v2`, `generate_revision_report` | Evidence-first 7-dimension scoring, profile-based journal matching, and 3-layer revision reports. |
-| **Submission** | `run_submission_check`, `recommend_journals` | Final Q1-standard readiness evaluation and journal strategy. |
-| **Version Management** | `check_crane_version`, `upgrade_crane`, `rollback_crane` | Check for updates, upgrade with backup, and rollback on failure. |
+1. **證據優先的 Q1 評估**：7 維度混合評分引擎 + 閘值機制，從 LaTeX 論文中自動提取證據，而非單純關鍵字匹配
+2. **個性化期刊匹配**：跨 18 本 Q1 期刊的加權適配度評分（範圍 35%、貢獻 20%、評估 20%、引用 15%、運營 10%）+ 桌面拒稿風險評估
+3. **互動式修改工作流**：三層報告（計分卡 + 證據檢視 + 修改待辦清單）+ 優先級排序 + 修改前後比較
+4. **PICOS 系統篩選**：自動提取人群/干預/比較/結果/研究設計，適合系統文獻綜述
+5. **領域感知評估**：可插拔領域包（已含 AI/ML）+ 自動檢測 + 自訂評分標準 + 評審者模擬
 
 ---
 
-## Quick Start (5 Commands to Run Your First Pipeline)
+## 按論文寫作階段的功能指南
 
-Get CRANE running and perform a complete literature review in minutes:
+### 📚 **第一階段：文獻回顧與任務規劃**
 
-1.  **Install CRANE**:
-    ```bash
-    curl -fsSL https://raw.githubusercontent.com/AugustChaoTW/opencode-crane/main/scripts/install.sh | bash
-    ```
-2.  **Initialize Project**:
-    ```bash
-    cd your-research-repo && bash ~/.opencode-crane/scripts/setup-project.sh
-    ```
-3.  **Run Pipeline (via OpenCode)**:
-    Ask: *"Initialize this repo as a research project"*
-4.  **Search & Add**:
-    Ask: *"Search for papers about 'Transformer Scaling Laws' and add the top 3 to my library"*
-5.  **Automated Review**:
-    Ask: *"Perform a literature review pipeline for the topic 'Agentic Workflows'"*
+**目標**：系統地搜索、組織、評估相關文獻
+
+| 功能 | 工具 | 說明 |
+|------|------|------|
+| **初始化專案** | `init_research` | 設置 GitHub 里程碑、標籤、本地資料夾結構 |
+| **多源文獻搜索** | `search_papers` | 從 arXiv、OpenAlex、alphaXiv 同時搜索，支援語義過濾 |
+| **添加到文庫** | `add_reference` | 自動生成 BibTeX、YAML 元數據，同步 bibliography.bib |
+| **讀取論文** | `read_paper` | 自動下載 PDF，提取全文或使用 alphaXiv 結構化摘要 |
+| **系統篩選** | `screen_papers_by_picos` | 按人群/干預/比較/結果/設計自動篩選（系統綜述專用） |
+| **語義搜索** | `semantic_search` | 向量相似度搜索，找出相關工作 |
+| **引用圖分析** | `build_citation_graph` | 自動構建論文間引用關係，可視化研究網絡 |
+| **識別文獻空白** | `find_citation_gaps` | 檢測您忽略但被多篇論文引用的重要論文 |
+| **任務管理** | `create_task`, `list_tasks` | 通過 GitHub Issues 追蹤研究進度 |
+
+**建議流程**：
+```
+1. 初始化專案: init_research()
+2. 搜索文獻: search_papers(query="your topic", max_papers=50)
+3. 批量添加: add_reference() for each paper
+4. 系統篩選: screen_papers_by_picos(population="...", intervention="...")
+5. 分析引用圖: build_citation_graph() → find_citation_gaps()
+6. 創建任務: create_task(title="Read and summarize paper X")
+```
 
 ---
 
-## Installation
+### ✍️ **第二階段：論文寫作與架構規劃**
 
-### Prerequisites
-- **Python**: 3.10+
-- **Tools**: [uv](https://astral.sh/uv/install.sh) (fast package manager), [bun](https://bun.sh/install)
-- **OS**: Linux (Ubuntu 20.04+, Rocky Linux 8+, Fedora 36+)
+**目標**：組織想法、撰寫各章節、確保論文質量
 
-### Simplified Setup
+| 功能 | 工具 | 說明 |
+|------|------|------|
+| **問文獻庫** | `ask_library` | 對所有參考文獻進行自然語言 Q&A，得到帶頁碼的引用 |
+| **分塊管理** | `chunk_papers` | 將 PDF 分解為 ~500 字段落，啟用細粒度搜索 |
+| **檢查引用完整性** | `check_citations` | 驗證論文中的每一個 `\cite{}` 都在文庫中，發現遺漏引用 |
+| **驗證元數據** | `verify_reference` | 確保 DOI、年份、標題與原始論文一致 |
+| **論文章節審核** | `review_paper_sections` | 檢測邏輯錯誤、資料不一致、過度聲稱、AI 寫作痕跡 |
+| **研究定位分析** | `analyze_research_positioning` | 5 層次分析（文明→領域→方法→課題→操作），檢測層級錯位 |
+
+**建議流程**：
+```
+1. 寫初稿 (Introduction, Related Work, Methods)
+2. 檢查引用: check_citations(manuscript_path="main.tex")
+3. 問文獻: ask_library(question="How do related works handle X?")
+4. 審核章節: review_paper_sections(sections=["introduction", "methods"])
+5. 驗證定位: analyze_research_positioning(paper_path="main.tex")
+```
+
+---
+
+### 🔬 **第三階段：實驗設計與評估**
+
+**目標**：設計堅實的評估，生成可重現的結果
+
+| 功能 | 工具 | 說明 |
+|------|------|------|
+| **紙碼一致性驗證** | `verify_paper_code_alignment` | 比較 LaTeX 表格的聲稱與實際代碼實現（AST 級別） |
+| **研究管道基準** | `benchmark_research_pipeline` | 評估完整 6 階段管道（構思→文獻→設計→實現→撰寫→投稿），預測期刊接受率 |
+| **信任校準** | `calibrate_trust` | 動態調整自主程度（0-3 級），量化 AI 輸出的不確定性 |
+| **工具編排** | `orchestrate_research_tools` | 跨領域工具選擇與排序（支援 ML、SE、HCI、理論、系統） |
+
+**建議流程**：
+```
+1. 驗證紙碼對齐: verify_paper_code_alignment(paper_path="main.tex")
+2. 基準管道: benchmark_research_pipeline(paper_path="main.tex")
+3. 評估信任度: calibrate_trust(task_description="running X experiment")
+```
+
+---
+
+### 🎯 **第四階段：論文質量評估與修改**
+
+**目標**：達到 Q1 期刊標準，識別修改優先級
+
+| 功能 | 工具 | 說明 |
+|------|------|------|
+| **7 維度評分** | `evaluate_paper_v2` | 證據優先評分：寫作(12%) + 方法論(18%) + 新穎性(18%) + 評估(20%) + 呈現(8%) + 局限(10%) + 可重現(14%) |
+| **期刊匹配** | `match_journal_v2` | 跨 18 本 Q1 期刊的加權適配度評分 + 目標/備選/安全推薦 |
+| **修改報告** | `generate_revision_report` | 三層報告：計分卡 + 證據檢視 + 優先級排序修改清單 |
+| **Feynman 方法** | `generate_feynman_session` | 生成 30+ 探索性問題，迫使您為論文辯護 |
+| **評審者模擬** | 集成在評分中 | 預測 10 種常見批評，模擬期刊決定 |
+| **投稿前檢查** | `run_submission_check` | 最終 Q1 準備度評估 + 6 步自動化審查管道 |
+
+**建議流程**：
+```
+1. 初步評分: evaluate_paper_v2(paper_path="main.tex")
+2. 期刊推薦: match_journal_v2(paper_path="main.tex") 
+3. Feynman 練習: generate_feynman_session(focus_dimensions=["methodology", "evaluation"])
+4. 生成修改計劃: generate_revision_report(paper_path="main.tex")
+5. 優先化修改: (按 ROI 排序，逐項改進)
+6. 重新評分: evaluate_paper_v2() 檢查進度
+```
+
+---
+
+### 🚀 **第五階段：投稿準備與策略**
+
+**目標**：最大化期刊接受率，準備補充材料
+
+| 功能 | 工具 | 說明 |
+|------|------|------|
+| **投稿結果預測** | `simulate_submission_outcome` | LeCun 世界模型推理：預測接受/修改/拒稿 + 二階效應 |
+| **APC 成本分析** | `analyze_apc` | 跨 18 本期刊的預算感知排名（IEEE ~$2,800、Nature MI $11,990、JMLR 0 元） |
+| **版本管理** | `check_crane_version`, `upgrade_crane` | 檢查更新、自動備份升級、版本回滾 |
+| **補充材料檢查清單** | 手冊 | 代碼質量、依賴版本固定、可重現性文檔、GitHub 設置 |
+| **撰寫投稿信** | 模板 | 為目標期刊定制投稿信 |
+
+**建議流程**：
+```
+1. 預測結果: simulate_submission_outcome(paper_path="main.tex", target_journal="IEEE TPAMI")
+2. 分析 APC: analyze_apc(paper_path="main.tex", budget_usd=3000)
+3. 最終檢查: run_submission_check(paper_path="main.tex")
+4. 補充材料: 
+   - 整理 GitHub (README, LICENSE, dependencies)
+   - 上傳到 Zenodo (創建 DOI)
+   - 準備補充文件 (實驗代碼、數據、結果)
+5. 投稿信: 使用個性化模板
+6. 投稿!
+```
+
+---
+
+## 完整工作流示例：從研究想法到投稿
+
 ```bash
-# 1. Install CRANE core
+# 1️⃣  初始化 (Week 1)
+init_research(field="Machine Learning", domain="Transformers")
+create_task(title="Systematic literature review on scaling laws", phase="literature_review")
+
+# 2️⃣  文獻綜述 (Week 1-2)
+search_papers(query="transformer scaling laws", max_papers=100)
+add_reference(paper_id="arxiv:2001.08361")  # Chinchilla
+screen_papers_by_picos(intervention="scaling", outcome="performance")
+build_citation_graph()
+ask_library(question="What are the key factors affecting scaling efficiency?")
+
+# 3️⃣  撰寫初稿 (Week 2-4)
+# 手動撰寫 Introduction, Related Work, Methods...
+check_citations(manuscript_path="main.tex")
+review_paper_sections(sections=["introduction", "methodology"])
+
+# 4️⃣  實驗與評估 (Week 4-6)
+verify_paper_code_alignment(paper_path="main.tex")
+benchmark_research_pipeline(paper_path="main.tex")
+
+# 5️⃣  質量評估與修改 (Week 6-7)
+evaluate_paper_v2(paper_path="main.tex")  # 評分: 88/100
+match_journal_v2(paper_path="main.tex")   # 推薦: IEEE TPAMI (目標), TNNLS (備選)
+generate_revision_report(paper_path="main.tex")
+# 修改: 添加消融研究 (+8 分), 補充統計顯著性測試 (+5 分)
+evaluate_paper_v2(paper_path="main.tex")  # 重新評分: 92/100
+
+# 6️⃣  投稿準備 (Week 8)
+simulate_submission_outcome(paper_path="main.tex", target_journal="IEEE TPAMI")
+analyze_apc(paper_path="main.tex", budget_usd=3000)
+run_submission_check(paper_path="main.tex")  # 最終檢查
+# 準備 GitHub、Zenodo、補充文件
+```
+
+---
+
+## 核心特性（詳細說明）
+
+### 🏆 **v0.10.0 新功能：ACM TOSEM 投稿完整工具鏈**
+
+CRANE v0.10.0 添加了完整的 ACM TOSEM 期刊投稿支援工作流，包括：
+
+#### 1. **投稿前完整檢查** (`run_submission_check`)
+- 文獻回顧驗證 (40 個參考文獻檢查清單)
+- 實驗數據彙總 (156 個實驗結果確認)
+- 論文框架分析 (過度聲稱、薄弱論證檢測)
+- 論文健康報告 (8 項檢查類別，可視化進度)
+
+#### 2. **期刊策略與風險評估** 
+- 4 維度風險評估 (Desk Reject、評審期望、寫作品質、倫理合規)
+- 18 本 Q1 期刊適配度分析
+- 個性化投稿信生成
+- 修改追蹤與版本控制
+
+#### 3. **集成的投稿前評估報告**
+- TOSEM 期刊特定評分（Software Engineering Methods 92/100 等）
+- 優先級排序改進建議 (ROI 矩陣)
+- 修改時間表 (1-3 週內可完成的改進)
+
+#### 4. **論文寫作階段模板**
+- Implementation 章節模板
+- Empirical Evaluation 章節模板
+- Limitations & Discussion 模板
+- Conclusion 模板
+- 全部針對 ACM TOSEM 標準最佳化
+
+#### 5. **效能基準與使用者評估框架**
+- 性能基準方法論 (4 個核心指標)
+- 使用者評估問卷 (28 題，5 個評估維度)
+- 數據收集模板 (JSON/CSV)
+- 競爭對手分析矩陣 (15 維度 × 5 工具對比)
+
+#### 6. **補充材料與可重現性**
+- GitHub 設置檢查清單
+- 補充材料提交指南
+- README 模板
+- 可重現性文檔模板
+- 數據可得性聲明模板
+
+---
+
+### 📊 **Q1 評估引擎 (v0.9.1+)**
+- **7 維度混合評分**：寫作品質(12%) + 方法論(18%) + 新穎性(18%) + 評估(20%) + 呈現(8%) + 局限(10%) + 可重現(14%)
+- **證據優先**：每維度提取引用跨度與推理代碼
+- **閘值機制**：方法論/新穎性/評估任一維度低於 60 則阻止 Q1 認證
+- **自動分類**：識別論文類型（實驗/系統/理論/綜述）
+
+### 🎯 **期刊匹配 (v0.9.1+)**
+- **18 本 Q1 期刊檔案**：真實影響因子、接受率、範圍關鍵字
+- **加權適配度**：範圍(35%) + 貢獻風格(20%) + 評估風格(20%) + 引用鄰域(15%) + 運營(10%)
+- **三層推薦**：目標/備選/安全 + 桌面拒稿風險
+
+### 🔧 **修改規劃 (v0.9.1+)**
+- **三層報告**：計分卡(分數 + 閘值 + 準備度) + 證據檢視(維度級別) + 修改待辦清單(優先級)
+- **ROI 排序**：影響 × 工作量矩陣
+- **修改前後追蹤**：快照評分、重新評估、查看差異
+
+### 🧠 **LeCun 推理框架 (v0.9.3+)**
+- **世界模型投稿預測**：因果推理預測接受/修改/拒稿情景
+- **5 層策略分析**：文明→領域→方法→課題→操作，檢測層級錯位
+- **第一性原則解構**：剝離領域內的假設，識別逆向機會
+
+### 🔐 **權限規則引擎 (v0.9.3+)**
+- **三類規則**：`allow`(自動批准) + `soft_deny`(需確認) + `environment`(情境)
+- **REPLACE 語義合併**：使用者規則替代預設規則，而非全有全無
+- **動態評估**：`evaluate_permission_action` 傳回 allow/deny/ask
+
+---
+
+## 快速開始（5 個命令啟動第一個管道）
+
+```bash
+# 1. 安裝 CRANE
 git clone https://github.com/AugustChaoTW/opencode-crane.git ~/.opencode-crane
 cd ~/.opencode-crane && uv sync
 
-# 2. Add to OpenCode configuration
-# Add CRANE to your ~/.config/opencode/opencode.json under "mcp"
-```
-*For detailed plugin and skill installation, see the [Full Installation Guide](#full-installation-guide).*
+# 2. 初始化研究專案
+crane init research --field="AI/ML" --type="literature-review"
 
----
+# 3. 搜索與添加文獻
+crane search papers --query="Scaling Laws in LLMs" --max=20
+crane add reference --paper-id="arxiv:2001.08361"
 
-## Architecture Diagram
+# 4. 執行評估管道
+crane evaluate paper --path="main.tex"
 
-```text
-+-----------------------------------------------------------+
-|                      OpenCode Agent                       |
-|           (Natural Language Command Interface)             |
-+--------------------------+--------------------------------+
-                           |
-            +--------------v--------------+
-            |      CRANE MCP Server       |
-            |    (FastMCP / 56 Tools)     |
-            +--------------+--------------+
-                           |
-    +----------+-----------+-----------+-----------+----------+
-    |          |           |           |           |          |
-+---v---+ +---v---+  +----v----+ +----v----+ +----v----+ +---v---+
-|GitHub | |LocalFS|  |Academic | |Eval v2  | |Domain   |Version|
-|API(gh)| |(YAML) |  |APIs     | |Engine   | |Packs    |Manager|
-+---+---+ +---+---+  +----+----+ +----+----+ +----v----+ +---v---+
-    |         |            |           |           |         |
-    |Tasks    |Meta/BibTeX |arXiv      |7-dim Q1   |AI/ML    |Upgrade
-    |Issues   |PDFs        |OpenAlex   |Journal    |Medical  |Rollback
-    |Progress |Rubric Vers |alphaXiv   |Revision   |Custom   |Migrate
-    +---------+------------+-----------+-----------+---------+------+
+# 5. 生成修改計劃
+crane generate revision-report --path="main.tex"
 ```
 
 ---
 
-## Key Features (Detail)
+## 安裝
 
-### Q1 Evaluation Engine (New)
-- **7-Dimension Hybrid Scoring**: Writing Quality (12%), Methodology (18%), Novelty (18%), Evaluation (20%), Presentation (8%), Limitations (10%), Reproducibility (14%) — each scored 0-100 with evidence spans and reason codes.
-- **Gate Mechanism**: Methodology, Novelty, or Evaluation scoring below 60 blocks Q1 readiness — prevents false positives.
-- **Paper Profiling**: Automatic classification of paper type (empirical/system/theoretical/survey), method family, evidence pattern, novelty shape, and reproducibility maturity.
-- **Backward Compatible**: `mode="heuristic"` preserves the original regex-based evaluation; `mode="hybrid"` activates the evidence-first engine.
+### 前置需求
+- **Python**: 3.10+
+- **工具**：[uv](https://astral.sh/uv/install.sh)（快速套件管理器）
+- **作業系統**：Linux (Ubuntu 20.04+) 或 macOS
 
-### Journal Matching (New)
-- **18 Q1 Journal Profiles**: Real impact factors, acceptance rates, scope keywords, desk-reject signals for IEEE TPAMI, TNNLS, ACM Computing Surveys, Nature MI, JMLR, and more.
-- **Weighted Fit Scoring**: Scope (35%) + Contribution-style (20%) + Evaluation-style (20%) + Citation-neighborhood (15%) + Operational (10%).
-- **Target/Backup/Safe Recommendations**: Not just "best match" — a 3-tier strategy with desk-reject risk assessment.
+### 快速安裝
+```bash
+# 克隆並同步
+git clone https://github.com/AugustChaoTW/opencode-crane.git ~/.opencode-crane
+cd ~/.opencode-crane && uv sync
 
-### Revision Planning (New)
-- **3-Layer Reports**: Scorecard (scores + gates + readiness), Evidence View (per-dimension evidence spans), Revision Backlog (prioritized checkboxes).
-- **ROI-Sorted Actions**: Impact x Effort matrix ranks what to fix first for maximum score improvement.
-- **Before/After Tracking**: Snapshot scores, re-evaluate after changes, see delta per dimension.
-
-### Domain Packs (New)
-- **Pluggable Rubrics**: Each domain (AI/ML, medical, etc.) gets its own weight configuration, gate rules, and scoring signals.
-- **Auto-Detection**: Paper domain detected from keywords — automatically selects the right rubric pack.
-
-### Reviewer Simulation (New)
-- **10 Criticism Patterns**: Novelty concerns, weak baselines, methodology unclear, insufficient experiments, reproducibility concerns, overclaiming, poor writing, missing limitations, statistical rigor, presentation issues.
-- **Predicted Decision**: accept / minor_revisions / major_revisions / reject with confidence scoring.
-- **Mock Review Generation**: Structured review text from predicted criticisms.
-
-### Rubric Calibration (New)
-- **Version Management**: Save, compare, and rollback rubric versions as YAML.
-- **Proposal Workflow**: Propose weight updates with validation (weights sum to 1.0, reason required).
-
-### APC Cost-Benefit Analysis (New)
-- **Budget-Aware Journal Ranking**: Journals sorted by affordability first, then fit score.
-- **18 Journal APC Profiles**: IEEE ~$2,800, Elsevier ~$3,200-3,400, Nature MI $11,990, JMLR $0 (diamond OA).
-- **CostAssessment Model**: Tracks APC, publication model, waiver availability, and affordability status.
-- **analyze_apc MCP Tool**: One-click APC comparison report across all Q1 journals.
-
-### Feynman Method Interactive Coach (New)
-- **30+ Probing Questions**: Per-dimension question banks targeting methodology, novelty, evaluation, writing, reproducibility, and limitations.
-- **Auto-Targeting Weak Dimensions**: Generates questions for dimensions scoring below 70.
-- **Difficulty Mixing**: Basic, probing, and challenging questions per weak dimension.
-- **generate_feynman_session MCP Tool**: Forces you to articulate and defend your work before submission.
-
-### alphaXiv Structured Paper Summaries (New)
-- **AlphaXivProvider**: Fetches AI-generated structured markdown overviews instead of parsing raw PDFs.
-- **Dual-Source Reading**: alphaXiv first → cache → PyPDF2 fallback.
-- **Structured Chunking**: Section-aware markdown splitting preserves equations and tables.
-- **Rate Limit Handling**: Automatic retry with exponential backoff on 429 errors.
-
-### Version Management (New)
-- **check_crane_version**: Compare local version against GitHub Releases, get compatibility assessment.
-- **upgrade_crane**: Automated upgrade with backup, git pull, uv sync, and verification.
-- **rollback_crane**: Restore from backup directory or git tag on failure.
-- **Startup Auto-Check**: CRANE checks for updates on launch (configurable via `CRANE_CHECK_VERSION_ON_START`).
-- **Migration Framework**: Apply/skip/unskip version migrations with persistent state tracking.
-
-### Core Features
-- **Section-level Paper Review**: Detects 6 common issues per section (logic errors, data inconsistencies, overclaiming, missing completeness, AI writing traces, figure quality).
-- **LaTeX Structure Parsing**: Automatically detects `\section{}`, `\subsection{}`, and `\appendix`.
-- **3-LLM Paper Verification**: An AI review process with Auditor, Detector, and Editor roles.
-- **AI Writing Detection**: Three-layer analysis: L1 Vocabulary, L2 Paragraph Rhythm, and L3 Academic Subjectivity.
-- **PICOS Screening**: Automated extraction of Population/Intervention/Comparison/Outcome/Study Design elements with weighted matching.
-- **Protected Zones**: Automatically protects verified content from accidental modification.
-- **Workspace Management**: Stateless design, automatically parsing workspace from git context.
+# 驗證安裝
+uv run pytest tests/ -q
+```
 
 ---
 
-## Comparison: CRANE vs. Alternatives
+## 功能對比
 
-| Feature | CRANE | Zotero | Mendeley | Obsidian |
-|---------|-------|--------|----------|----------|
-| **AI Autonomy** | Native MCP | Third-party plugins | Limited | Manual setup |
-| **Q1 Evaluation** | 7-dim evidence-first | None | None | None |
-| **Journal Matching** | Profile-based (18 Q1) | None | None | None |
-| **Revision Planning** | 3-layer + ROI sorting | None | None | None |
-| **PICOS Screening** | Automated extraction | None | None | Manual |
-| **Paper Auditing** | Section-level Logic/AI | None | None | Manual |
-| **Citation Check** | Automated (BibTeX) | Semi-automated | Semi-automated | Manual |
-| **Developer-First** | CLI/MCP/YAML | GUI-heavy | GUI-heavy | Note-heavy |
-
----
-
-## Real-World Use Cases
-
-### 1. The Systematic Literature Review
-*Scenario*: A PhD student needs to screen 500 papers on "LoRa Security".
-- **CRANE Action**: Run `run_pipeline(topic="LoRa Security", max_papers=500)`.
-- **Result**: CRANE searches arXiv/OpenAlex, downloads PDFs, extracts abstracts, and creates a GitHub project board with milestones for screening, while annotating each YAML file with AI-extracted methodology.
-
-### 2. The Collaborative Paper Drafting
-*Scenario*: A team is writing a NeurIPS submission and wants to ensure consistency.
-- **CRANE Action**: `check_citations(manuscript_path="main.tex")` followed by `review_paper_sections()`.
-- **Result**: CRANE identifies 3 missing references and flags a data inconsistency where "Table 1" shows 85% accuracy but the "Abstract" claims 87%.
-
-### 3. The Q1 Submission Preparation
-*Scenario*: A researcher wants to evaluate if their paper is ready for a Q1 journal.
-- **CRANE Action**: `evaluate_paper_v2(paper_path="main.tex")` followed by `match_journal_v2(paper_path="main.tex")`.
-- **Result**: CRANE scores all 7 dimensions (Methodology: 78, Evaluation: 65, ...), flags that the Evaluation gate is borderline, recommends IEEE TPAMI (target), TNNLS (backup), Pattern Recognition (safe), and generates a revision backlog: "Add ablation study (+12 impact), Include statistical significance tests (+8 impact)".
-
-### 4. The Continuous Research Monitor
-*Scenario*: A researcher wants to stay updated on "Diffusion Models" weekly.
-- **CRANE Action**: Schedule a job to run `search_papers` and `add_reference` for new hits.
-- **Result**: Every Monday, the researcher checks their GitHub Issues to see a curated list of new papers, summarized and ready for deep reading.
-
-### 5. The Pre-Submission Feynman Rehearsal
-*Scenario*: A researcher wants to test their understanding before submitting to a Q1 journal.
-- **CRANE Action**: `generate_feynman_session(paper_path="main.tex", mode="pre_submission")`.
-- **Result**: CRANE generates 5-10 probing questions targeting weak dimensions (e.g., "Your evaluation shows 2% improvement — is that statistically significant?"), forcing the researcher to articulate and defend their work. Unanswerable questions become revision items.
-
-### 6. The APC-Aware Journal Selection
-*Scenario*: A researcher has a $3,000 publication budget and needs to choose a Q1 journal.
-- **CRANE Action**: `analyze_apc(paper_path="main.tex", budget_usd=3000)`.
-- **Result**: CRANE ranks 18 Q1 journals by affordability: 12 within budget (IEEE TPAMI $2,800), 3 near budget, 3 over budget (Nature MI $11,990). Recommends the highest-fit journal within budget with desk-reject risk assessment.
+| 特性 | CRANE | Zotero | Mendeley | Obsidian |
+|------|-------|--------|----------|----------|
+| **AI 自主性** | 原生 MCP | 第三方插件 | 有限 | 手動設置 |
+| **Q1 評估** | 7 維證據優先 | ✗ | ✗ | ✗ |
+| **期刊匹配** | 18 本 Q1 期刊 | ✗ | ✗ | ✗ |
+| **修改規劃** | 三層 + ROI 排序 | ✗ | ✗ | ✗ |
+| **PICOS 篩選** | 自動提取 | ✗ | ✗ | 手動 |
+| **論文審核** | 章節級邏輯 | ✗ | ✗ | 手動 |
+| **開發者友善** | CLI/MCP/YAML | GUI 重 | GUI 重 | 筆記重 |
 
 ---
 
-## Development
+## 實際應用案例
 
-CRANE is built for researchers who code.
+### 1️⃣ 系統文獻綜述
+**場景**：博士生需篩選 500 篇「LoRa 安全」論文
 
-### Environment Setup
+```bash
+crane run-pipeline \
+  --pipeline="literature-review" \
+  --topic="LoRa Security" \
+  --max-papers=500 \
+  --include-picos
+```
+
+**結果**：CRANE 搜索 arXiv/OpenAlex、下載 PDF、提取摘要、創建 GitHub 專案板、PICOS 自動篩選
+
+---
+
+### 2️⃣ Q1 投稿準備
+**場景**：研究人員評估論文是否準備好投稿 Q1 期刊
+
+```bash
+crane evaluate paper --path="main.tex"
+crane match journal --path="main.tex"
+crane generate-revision-report --path="main.tex"
+```
+
+**結果**：
+- 7 維評分：方法論 78/100、評估 65/100...
+- 期刊推薦：IEEE TPAMI(目標)、TNNLS(備選)、PR(安全)
+- 修改清單：添加消融研究(+12 分)、統計顯著性測試(+8 分)
+
+---
+
+### 3️⃣ ACM TOSEM 投稿流程
+**場景**：準備投稿 ACM TOSEM
+
+```bash
+# 一鍵完整檢查
+crane run-submission-check --paper="main.tex" --journal="ACM TOSEM"
+```
+
+**結果**：
+- 文獻檢查清單（40 項）
+- 實驗數據彙總（156 項）
+- 論文健康報告（8 項檢查）
+- 優先級排序改進計劃（1-3 週內完成）
+- 個性化投稿信
+
+---
+
+## 開發指南
+
+### 環境設置
 ```bash
 cd ~/.opencode-crane
 python3 -m venv .venv
-.venv/bin/pip install -e ".[dev]"
+source .venv/bin/activate
+pip install -e ".[dev]"
 ```
 
-### Running Tests
+### 運行測試
 ```bash
-# Full test suite (1300+ tests)
+# 完整測試套件
 uv run pytest tests/ -v
-# Coverage report
+# 覆蓋率報告
 uv run pytest tests/ --cov=crane --cov-report=term-missing
-# Benchmark integration tests only
-uv run pytest tests/benchmark/ -v
 ```
 
-### Project Structure
+### 專案結構
 ```
 src/crane/
-  models/          # Data models (Paper, PaperProfile, EvidenceLedger, etc.)
-  services/        # Business logic (20+ services)
-  tools/           # MCP tool registration (56 tools)
-  config/          # Domain packs and configuration
-  templates/llm/   # Prompt templates for future LLM integration
-  providers/       # Academic data sources (arXiv, OpenAlex, etc.)
+  models/          # 資料模型
+  services/        # 業務邏輯 (20+ 服務)
+  tools/           # MCP 工具註冊 (90+ 工具)
+  config/          # 領域包與配置
+  providers/       # 學術資料源 (arXiv, OpenAlex)
 data/
-  journals/        # Q1 journal profiles (18 journals) + conference templates
-  review_patterns.yaml  # 10 criticism patterns for reviewer simulation
+  journals/        # Q1 期刊檔案 (18 本)
+  review_patterns/ # 評審模式與批評框架
 tests/
-  services/        # Unit tests per service
-  models/          # Model validation tests
-  benchmark/       # Integration tests with synthetic LaTeX papers
-  config/          # Domain pack tests
+  services/        # 單元測試
+  integration/     # 集成測試
 ```
 
 ---
 
-## License
-MIT License
+## 版本歷史
 
-## Citation
+| 版本 | 發佈日期 | 重點 |
+|------|----------|------|
+| **v0.10.0** | 2026-04-06 | ACM TOSEM 投稿完整工具鏈：投稿前檢查、期刊策略、修改追蹤、論文模板、性能基準、使用者評估框架 |
+| v0.9.4 | 2026-04-04 | 第 5 階段：紙碼一致性、研究管道基準、信任校準、工具編排 |
+| v0.9.3 | 2026-04-04 | LeCun 框架、代理管理、權限規則、傳輸與工作階段 |
+| v0.9.2 | 2026-04-03 | 遷移框架、版本管理 |
+| v0.9.1 | 2026-04-02 | Q1 評估 v2、期刊匹配、修改規劃 |
+| v0.9.0 | 2026-04-01 | 初始版本：文獻綜述、PICOS、引用圖 |
+
+---
+
+## 授權
+
+MIT 授權
+
+## 引用
 ```bibtex
 @article{zhang2025scaling,
   title={Scaling Laws in Scientific Discovery with AI and Robot Scientists},
@@ -287,57 +433,28 @@ MIT License
 
 ---
 
-<a name="full-installation-guide"></a>
-## Appendix: Full Installation Guide (Executable by AI)
+## 補充：完整安裝指南
 
-> **Note to AI Agent**: These steps are independent.
-
-### 1. Toolchain
+### 1. 工具鏈
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 curl -fsSL https://bun.sh/install | bash
 hash -r
 ```
 
-### 2. Manual Installation
+### 2. 安裝 CRANE
 ```bash
 git clone https://github.com/AugustChaoTW/opencode-crane.git ~/.opencode-crane
 cd ~/.opencode-crane && uv sync
 ```
 
-### 3. Plugins & Configuration
-```bash
-OPENCODE="$HOME/.config/opencode"
-cat > "$OPENCODE/package.json" << 'EOF'
-{
-  "dependencies": {
-    "@opencode-ai/plugin": "^1.3.2",
-    "oh-my-opencode": "^3.12.3",
-    "opencode-claude-auth": "^1.3.1"
-  }
-}
-EOF
-cd "$OPENCODE" && bun install
-
-# Memory System Plugin
-git clone --depth 1 https://github.com/AugustChaoTW/aug-money.git /tmp/aug-money
-cd /tmp/aug-money/opencode-memory-system && bun install && bun run build
-mkdir -p "$OPENCODE/plugins/memory-system"
-cp dist/index.js dist/sql-wasm.wasm package.json "$OPENCODE/plugins/memory-system/"
-rm -rf /tmp/aug-money
-```
-
-### 4. Write Configuration
+### 3. 設定 OpenCode
 ```bash
 OPENCODE="$HOME/.config/opencode"
 cat > "$OPENCODE/opencode.json" << 'EOF'
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    "oh-my-opencode",
-    "opencode-claude-auth",
-    "./plugins/memory-system"
-  ],
+  "plugin": ["oh-my-opencode"],
   "mcp": {
     "crane": {
       "type": "local",
@@ -348,3 +465,7 @@ cat > "$OPENCODE/opencode.json" << 'EOF'
 }
 EOF
 ```
+
+---
+
+**立即開始**：執行 `crane init research` 並按照引導式工作流走完整個研究過程！
