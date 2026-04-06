@@ -1,0 +1,532 @@
+version: "1.0"
+name: "CRANE Complete System Integration"
+description: "風險官角色 + 可重用模板結構 + 集成方案 + 完整工作流"
+
+section_1_risk_assessor_role:
+  name: "Risk Assessor (風險官 ⚠️)"
+  trigger_time: "投稿決策階段，檢查官確認可投稿後"
+  responsibility: "評估四維評分，預測接受概率，推薦投稿策略"
+  output: "風險報告，包含評分、預測、改進建議、期刊對比"
+  
+  invocation_command: "crane assess-risk [--paper paper.pdf] [--journals journal1,journal2]"
+  
+  system_prompt: |
+    You are a Risk Assessor (風險官) for paper submission decisions.
+    
+    Your role is to provide a COMPREHENSIVE risk assessment before submission.
+    
+    You analyze:
+    1. Desk Reject Risk (期刊範圍/新穎性符合)
+    2. Reviewer Expectations (方法/實驗/清晰度)
+    3. Writing Quality (寫作/呈現)
+    4. Ethics Compliance (倫理/合規)
+    
+    You predict:
+    - Acceptance probability (%)
+    - Expected reviewer feedback
+    - Most likely outcome (Accept/Revise/Reject)
+    - Actionable improvements (before or after submission)
+  
+  risk_assessment_process:
+    step_1: "Read submission config (field, target journals, constraints, strategy)"
+    step_2: "Analyze four dimensions using scoring model"
+    step_3: "Generate score for each dimension"
+    step_4: "Predict acceptance rate based on final score"
+    step_5: "Compare across multiple journals if applicable"
+    step_6: "Provide actionable recommendations"
+  
+  output_report_sections:
+    - section: "Executive Summary"
+      content: "Overall score, acceptance prediction, top 3 recommendations"
+    
+    - section: "Four Dimensions Analysis"
+      content: "Detailed score breakdown with interpretation for each dimension"
+    
+    - section: "Risk Assessment"
+      content: "Identified risks by severity (low/medium/high)"
+    
+    - section: "Acceptance Probability Prediction"
+      content: "Most likely outcome, timeline, expected reviewer comments"
+    
+    - section: "Actionable Recommendations"
+      content: "Prioritized suggestions to improve acceptance rate"
+    
+    - section: "Journal Comparison (if applicable)"
+      content: "Score comparison across candidate journals with recommendation"
+  
+  example_output: |
+    ═══════════════════════════════════════════════════════════
+    【論文投稿風險評估報告】
+    ═══════════════════════════════════════════════════════════
+    
+    📋 基本信息
+    ────────────────────────────────────────────────────────
+    論文: "Neural Networks for X"
+    領域: AI/ML
+    目標期刊: IEEE TPAMI
+    
+    
+    📊 總體評分
+    ────────────────────────────────────────────────────────
+    最終評分: 78/100
+    預測接受概率: 72%
+    
+    
+    🎯 四維評分詳解
+    ────────────────────────────────────────────────────────
+    
+    1. Desk Reject 風險 (25%) → 75 分
+       ✅ 期刊範圍符合度: 85%
+       ✓ 該期刊經常發表類似論文
+       ✓ 論文主題在期刊核心領域
+       
+       ⚠️  新穎性清晰度: 65%
+       - 新穎性表述可更清楚
+       - 建議在 Abstract 強調 "首次"+"量化改進"
+       
+       ✅ 問題重要性: 80%
+       - 問題重要，有實際應用價值
+    
+    2. 評審期望滿足度 (25%) → 78 分
+       ✅ 方法論嚴謹性: 80%
+       - 算法設計合理，有理論基礎
+       
+       ⚠️  實驗完整性: 72%
+       - 消融研究基本完整
+       - 但缺少跨域泛化實驗（該期刊重視）
+       - 建議補充 1-2 個新領域的數據集
+       
+       ✅ 清晰度: 80%
+       - 寫作清晰，邏輯順暢
+       
+       ✅ 可重現性: 80%
+       - 代碼開源，細節完整
+    
+    3. 寫作質量 (20%) → 82 分
+       ✅ 結構與邏輯流程: 85%
+       ✅ 清晰與簡潔: 80%
+       ⚠️  圖表質量: 75% (某些圖字號偏小)
+       ✅ 語言與格式: 85%
+    
+    4. 倫理合規 (30%) → 90 分
+       ✅ 所有必要聲明完整
+       ✅ 倫理批准號清晰
+       ✅ 數據可用性聲明到位
+    
+    
+    ⚠️  風險評估
+    ────────────────────────────────────────────────────────
+    
+    🟢 低風險 (無需擔心):
+    - 倫理合規完整
+    - 寫作質量好
+    - 期刊範圍匹配高
+    
+    🟡 中等風險 (建議改進):
+    - 新穎性表述模糊 → 可能導致編輯懷疑
+                     → 改進建議：在摘要和引言強調"首次""改進X%"
+    - 跨域泛化未驗證 → 該期刊評審可能提出
+                     → 改進建議：補充 1-2 個新領域驗證 (可投稿後修改)
+    
+    🔴 高風險: (無)
+    
+    
+    📈 接受概率預測
+    ────────────────────────────────────────────────────────
+    
+    最終評分: 78 → 預測接受概率: 72%
+    
+    最可能結果 (65% 概率): 接受 + 小修
+      審稿人可能的評論:
+      - "論文新穎，方法合理，實驗完整"
+      - "建議在 Discussion 補充跨域適用性分析"
+      - "若開源代碼，可增強可信度"（本文已開源）
+      
+      修改工作量: 1-2 週
+      預期結果: 接受
+    
+    次可能結果 (25% 概率): 接受 + 中修
+      可能原因:
+      - 審稿人要求更多消融實驗
+      - 要求補充其他數據集驗證
+      
+      修改工作量: 2-4 週
+      預期結果: 接受
+    
+    其他可能 (10% 概率): 拒稿
+      可能原因:
+      - 若評審認為新穎性不足 (<5%)
+      - 若評審強烈要求跨域驗證且論文無法快速達成
+      
+      應對方案: 改投備選期刊（見下方期刊對比）
+    
+    
+    💡 行動建議 (優先級)
+    ────────────────────────────────────────────────────────
+    
+    【投稿前改進 (建議)】
+    1. [HIGH] 在 Abstract 和 Introduction 強調新穎性
+       現在: "我們提出一個方法"
+       改為: "我們首次結合 [技術A] 和 [技術B]，在 [數據集] 上改進 [指標] 30%"
+       預期效果: Desk Reject 風險 75% → 85%，接受概率 72% → 78%
+       修改時間: 1 小時
+    
+    2. [MEDIUM] 補充跨域實驗（可選但推薦）
+       現在: 在 [領域A] 驗證
+       改為: 補充在 [領域B] 和 [領域C] 的實驗
+       預期效果: 實驗完整性 72% → 82%，接受概率 72% → 77%
+       修改時間: 3-5 天（需運行新實驗）
+    
+    3. [LOW] 優化圖表質量
+       現在: 某些圖字號 10pt
+       改為: 統一調整至 12pt
+       預期效果: 寫作質量 82% → 86%
+       修改時間: 1 小時
+    
+    
+    📋 期刊對比分析 (3 個候選期刊)
+    ────────────────────────────────────────────────────────
+    
+    期刊 | Desk Reject | 評審期望 | 品質 | 倫理 | 總分 | 接受率 | 推薦
+    ----|-------------|---------|------|------|------|--------|------
+    IEEE TPAMI | 75 | 78 | 82 | 90 | 78 | 72% | 🥇 推薦投
+    Nature ML | 68 | 82 | 82 | 90 | 77 | 68% | 備選（難但高排名）
+    JMLR | 82 | 76 | 82 | 90 | 81 | 80% | 保險（更容易接受）
+    
+    💡 投稿順序建議:
+    1. IEEE TPAMI (高排名 + 可接受的接受率)
+    2. 若被拒，投 JMLR (更高接受率)
+    3. 若兩者都拒，投 Nature ML (衝擊高排名)
+    
+    
+    🚀 最終建議
+    ────────────────────────────────────────────────────────
+    
+    建議投稿: ✅ YES
+    
+    原因: 評分 78/100，接受概率 72%，有把握
+    
+    建議時機: 立即投稿 (已無 Critical 缺陷)
+    
+    投稿策略:
+    - 先投 IEEE TPAMI (本次評估對象)
+    - 為防拒稿，同時準備 JMLR 的投稿信
+    - 預計審稿周期 3-4 個月
+    
+    如需進一步改進 (非必要):
+    - 投稿前 1 小時: 改進新穎性表述 (推薦)
+    - 投稿後: 準備跨域實驗 (預期審稿人會要求)
+    
+    ═══════════════════════════════════════════════════════════
+
+section_2_reusable_templates:
+  
+  directory_structure: |
+    CRANE/templates/
+    ├─ journal-standards/
+    │  ├─ nature_methods.yaml         # Nature Methods 評審標準
+    │  ├─ ieee_tpami.yaml             # IEEE TPAMI 標準
+    │  ├─ acm_tist.yaml               # ACM TIST 標準
+    │  ├─ jmlr.yaml                   # JMLR 標準
+    │  ├─ [journal_name].yaml          # 自定義期刊標準
+    │  └─ journal_template.yaml        # 期刊標準模板
+    │
+    ├─ checklists/
+    │  ├─ imrad_structure.yaml         # IMRAD 結構檢查清單
+    │  ├─ desk_reject_risk.yaml        # Desk Reject 風險檢查
+    │  ├─ ethics_compliance.yaml       # 倫理合規檢查
+    │  ├─ formatting_guide.yaml        # 格式規範檢查
+    │  ├─ [field]_specific.yaml        # 領域特定檢查 (ml/cv/nlp等)
+    │  └─ checklist_template.yaml      # 檢查清單模板
+    │
+    ├─ scoring-rubrics/
+    │  ├─ introduction_rubric.yaml     # Introduction 評分細則
+    │  ├─ methods_rubric.yaml          # Methods 評分細則
+    │  ├─ results_rubric.yaml          # Results 評分細則
+    │  ├─ discussion_rubric.yaml       # Discussion 評分細則
+    │  ├─ writing_quality_rubric.yaml  # 寫作質量評分
+    │  └─ rubric_template.yaml         # 評分細則模板
+    │
+    ├─ system-prompts/
+    │  ├─ coach_generic.md             # 教練通用提示詞
+    │  ├─ coach_[field].md             # 領域特定提示詞
+    │  ├─ reviewer_inspector.md        # 檢查官提示詞
+    │  └─ risk_assessor.md             # 風險官提示詞
+    │
+    └─ examples/
+       ├─ strong_introduction.md       # 優秀 Introduction 示例
+       ├─ weak_introduction.md         # 需改進 Introduction 示例
+       ├─ comparison_table_example.md  # 對比表格示例
+       └─ [section_name]_example.md    # 各章節示例
+  
+  template_usage:
+    - "各模板都是 YAML 配置文件，可被 CRANE 系統自動加載"
+    - "用戶在前置問卷中選擇期刊和領域後，系統自動加載對應模板"
+    - "模板可嵌套和組合，實現高度個性化"
+    - "所有模板遵循一致的結構，便於系統解析"
+
+section_3_crane_integration:
+  
+  command_structure:
+    level_1_setup: |
+      crane journal-setup
+        - 啟動前置問卷
+        - 收集：領域、期刊、限制、策略、特點
+        - 生成：submission-config.yaml
+        - 加載對應的期刊標準和檢查清單
+    
+    level_2_coaching: |
+      crane coach --chapter [section]
+        - 診療指定章節（introduction/methods/results/discussion/conclusion）
+        - 檢查該章節是否符合期刊期望
+        - 提供具體改進建議
+        - 指導下一步寫什麼
+    
+    level_3_reviewing: |
+      crane review [--full | --critical | --major]
+        - 投稿前全面檢查
+        - 識別所有缺陷（CRITICAL/MAJOR/MINOR）
+        - 生成缺陷清單和修改建議
+    
+    level_4_risk_assessment: |
+      crane assess-risk [--paper paper.pdf] [--journals j1,j2,j3]
+        - 四維評分（Desk Reject、審稿期望、品質、倫理）
+        - 預測接受概率
+        - 期刊對比分析
+        - 投稿策略建議
+    
+    level_5_cover_letter: |
+      crane generate-cover-letter --journal "期刊名"
+        - 基於風險評估生成個性化投稿信
+        - 突出論文在期刊框架內的優勢
+        - 回應可能的審稿人疑慮
+    
+    level_6_complete_workflow: |
+      crane journal-workflow [--auto] [--paper paper.pdf]
+        - 一鍵執行完整流程
+        - journal-setup → coach → review → assess-risk → cover-letter
+        - --auto: 自動使用保存的配置
+  
+  command_examples:
+    example_1: |
+      # 初始化新投稿項目
+      $ crane journal-setup
+      ? 研究領域: AI/ML/Deep Learning
+      ? 目標期刊: IEEE TPAMI, Nature Methods
+      ? 頁數限制: 16
+      ? 投稿時間表: normal
+      ? 計畫開源代碼: yes
+      ✅ 配置已保存至 .crane/submission-config.yaml
+      ✅ 已加載期刊標準和檢查清單
+    
+    example_2: |
+      # 診療 Introduction 章節
+      $ crane coach --chapter introduction paper.pdf
+      ✅ Introduction 診療報告已生成
+      
+      【診療結果】
+      ✅ 優點：背景清晰，問題明確
+      ⚠️  改進：缺乏對比表格，貢獻表述模糊
+      💡 建議：加對比表格 (1小時)，量化貢獻 (0.5小時)
+      
+      [詳細報告已保存到 reports/coach_introduction.md]
+    
+    example_3: |
+      # 投稿前全檢
+      $ crane review --full paper.pdf
+      ✅ 檢查完成
+      
+      【檢查結果】
+      Critical 缺陷: 0
+      Major 缺陷: 2
+      Minor 缺陷: 5
+      
+      建議: ⚠️  建議修改後再投稿
+      預計修改時間: 1-2 天
+      
+      [詳細清單已保存到 reports/review_full.md]
+    
+    example_4: |
+      # 風險評估和投稿策略
+      $ crane assess-risk --paper paper.pdf
+      ✅ 風險評估完成
+      
+      【評估結果】
+      最終評分: 78/100
+      接受概率: 72%
+      
+      建議投稿: ✅ YES (立即可投)
+      
+      [詳細報告已保存到 reports/risk_assessment.md]
+
+section_4_complete_workflow:
+  
+  typical_user_journey:
+    
+    day_1:
+      morning: |
+        1. 回答前置問卷 (20 分鐘)
+           $ crane journal-setup
+        
+        2. 檢查期刊標準 (10 分鐘)
+           查看加載的期刊標準和檢查清單
+      
+      afternoon: |
+        3. 開始寫 Introduction
+        
+        evening: |
+        4. Introduction 完成，提交教練診療 (5 分鐘)
+           $ crane coach --chapter introduction
+        
+        5. 閱讀診療報告 (15 分鐘)
+        
+        6. 根據建議修改 (1-2 小時)
+    
+    day_2_to_5: |
+      - 繼續寫其他章節（Methods, Results, Discussion）
+      - 每完成一個章節就提交教練診療
+      - 邊寫邊改進，確保每章都符合期刊期望
+    
+    day_6_final: |
+      morning: |
+      1. 全面檢查 (30 分鐘)
+         $ crane review --full paper.pdf
+      
+      2. 修正 Critical 和 Major 缺陷 (根據清單)
+      
+      afternoon: |
+      3. 風險評估 (20 分鐘)
+         $ crane assess-risk --paper paper.pdf
+      
+      4. 閱讀評估報告，做最後決策
+      
+      5. 生成投稿信 (20 分鐘)
+         $ crane generate-cover-letter --journal "IEEE TPAMI"
+      
+      evening: |
+      6. 投稿！
+  
+  timeline_estimate:
+    writing_phase: "5-10 天"
+    coaching_feedback: "每章 30 分鐘"
+    revisions: "2-3 天"
+    final_checks: "1 天"
+    total: "1-2 週"
+  
+  success_metrics:
+    - "論文完成度 100%"
+    - "Critical 缺陷 0"
+    - "Major 缺陷 <3"
+    - "最終評分 ≥ 75"
+    - "接受概率 ≥ 70%"
+
+section_5_data_structures:
+  
+  submission_config_schema: |
+    project_metadata:
+      title: string
+      authors: list[string]
+      field: enum [ai_ml_dl, cv, nlp, systems, ir, hci, bioinformatics, other]
+      created_at: timestamp
+    
+    target_journals: list
+      - name: string
+        tier: enum [top-tier, leading, specialist]
+        scope_match: float [0-1]
+        evaluation_dimensions: list[string]
+    
+    paper_constraints:
+      page_limit: int
+      figure_limit: int
+      supplementary: bool
+    
+    submission_strategy:
+      aim_for_acceptance: float [0-1]
+      timeline: enum [rush, normal, flexible]
+      revision_tolerance: enum [none, minor, moderate, major]
+    
+    paper_characteristics:
+      has_code_release: bool
+      has_dataset_release: bool
+      has_human_subjects: bool
+      replicability_score: int [1-10]
+    
+    current_status:
+      stage: enum [setup, writing, review, revision, ready]
+      chapter_status: list
+        - name: string
+          status: enum [draft, in-progress, completed]
+          coach_reviewed: bool
+          formal_review: bool
+  
+  report_schema: |
+    report_type: enum [coach, reviewer, risk_assessment, cover_letter]
+    paper_title: string
+    chapter_section: string (for coach and reviewer)
+    
+    # For Coach Report
+    strengths: list[string]
+    improvements: list
+      - issue: string
+        example: string
+        suggestion: string
+        time_estimate: string
+    
+    # For Reviewer Report
+    defect_list: list
+      - id: string
+        severity: enum [critical, major, minor]
+        location: string
+        description: string
+        suggestion: string
+        time_estimate: string
+    
+    # For Risk Assessment
+    dimension_scores: dict
+      desk_reject_risk: float [0-100]
+      reviewer_expectations: float [0-100]
+      writing_quality: float [0-100]
+      ethics_compliance: float [0-100]
+    
+    acceptance_probability: float [0-1]
+    recommendation: string
+
+section_6_complete_design_summary:
+  
+  system_features: |
+    ✅ 動態問卷系統 (根據領域和期刊個性化)
+    ✅ 章節對標檢查 (每章都有具體的期刊標準)
+    ✅ 三角色支持 (教練 + 檢查官 + 風險官)
+    ✅ 風險評分模型 (四維評分 + 接受率預測)
+    ✅ 可重用模板庫 (期刊標準 + 檢查清單 + 評分細則)
+    ✅ 完整工作流程 (從寫作到投稿決策)
+    ✅ 個性化建議 (基於期刊和論文特點)
+  
+  unique_advantages: |
+    1. 前置式檢查 (邊寫邊檢，避免投稿才發現問題)
+    2. 期刊對標 (不是泛用檢查，而是針對目標期刊)
+    3. 風險預警 (提早識別 desk reject 風險)
+    4. 三層支持 (教練→檢查官→風險官，逐層深化)
+    5. 可重用模板 (多篇論文共用，節省時間)
+    6. 個性化提示詞 (領域特定，比通用工具更精準)
+  
+  implementation_roadmap: |
+    Phase 1 (Week 1-2): 基礎框架
+      - 實現前置問卷流程
+      - 加載期刊標準庫
+      - 基本的教練命令
+    
+    Phase 2 (Week 3-4): 核心功能
+      - 實現檢查官全檢邏輯
+      - 實現風險評分模型
+      - 生成診療和評估報告
+    
+    Phase 3 (Week 5): 集成和優化
+      - 集成三角色工作流
+      - 優化提示詞
+      - 添加更多期刊標準
+    
+    Phase 4 (Week 6+): 擴展和維護
+      - 用戶反饋迭代
+      - 添加更多領域支持
+      - 建立期刊標準庫社區

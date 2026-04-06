@@ -1,0 +1,26 @@
+
+flowchart LR
+    classDef user fill:#fef5e7,stroke:#f39c12,stroke-width:2px,color:#2c3e50,rx:8px,ry:8px;
+    classDef ai fill:#ebf5fb,stroke:#3498db,stroke-width:2px,color:#2c3e50,rx:8px,ry:8px;
+    classDef core fill:#fdfefe,stroke:#e74c3c,stroke-width:2px,color:#2c3e50,rx:8px,ry:8px;
+    classDef wf fill:#eafaf1,stroke:#2ecc71,stroke-width:2px,color:#2c3e50,rx:4px,ry:4px;
+    
+    subgraph Zones ["Protected Zones Architecture"]
+        direction TB
+        
+        CoreZone["Core Zone (Immutable)<br/><small>Root config, API keys, Model Prompts</small>"]:::core
+        UserZone["User-Controlled Zone (Manual)<br/><small>Main Tex file, Experiment Scripts</small>"]:::user
+        AIZone["AI-Modifiable Zone (Dynamic)<br/><small>Generated reports, Bibliographies, Summaries</small>"]:::ai
+    end
+    
+    subgraph Workflow ["Journal Submission Pipeline (Workflow Overlay)"]
+        direction TB
+        W1["1. Initialization<br/><small>(AI Zone)</small>"]:::wf
+        W2["2. Coaching & Review<br/><small>(AI Zone read, User modifies)</small>"]:::wf
+        W3["3. Risk Assessment<br/><small>(AI measures User Zone)</small>"]:::wf
+        W4["4. Cover Letter Gen<br/><small>(AI Zone export)</small>"]:::wf
+        
+        W1 --> W2 --> W3 --> W4
+    end
+    
+    Zones --- Workflow

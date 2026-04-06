@@ -1,9 +1,131 @@
-\begin{thebibliography}{2}
+\begin{thebibliography}{32}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Ammar et~al.(2018)Ammar, Groeneveld, Bhagavatula, Beltagy, Crawford,
+  Downey, Dunkelberger, Elgohary, Feldman, Ha, et~al.]{ammar2018construction}
+Waleed Ammar, Dirk Groeneveld, Chandra Bhagavatula, Iz~Beltagy, Miles Crawford,
+  Doug Downey, Jason Dunkelberger, Ahmed Elgohary, Sergey Feldman, Vu~Ha,
+  et~al.
+\newblock Construction of the literature graph in semantic scholar.
+\newblock In \emph{Proceedings of NAACL-HLT}, pages 84--91, 2018.
+
+\bibitem[{Anthropic}(2024)]{anthropic2024mcp}
+{Anthropic}.
+\newblock Model context protocol specification.
+\newblock \url{https://modelcontextprotocol.io/}, 2024.
+
+\bibitem[Bass et~al.(2021)Bass, Clements, and Kazman]{bass2021software}
+Len Bass, Paul Clements, and Rick Kazman.
+\newblock \emph{Software Architecture in Practice}.
+\newblock Addison-Wesley, 4 edition, 2021.
+
+\bibitem[Bommasani et~al.(2021)Bommasani, Hudson, Adeli, Altman, Arora, von
+  Arx, Bernstein, Bohg, Bosselut, Brunskill, et~al.]{bommasani2021foundation}
+Rishi Bommasani, Drew Hudson, Ehsan Adeli, Russ Altman, Simran Arora, Sydney
+  von Arx, Michael Bernstein, Jeannette Bohg, Antoine Bosselut, Emma Brunskill,
+  et~al.
+\newblock On the opportunities and risks of foundation models.
+\newblock \emph{arXiv preprint arXiv:2108.07258}, 2021.
+
+\bibitem[Brown et~al.(2020)Brown, Mann, Ryder, Subbiah, Kaplan, Dhariwal,
+  Neelakantan, Shyam, Sastry, Askell, et~al.]{brown2020gpt3}
+Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared~D Kaplan, Prafull
+  Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell,
+  et~al.
+\newblock Language models are few-shot learners.
+\newblock \emph{Advances in neural information processing systems},
+  33:\penalty0 1877--1901, 2020.
+
+\bibitem[Chang et~al.(2024)Chang, Wang, Wang, Wu, Zhu, Chen, Yang, Yi, Wang,
+  Wang, et~al.]{chang2024survey}
+Yuhang Chang, Xu~Wang, Jindong Wang, Yuan Wu, Kaijie Zhu, Hao Chen, Linyi Yang,
+  Xiaoyuan Yi, Cunxiang Wang, Yue Wang, et~al.
+\newblock A survey on evaluation of large language models.
+\newblock \emph{ACM Transactions on Intelligent Systems and Technology}, 2024.
+
+\bibitem[Cohan et~al.(2020)Cohan, Feldman, Beltagy, Downey, and
+  Weld]{cohan2020specter}
+Arman Cohan, Sergey Feldman, Iz~Beltagy, Doug Downey, and Daniel~S. Weld.
+\newblock Specter: Document-level representation learning using
+  citation-informed transformers.
+\newblock \emph{Proceedings of ACL}, 2020.
+
+\bibitem[{Corporation for Digital Scholarship}(2024)]{zotero2024}
+{Corporation for Digital Scholarship}.
+\newblock Zotero documentation and developer api.
+\newblock \url{https://www.zotero.org/support/}, 2024.
+
+\bibitem[{CrewAI}(2024)]{crewai2024}
+{CrewAI}.
+\newblock Crewai documentation.
+\newblock \url{https://docs.crewai.com/}, 2024.
+
+\bibitem[{Elsevier}(2024)]{mendeley2024}
+{Elsevier}.
+\newblock Mendeley reference manager guide.
+\newblock \url{https://www.mendeley.com/}, 2024.
+
+\bibitem[Fowler(2002)]{fowler2002patterns}
+Martin Fowler.
+\newblock \emph{Patterns of Enterprise Application Architecture}.
+\newblock Addison-Wesley, 2002.
+
+\bibitem[Gehrmann et~al.(2019)Gehrmann, Strobelt, and Rush]{gehrmann2019gltr}
+Sebastian Gehrmann, Hendrik Strobelt, and Alexander~M. Rush.
+\newblock Gltr: Statistical detection and visualization of generated text.
+\newblock In \emph{Proceedings of ACL System Demonstrations}, pages 111--116,
+  2019.
+
+\bibitem[Guu et~al.(2020)Guu, Lee, Tung, Pasupat, and Chang]{guu2020retrieval}
+Kelvin Guu, Kenton Lee, Zora Tung, Panupong Pasupat, and Ming-Wei Chang.
+\newblock Realm: Retrieval-augmented language model pre-training.
+\newblock In \emph{Proceedings of ICML}, pages 3929--3938, 2020.
+
+\bibitem[Hendricks et~al.(2020)Hendricks, Tkaczyk, Lin, and
+  Feeney]{hendricks2020crossref}
+Ginny Hendricks, Dominika Tkaczyk, Jennifer Lin, and Patricia Feeney.
+\newblock Crossref: The sustainable source of community-owned scholarly
+  metadata.
+\newblock \url{https://www.crossref.org/}, 2020.
+
+\bibitem[{LangChain Inc.}(2022)]{langchain2022}
+{LangChain Inc.}
+\newblock Langchain documentation.
+\newblock \url{https://python.langchain.com/}, 2022.
+
+\bibitem[Lewis et~al.(2020)Lewis, Perez, Piktus, Petroni, Karpukhin, Goyal,
+  K{"u}ttler, Lewis, Yih, Rockt{"a}schel, et~al.]{lewis2020rag}
+Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir
+  Karpukhin, Naman Goyal, Heinrich K{"u}ttler, Mike Lewis, Wen-tau Yih, Tim
+  Rockt{"a}schel, et~al.
+\newblock Retrieval-augmented generation for knowledge-intensive nlp tasks.
+\newblock \emph{Advances in Neural Information Processing Systems},
+  33:\penalty0 9459--9474, 2020.
+
+\bibitem[Liang et~al.(2023)Liang, Bommasani, Lee, Tsipras, Soylu, Yasunaga,
+  Zhang, Narayanan, Wu, Kumar, et~al.]{liang2023holistic}
+Percy Liang, Rishi Bommasani, Tony Lee, Dimitris Tsipras, Dilara Soylu,
+  Michihiro Yasunaga, Yao Zhang, Deepak Narayanan, Yuhuai Wu, Ananya Kumar,
+  et~al.
+\newblock Holistic evaluation of language models.
+\newblock \emph{Transactions on Machine Learning Research}, 2023.
+
+\bibitem[Lo et~al.(2020)Lo, Wang, Neumann, Kinney, and Weld]{lo2020s2orc}
+Kyle Lo, Lucy~Lu Wang, Mark Neumann, Rodney Kinney, and Daniel Weld.
+\newblock S2orc: The semantic scholar open research corpus.
+\newblock \emph{Proceedings of ACL}, 2020.
+
+\bibitem[Mitchell et~al.(2023)Mitchell, Lee, Khazatsky, Manning, and
+  Finn]{mitchell2023detectgpt}
+Eric Mitchell, Yoonho Lee, Alexander Khazatsky, Christopher~D. Manning, and
+  Chelsea Finn.
+\newblock Detectgpt: Zero-shot machine-generated text detection using
+  probability curvature.
+\newblock \emph{Proceedings of ICML}, 2023.
 
 \bibitem[Moreno et~al.(2026)Moreno, Bright-Thonney, Novak, Garcia, and
   Harris]{moreno2026ai-agents-hep}
@@ -13,8 +135,83 @@ Eric~A. Moreno, Samuel Bright-Thonney, Andrzej Novak, Dolores Garcia, and
   physics.
 \newblock \emph{arXiv preprint arXiv:2603.20179}, 2026.
 
+\bibitem[{Ought}(2024)]{elicit2024}
+{Ought}.
+\newblock Elicit: Ai research assistant documentation.
+\newblock \url{https://elicit.com/}, 2024.
+
+\bibitem[Ouyang et~al.(2022)Ouyang, Wu, Jiang, Almeida, Wainwright, Mishkin,
+  Zhang, Agarwal, Slama, Ray, et~al.]{ouyang2022instructgpt}
+Long Ouyang, Jeffrey Wu, Xu~Jiang, Diogo Almeida, Carroll Wainwright, Pamela
+  Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et~al.
+\newblock Training language models to follow instructions with human feedback.
+\newblock \emph{Advances in Neural Information Processing Systems},
+  35:\penalty0 27730--27744, 2022.
+
+\bibitem[Park et~al.(2023)Park, Lu, Cai, Morris, Liang, and
+  Bernstein]{park2023recite}
+Joon~Sung Park, Chi Lu, Sheng Cai, Meredith Morris, Percy Liang, and Michael
+  Bernstein.
+\newblock Recite, reflect, and revise: Self-correction in retrieval-augmented
+  generation.
+\newblock \emph{arXiv preprint arXiv:2305.14283}, 2023.
+
+\bibitem[Priem et~al.(2022)Priem, Piwowar, and Orr]{priem2022openalex}
+Jason Priem, Heather Piwowar, and Richard Orr.
+\newblock Openalex: A fully-open index of scholarly works, authors, venues,
+  institutions, and concepts.
+\newblock \emph{arXiv preprint arXiv:2205.01833}, 2022.
+
+\bibitem[Qin et~al.(2023)Qin, Ye, Fang, Su, Lu, Chen, Huang, Petrov, Lu, Jiang,
+  et~al.]{qin2023toolllm}
+Yujia Qin, Yining Ye, Zhiyuan Fang, Haotian Su, Yining Lu, Yan Chen, Bin Huang,
+  Sergey Petrov, Jiaqi Lu, Xiang Jiang, et~al.
+\newblock Toolllm: Facilitating large language models to master 16000+
+  real-world apis.
+\newblock \emph{arXiv preprint arXiv:2307.16789}, 2023.
+
 \bibitem[Raschka(2025)]{raschka2025llm-arch-comparison}
 Sebastian Raschka.
 \newblock The big llm architecture comparison: From deepseek v3 to glm-5, 2025.
+
+\bibitem[{ResearchRabbit}(2024)]{researchrabbit2024}
+{ResearchRabbit}.
+\newblock Researchrabbit product documentation.
+\newblock \url{https://www.researchrabbit.ai/}, 2024.
+
+\bibitem[Sadasivan et~al.(2023)Sadasivan, Kumar, Balasubramanian, and
+  Feizi]{sadasivan2023detecting}
+Vinu Sadasivan, Atoosa Kumar, Sriram Balasubramanian, and Soheil Feizi.
+\newblock Can ai-generated text be reliably detected?
+\newblock \emph{arXiv preprint arXiv:2303.11156}, 2023.
+
+\bibitem[Schick et~al.(2023)Schick, Dwivedi-Yu, Dess\'\i, Raileanu, Lomeli,
+  Hambro, Zettlemoyer, Cancedda, and Scialom]{schick2023toolformer}
+Timo Schick, Jane Dwivedi-Yu, Roberto Dess\'\i, Roberta Raileanu, Maria Lomeli,
+  Eric Hambro, Luke Zettlemoyer, Nicola Cancedda, and Thomas Scialom.
+\newblock Toolformer: Language models can teach themselves to use tools.
+\newblock \emph{arXiv preprint arXiv:2302.04761}, 2023.
+
+\bibitem[Wu et~al.(2023)Wu, Bansal, Zhang, Wu, Li, Zhu, Jiang, Zhang, Liu,
+  Awadallah, et~al.]{wu2023autogen}
+Qingyun Wu, Gagan Bansal, Jieyu Zhang, Yiran Wu, Beibin Li, Erkang Zhu,
+  Li~Jiang, Xiaoyun Zhang, Siyuan Liu, Ahmed~Hassan Awadallah, et~al.
+\newblock Autogen: Enabling next-gen llm applications via multi-agent
+  conversation.
+\newblock \emph{arXiv preprint arXiv:2308.08155}, 2023.
+
+\bibitem[Yao et~al.(2022)Yao, Zhao, Yu, Du, Shafran, Narasimhan, and
+  Cao]{yao2022react}
+Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan,
+  and Yuan Cao.
+\newblock React: Synergizing reasoning and acting in language models.
+\newblock \emph{arXiv preprint arXiv:2210.03629}, 2022.
+
+\bibitem[Zheng et~al.(2023)Zheng, Chiang, Sheng, Li, Zhuang, Wu, Zhuang, Lin,
+  Li, Xing, et~al.]{zheng2023judging}
+Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Tianle Li, Siyuan Zhuang, Zhanghao
+  Wu, Yonghao Zhuang, Zi~Lin, Yue Li, Eric Xing, et~al.
+\newblock Judging llm-as-a-judge with mt-bench and chatbot arena.
+\newblock \emph{arXiv preprint arXiv:2306.05685}, 2023.
 
 \end{thebibliography}

@@ -1,0 +1,73 @@
+name: cybersecurity
+display_name: "Cybersecurity"
+version: "1.0.0"
+description: "Evaluation rubric optimized for cybersecurity research papers targeting Q1 venues"
+
+dimension_weights:
+  writing_quality: 0.12
+  methodology: 0.20
+  novelty: 0.16
+  evaluation: 0.22
+  presentation: 0.08
+  limitations: 0.12
+  reproducibility: 0.10
+
+gate_dimensions: ["methodology", "evaluation", "novelty"]
+gate_threshold: 60.0
+
+scoring_signals:
+  writing_quality:
+    - "\\b(we demonstrate|we present|in this paper)\\b"
+    - "\\b(threat landscape|security analysis|attack surface)\\b"
+  methodology:
+    - "\\\\section\\{.*[Mm]ethod.*\\}"
+    - "\\\\section\\{.*[Tt]hreat [Mm]odel.*\\}"
+    - "\\b(formal verification|proof of security|security proof)\\b"
+    - "\\b(we propose|we design|we formalize)\\b"
+    - "\\b(adversary model|attacker model|threat model)\\b"
+  novelty:
+    - "\\b[Cc]ontribution"
+    - "\\b(novel|new approach|first to)\\b"
+    - "\\b(zero-day|previously unknown|undiscovered)\\b"
+    - "\\b([Uu]nlike|[Dd]iffer from|[Ii]n contrast)\\b"
+  evaluation:
+    - "\\b(CVE|CVSS|vulnerability disclosure)\\b"
+    - "\\b(penetration test|red team|security audit)\\b"
+    - "\\b(false positive|true positive|detection rate)\\b"
+    - "\\\\begin\\{table\\}"
+    - "\\b(dataset|benchmark|real-world)\\b"
+  presentation:
+    - "\\\\begin\\{figure\\}"
+    - "\\\\caption\\{"
+    - "\\b(attack flow|kill chain|architecture)\\b"
+  limitations:
+    - "\\b(limitation|threats to validity|future work)\\b"
+    - "\\b(ethical consideration|responsible disclosure)\\b"
+  reproducibility:
+    - "\\b(github\\.com|code available|repository|open.source)\\b"
+    - "\\b(implementation details|configuration|setup)\\b"
+    - "\\b(reproducible|replicate|artifact)\\b"
+
+recommended_journals:
+  - "IEEE S&P"
+  - "IEEE TDSC"
+  - "ACM TOPS"
+  - "JCS"
+  - "Cybersecurity"
+  - "IEEE TIFS"
+  - "C&S"
+
+detection_keywords:
+  - "cybersecurity"
+  - "cryptography"
+  - "threat model"
+  - "vulnerability"
+  - "attack"
+  - "encryption"
+  - "privacy"
+  - "intrusion detection"
+  - "malware"
+  - "access control"
+  - "network security"
+  - "penetration testing"
+detection_threshold: 0.15

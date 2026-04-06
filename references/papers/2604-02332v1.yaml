@@ -1,0 +1,99 @@
+key: 2604-02332v1
+title: 'Hot Rocks Survey V: Secondary Eclipse Photometry of GJ 3473 b with JWST/MIRI'
+authors:
+- Måns Holmberg
+- Hannah Diamond-Lowe
+- João M. Mendonça
+- Daniel Kitzmann
+- Néstor Espinoza
+- Natalie H. Allen
+- Prune C. August
+- Mark Fortune
+- Amélie Gressier
+- Jegug Ih
+- Erik Meier Valdés
+- Merlin Zgraggen
+- Lars A. Buchhave
+- Brice-Olivier Demory
+- Chloe Fisher
+- Neale P. Gibson
+- Kevin Heng
+- Bibiana Prinoth
+- Adam J. Burgasser
+year: 2026
+doi: arxiv:2604.02332v1
+url: http://arxiv.org/abs/2604.02332v1
+pdf_url: https://arxiv.org/pdf/2604.02332v1
+pdf_path: ''
+abstract: JWST is transforming our ability to characterise small exoplanets, from
+  sub-Neptunes to rocky worlds. A key open question is whether highly irradiated rocky
+  planets can retain atmospheres or are stripped bare by stellar irradiation -- a
+  boundary that remains to be mapped observationally. Here we present the first JWST
+  secondary eclipse observations of the rocky exoplanet GJ 3473 b, obtained with MIRI
+  F1500W photometry. Using four visits, we confidently detect the eclipse at an average
+  depth of 186$\pm$45 ppm, somewhat lower than expected for a blackbody. We test a
+  wide range of data reduction and analysis assumptions and provide new insights into
+  MIRI detector settling behaviour that will benefit future observations. We model
+  a suite of airless surfaces with varied compositions, textures, and degrees of space
+  weathering, as well as idealised atmospheric scenarios including the possibility
+  of atmospheric collapse. Both atmospheric and bare-rock interpretations remain consistent
+  with the data, but we exclude thick CO$_2$ atmospheres, placing a 95 % credible
+  upper limit of 1.2-6.5 bar on the surface pressure. We also find tentative evidence
+  for visit-to-visit variability in eclipse depth (33-371 ppm), though additional
+  data are required to confirm this. Our results highlight the challenges and intrinsic
+  degeneracies in interpreting MIRI F1500W eclipse measurements of rocky exoplanets,
+  indicating that such observations alone may not uniquely distinguish between bare-rock
+  and atmospheric scenarios. Future spectroscopic or phase-curve observations will
+  be required to determine whether or not GJ 3473 b hosts a substantial atmosphere
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- astro-ph.EP
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+cited_by: []
+cites: []
+bibtex: "@inproceedings{2604-02332v1,\n  title={Hot Rocks Survey V: Secondary Eclipse\
+  \ Photometry of GJ 3473 b with JWST/MIRI},\n  author={Måns Holmberg and Hannah Diamond-Lowe\
+  \ and João M. Mendonça and Daniel Kitzmann and Néstor Espinoza and Natalie H. Allen\
+  \ and Prune C. August and Mark Fortune and Amélie Gressier and Jegug Ih and Erik\
+  \ Meier Valdés and Merlin Zgraggen and Lars A. Buchhave and Brice-Olivier Demory\
+  \ and Chloe Fisher and Neale P. Gibson and Kevin Heng and Bibiana Prinoth and Adam\
+  \ J. Burgasser},\n  booktitle={arXiv},\n  year={2026},\n  doi={arxiv:2604.02332v1}\n\
+  }"
+ai_annotations:
+  summary: JWST is transforming our ability to characterise small exoplanets, from
+    sub-Neptunes to rocky worlds. A key open question is whether highly irradiated
+    rocky planets can retain atmospheres or are stripped bare by stellar irradiation
+    -- a boundary that remains to be mapped observationally. Here we present the first
+    JWST secondary eclipse observations of the rocky exoplanet GJ 3473 b, obtained
+    with MIRI F1500W photometry. Using four visits, we confidently detect the eclipse
+    at an average depth of 186$\pm$45 ppm, somewhat lower than expected for a blackbody.
+    We test a wide range of data reduction and analysis assumptions and provide new
+    insights into MIRI detector settling behaviour that will benefit future observations.
+    We model a suite of airless surfaces with varied compositions, textures, and degrees
+    of space weathering, as well as idealised atmospheric scenarios including the
+    possibility of atmospheric collapse. Both atmospheric and bare-rock interpretations
+    remain consistent with the data, but we exclude thick CO$_2$ atmospheres, placing
+    a 95 % credible upper limit of 1.2-6.5 bar on the surface pressure. We also find
+    tentative evidence for visit-to-visit variability in eclipse depth (33-371 ppm),
+    though additional data are required to confirm this. Our results highlight the
+    challenges and intrinsic degeneracies in interpreting MIRI F1500W eclipse measurements
+    of rocky exoplanets, indicating that such observations alone may not uniquely
+    distinguish between bare-rock and atmospheric scenarios. Future spectroscopic
+    or phase-curve observations will be required to determine whether or not GJ 3473
+    b hosts a substantial atmosphere
+  key_contributions: []
+  contribution_types: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-04-05'

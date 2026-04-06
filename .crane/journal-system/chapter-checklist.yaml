@@ -1,0 +1,507 @@
+version: "1.0"
+name: "Chapter Alignment Checklist System"
+description: "基於期刊評審維度的章節檢查體系"
+
+chapter_templates:
+  abstract:
+    max_words: 250
+    structure:
+      - component: "background"
+        words: "30-50"
+        description: "研究背景和動機 (1-2句)"
+      - component: "problem"
+        words: "20-40"
+        description: "問題陳述和研究空白 (1句)"
+      - component: "solution"
+        words: "40-70"
+        description: "提出的方法/解決方案 (1-2句)"
+      - component: "results"
+        words: "40-70"
+        description: "主要結果和發現 (1-2句)"
+      - component: "conclusion"
+        words: "20-30"
+        description: "結論和影響 (1句)"
+    
+    universal_checks:
+      - id: "clarity"
+        criterion: "清晰易懂，無技術術語堆砌"
+        weight: 20
+        examples:
+          good: "我們通過組合X和Y方法實現了Z，在3個數據集上提高了30%效能"
+          bad: "基於多模態融合和端對端學習框架，實現顯著提升"
+      
+      - id: "completeness"
+        criterion: "包含背景、問題、方法、結果、結論五要素"
+        weight: 20
+      
+      - id: "impact"
+        criterion: "清晰陳述研究的重要性和實踐意義"
+        weight: 20
+      
+      - id: "specificity"
+        criterion: "使用具體數字和指標，避免模糊表述"
+        weight: 20
+      
+      - id: "writeability"
+        criterion: "寫作簡潔流暢，無語法錯誤"
+        weight: 20
+    
+    red_flags:
+      - "摘要超過250字"
+      - "包含參考文獻編號 [1]"
+      - "使用不常見縮寫未定義"
+      - "說'更好的'而未量化"
+      - "缺乏結論句"
+
+  introduction:
+    typical_page_count: "1.5-2.5"
+    structure:
+      - section: "background"
+        purpose: "建立問題背景，從寬到窄"
+        page_ratio: "25%"
+        key_elements:
+          - "為什麼這個領域重要？"
+          - "當前的主流方法是什麼？"
+      
+      - section: "motivation"
+        purpose: "說明現有方法的缺陷和研究缺口"
+        page_ratio: "25%"
+        key_elements:
+          - "現有方法有什麼問題？"
+          - "這些問題為什麼重要？"
+          - "對比表格或圖表（推薦）"
+      
+      - section: "problem_statement"
+        purpose: "清晰定義研究問題"
+        page_ratio: "25%"
+        key_elements:
+          - "本文要解決的具體問題是什麼？"
+          - "為什麼這個問題值得研究？"
+      
+      - section: "contributions"
+        purpose: "明確本文的貢獻"
+        page_ratio: "25%"
+        key_elements:
+          - "本文的創新點是什麼？"
+          - "通常3-4項貢獻"
+          - "每項貢獻的新穎性≥5%"
+    
+    universal_checks:
+      - id: "problem_clarity"
+        criterion: "問題明確定義，非'更好的系統'模糊表述"
+        weight: 15
+        scoring:
+          10: "問題明確具體，涉及特定應用場景"
+          5: "問題說得不清楚，缺乏具體例子"
+          0: "只說'我們想要更好的系統'"
+      
+      - id: "gap_identification"
+        criterion: "通過對比引出明確的研究空白"
+        weight: 15
+        has_comparison_table: true
+        examples:
+          good: "表1 對比SOTA方法在[方向A/B/C]的差異，本文在B方向有優勢"
+          bad: "現有方法不好，我們的更好"
+      
+      - id: "motivation_strength"
+        criterion: "為什麼解決這個問題很重要"
+        weight: 15
+        checks:
+          - "量化問題的影響（$, 性能差多少）"
+          - "說明受益人群"
+          - "引出實際應用場景"
+      
+      - id: "contribution_clarity"
+        criterion: "貢獻清晰，不超過4項，每項≥5%新穎性"
+        weight: 15
+        max_items: 4
+        scoring:
+          10: "每項貢獻都有量化的新穎性指標"
+          5: "貢獻說得有點模糊"
+          0: "無法分辨具體貢獻是什麼"
+      
+      - id: "scope_match"
+        criterion: "論文範圍與目標期刊高度匹配"
+        weight: 15
+        dynamic: true
+        examples_by_journal:
+          nature: "解決人類面臨的重大科學挑戰"
+          jmlr: "在ML理論或新算法上有顯著進展"
+          ieee_tpami: "在視覺或模式識別上有創新"
+      
+      - id: "writing_quality"
+        criterion: "寫作清晰連貫，邏輯遞進"
+        weight: 25
+        checks:
+          - "段落開場句清晰"
+          - "段間銜接順暢"
+          - "避免過度修飾"
+    
+    red_flags:
+      - "Introduction 超過3頁"
+      - "Introduction 少於1頁（太倉促）"
+      - "缺乏對比表格或圖表"
+      - "貢獻超過4項"
+      - "貢獻說'應該有效'而非'確實有效'"
+      - "沒有明確的問題陳述"
+
+  related_work:
+    typical_page_count: "2-3"
+    purpose: "證明論文的創新性，而非簡單列舉"
+    structure:
+      - section: "organization"
+        description: "分類組織（按方法類型、技術方向），不按發表年份"
+        key_point: "讀者應能快速定位本文與相關工作的關係"
+      
+      - section: "comparison_matrix"
+        description: "用表格或圖表明確對比"
+        mandatory: true
+        content: "本文 vs SOTA 在 [維度A/B/C] 的差異"
+      
+      - section: "gap_summary"
+        description: "總結各派系優缺點，引出本文創新"
+        mandatory: true
+        key_phrase: "綜上所述，現有工作在[缺口]，本文通過[方法]填補"
+    
+    universal_checks:
+      - id: "structured_organization"
+        criterion: "論文分類組織而非時間序列"
+        weight: 20
+        scoring:
+          10: "有3+個邏輯清晰的子類別"
+          5: "分類混亂或不清楚"
+          0: "按時間順序列舉"
+      
+      - id: "coverage"
+        criterion: "覆蓋主流方法和最新進展（通常10-30篇）"
+        weight: 20
+        criteria:
+          - "3+ 個相關領域的前沿工作"
+          - "近3年內發表的最新論文"
+          - "經典基礎工作不遺漏"
+      
+      - id: "comparison_clarity"
+        criterion: "用表格或圖表清晰對比"
+        weight: 20
+        must_have: true
+        content:
+          - "行：相關工作"
+          - "列：關鍵維度（新穎性、效能、複雜度等）"
+          - "突出本文的優勢"
+      
+      - id: "insight_extraction"
+        criterion: "從對比中提煉洞察"
+        weight: 20
+        examples:
+          good: "所有CNN方法在準確度上趨同（90%+），但在延遲上差異大（10-200ms）"
+          bad: "方法A用CNN，方法B用RNN，方法C用Transformer"
+      
+      - id: "contribution_differentiation"
+        criterion: "清楚表明本文與SOTA的差異"
+        weight: 20
+        checks:
+          - "本文首次嘗試[新角度]"
+          - "本文改進[指標]，達到[數字]，優於SOTA的[數字]"
+    
+    red_flags:
+      - "缺乏對比表格"
+      - "只列舉工作，無分析"
+      - "遺漏關鍵競爭性工作"
+      - "與SOTA的優勢不清楚"
+      - "感覺像在為論文辯護而非報告事實"
+
+  methods:
+    typical_page_count: "3-5"
+    purpose: "讓有經驗的研究者能複現研究"
+    structure:
+      - section: "algorithm_design"
+        description: "核心算法/方法論"
+        must_include:
+          - "偽代碼或數學公式"
+          - "演算法複雜度分析"
+          - "與現有方法的技術區別"
+      
+      - section: "implementation_details"
+        description: "實現細節（超參數、架構選擇等）"
+        must_include:
+          - "所有超參數的值和選擇理由"
+          - "模型架構圖表"
+          - "訓練過程細節"
+      
+      - section: "experimental_setup"
+        description: "實驗設置（數據、環境、基線）"
+        must_include:
+          - "數據集詳情（大小、分佈、預處理）"
+          - "計算環境（GPU型號、框架版本）"
+          - "評估指標定義"
+          - "統計方法（多少次運行？誤差如何計算？）"
+      
+      - section: "statistical_rigor"
+        description: "統計方法的嚴謹性"
+        must_include:
+          - "Sample size 合理性（為何該數字）"
+          - "顯著性檢驗方法（t-test? ANOVA?）"
+          - "多重比較修正（有重複運行則需Bonferroni）"
+    
+    universal_checks:
+      - id: "reproducibility"
+        criterion: "細節足夠讓他人複現（假設無源代碼）"
+        weight: 25
+        scoring:
+          10: "描述詳細，但不冗長；缺乏任何關鍵信息都能從補充材料補全"
+          5: "大部分細節都有，但有些模糊"
+          0: "太多'通過調整超參數選擇'這樣的模糊表述"
+      
+      - id: "algorithm_clarity"
+        criterion: "算法/方法論表達清晰"
+        weight: 20
+        must_have:
+          - "偽代碼或公式"
+          - "非顯而易見的邏輯步驟都有解釋"
+      
+      - id: "hyperparameter_reporting"
+        criterion: "所有超參數報告完整"
+        weight: 15
+        forbidden: "通過交叉驗證選擇"
+        must_have: "具體的超參數值或搜索範圍"
+      
+      - id: "baseline_selection"
+        criterion: "基線選擇合理，都是SOTA或經典方法"
+        weight: 15
+        checks:
+          - "基線是同時期發表的最強方法"
+          - "基線實現使用官方代碼或忠實複現"
+      
+      - id: "statistical_soundness"
+        criterion: "統計方法正確且報告完整"
+        weight: 15
+        must_report:
+          - "運行次數（通常5-10次）"
+          - "誤差棒/置信區間"
+          - "顯著性檢驗結果（p-value）"
+          - "多重比較修正（若有多個假設檢驗）"
+      
+      - id: "ethics_compliance"
+        criterion: "倫理批准文件齊全（若涉及人類/動物）"
+        weight: 10
+        conditional: ["涉及人類受試者或敏感數據"]
+    
+    red_flags:
+      - "沒有偽代碼或公式"
+      - "超參數模糊不清"
+      - "數據集描述不足（沒有規模、分佈、預處理信息）"
+      - "沒有運行次數報告"
+      - "無誤差棒"
+      - "基線是自己實現，與原論文結果有偏差"
+      - "統計檢驗不當（如無多次運行卻報p-value）"
+
+  results:
+    typical_page_count: "2-3"
+    rule: "結果章節純呈現，無解釋或討論。解釋放在Discussion"
+    structure:
+      - section: "main_results"
+        description: "主要實驗結果"
+        format: "表格或圖表"
+        mandatory: true
+      
+      - section: "ablation_study"
+        description: "消融研究（每個模塊的貢獻）"
+        mandatory: true
+        requirement: "每個提出的模塊都要有消融"
+      
+      - section: "supplementary_analysis"
+        description: "額外分析（敏感度、邊界情況等）"
+        optional: true
+    
+    universal_checks:
+      - id: "pure_presentation"
+        criterion: "純呈現事實，無解釋或評價"
+        weight: 15
+        forbidden_words: ["顯著", "有效", "證明", "表明"]
+        allowed: "數字、表格、圖表"
+      
+      - id: "figure_clarity"
+        criterion: "圖表清晰、軸標籤完整、圖例清楚"
+        weight: 15
+        checks:
+          - "每個軸都有標籤和單位"
+          - "圖例清晰標識所有曲線/柱子"
+          - "字號足夠大（印刷時仍可讀）"
+          - "顏色區分清楚（色盲友善）"
+      
+      - id: "error_reporting"
+        criterion: "主要結果都有誤差棒/置信區間"
+        weight: 15
+        must_have: "±標準差或95%置信區間"
+      
+      - id: "statistical_significance"
+        criterion: "統計顯著性報告完整"
+        weight: 15
+        must_report: "p-value，通常 p<0.05 為顯著"
+      
+      - id: "ablation_completeness"
+        criterion: "消融研究完整，每個提出的模塊都有"
+        weight: 20
+        example: "如果Methods提出3個模塊，需要3個消融實驗"
+      
+      - id: "selective_reporting"
+        criterion: "未隱藏失敗或中性結果"
+        weight: 20
+        checks:
+          - "失敗案例或不符合預期的結果也報告"
+          - "沒有'cherry-picking'成功的案例"
+    
+    red_flags:
+      - "結果與討論混淆（如'這表明...'）"
+      - "圖表標籤不清或缺失"
+      - "無誤差棒或置信區間"
+      - "無消融研究"
+      - "選擇性報告（隱藏失敗案例）"
+      - "表格中只報均值，無偏差"
+
+  discussion:
+    typical_page_count: "1.5-2.5"
+    purpose: "解釋為什麼，與現有文獻比較，說明限制"
+    structure:
+      - section: "result_interpretation"
+        description: "為什麼得到這些結果"
+        key_question: "什麼機制導致了這個結果？"
+      
+      - section: "comparison_with_sota"
+        description: "與現有文獻的對比"
+        key_elements:
+          - "本文為何優於/劣於SOTA"
+          - "優勢在哪裡（速度、準確度、通用性等）"
+          - "劣勢或局限在哪"
+      
+      - section: "limitations"
+        description: "說明研究的局限"
+        mandatory: true
+        requirement: "≥3項明確的限制"
+        examples:
+          - "數據集規模有限（只有100K樣本）"
+          - "僅在某個領域驗證，跨域泛化未知"
+          - "計算成本高（需要特殊硬體）"
+      
+      - section: "future_work"
+        description: "未來工作方向"
+        instruction: "說明而非承諾"
+    
+    universal_checks:
+      - id: "mechanistic_explanation"
+        criterion: "解釋為什麼，而不只重複結果"
+        weight: 20
+        scoring:
+          10: "給出具體的機制假設"
+          5: "淺層解釋，但邏輯通順"
+          0: "只是重複結果'模型X比Y好'"
+      
+      - id: "sota_comparison"
+        criterion: "與SOTA對比清晰，強弱分析"
+        weight: 20
+        checks:
+          - "為什麼本文優於SOTA（技術或設計原因）"
+          - "在哪些指標上優勢（速度、準確度、通用性）"
+          - "是否有權衡（如速度快但準確度略低）"
+      
+      - id: "limitation_acknowledgment"
+        criterion: "坦誠說明≥3項明確的限制"
+        weight: 20
+        scoring:
+          10: "列舉3-5項具體限制，並解釋其影響"
+          5: "提到2項限制，或限制說得不具體"
+          0: "完全迴避限制，或說'未來工作會改進'"
+      
+      - id: "avoid_overclaiming"
+        criterion: "避免過度聲稱"
+        weight: 20
+        forbidden:
+          - "這是首次實現X（除非確實首次）"
+          - "這是最好的方法（改為'優於已發表方法'）"
+          - "完全解決問題"
+        allowed:
+          - "優於現有SOTA X%"
+          - "相對於[基線]提高了"
+          - "在[數據集/領域]上表現更好"
+      
+      - id: "writing_quality"
+        criterion: "寫作清晰，邏輯連貫"
+        weight: 20
+        checks:
+          - "段落開場句明確主題"
+          - "段內邏輯遞進合理"
+          - "段間銜接順暢"
+    
+    red_flags:
+      - "只重複結果，無新解釋"
+      - "避免談論限制（引發審稿人反感）"
+      - "過度聲稱（'最好的''完全解決'）"
+      - "用'應該有效'而非'確實有效'"
+      - "未來工作部分過度承諾"
+
+  conclusion:
+    typical_page_count: "<1"
+    rule: "簡短有力，無新信息，有清晰結論句"
+    structure:
+      - section: "contribution_summary"
+        description: "簡述主要貢獻（1-2句）"
+        instruction: "不是Abstract的複製，而是論文的精髓"
+      
+      - section: "key_finding"
+        description: "最重要的發現或洞察"
+        instruction: "一句話"
+      
+      - section: "implications"
+        description: "對該領域的啟示"
+        instruction: "簡短，不要過度承諾"
+    
+    universal_checks:
+      - id: "contribution_clarity"
+        criterion: "清楚陳述主要貢獻"
+        weight: 25
+      
+      - id: "conclusion_strength"
+        criterion: "有清晰的結論句，不是問題句"
+        weight: 25
+        examples:
+          good: "我們展示了X方法在Y任務上超越SOTA"
+          bad: "這種方法有潛力改善X嗎？"
+      
+      - id: "no_new_content"
+        criterion: "不引入新的未被論證的信息"
+        weight: 25
+        checks:
+          - "不提新的實驗結果"
+          - "不提新的參考文獻"
+      
+      - id: "length"
+        criterion: "簡短，<1頁"
+        weight: 25
+        max_words: 500
+    
+    red_flags:
+      - "再寫一遍Abstract"
+      - "引入新的未驗證的聲稱"
+      - "結論是疑問句"
+      - "Conclusion >1 頁"
+
+overall_checks:
+  structure_integrity:
+    criteria:
+      - "IMRAD 結構完整，各章節均存在"
+      - "邏輯流程清晰，無跳躍"
+      - "章節長度均衡（±20%內可接受）"
+      - "前後一致（如Methods說的內容Results都報告了）"
+  
+  consistency:
+    criteria:
+      - "術語使用一致（避免同義詞混用）"
+      - "引用格式統一"
+      - "圖表編號順序正確，均被正文引用"
+      - "方程式編號正確"
+  
+  reference_integrity:
+    criteria:
+      - "引用完整無缺失"
+      - "引用格式符合目標期刊"
+      - "被引用的論文確實有該內容（檢查幻覺）"

@@ -21,12 +21,21 @@ from .tools.first_principles import (  # pyright: ignore[reportMissingImports]
     register_tools as register_first_principles_tools,
 )
 from .tools.journal_strategy import register_tools as register_journal_strategy_tools
+from .tools.journal_submission_tools import (
+    register_tools as register_journal_submission_tools,
+)
+from .tools.mcp_tool_orchestration import (  # pyright: ignore[reportMissingImports]
+    register_tools as register_mcp_tool_orchestration_tools,
+)
 from .tools.papers import register_tools as register_paper_tools
 from .tools.permission_rules import register_tools as register_permission_rule_tools
 from .tools.pipeline import register_tools as register_pipeline_tools
 from .tools.project import register_tools as register_project_tools
 from .tools.q1_evaluation import register_tools as register_q1_evaluation_tools
 from .tools.references import register_tools as register_reference_tools
+from .tools.research_pipeline_benchmark import (
+    register_tools as register_research_pipeline_benchmark_tools,
+)
 from .tools.research_positioning import (  # pyright: ignore[reportMissingImports]
     register_tools as register_research_positioning_tools,
 )
@@ -36,8 +45,12 @@ from .tools.semantic_search import register_tools as register_semantic_search_to
 from .tools.submission_check import register_tools as register_submission_check_tools
 from .tools.submission_simulation import register_tools as register_submission_simulation_tools
 from .tools.tasks import register_tools as register_task_tools
+from .tools.trust_calibration import (  # pyright: ignore[reportMissingImports]
+    register_tools as register_trust_calibration_tools,
+)
 from .tools.workspace import register_tools as register_workspace_tools
 from .tools.version_tools import register_tools as register_version_tools
+from .tools.writing_style_tools import register_tools as register_writing_style_tools
 
 register_transport_tools = import_module("crane.tools.transport_tools").register_tools
 
@@ -61,11 +74,16 @@ register_screening_tools(mcp)
 register_section_review_tools(mcp)
 register_q1_evaluation_tools(mcp)
 register_journal_strategy_tools(mcp)
+register_journal_submission_tools(mcp)
+register_mcp_tool_orchestration_tools(mcp)
 register_pipeline_tools(mcp)
 register_submission_check_tools(mcp)
 register_submission_simulation_tools(mcp)
 register_evaluation_v2_tools(mcp)
+register_research_pipeline_benchmark_tools(mcp)
 register_version_tools(mcp)
+register_trust_calibration_tools(mcp)
+register_writing_style_tools(mcp)
 register_transport_tools(mcp)
 
 

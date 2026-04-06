@@ -1,0 +1,465 @@
+version: "1.0"
+name: "Risk Assessment & Acceptance Prediction Model"
+description: "四維評分系統用於預測投稿成功率和審稿人期望"
+
+scoring_system:
+  overall_formula: |
+    Final Score = (Desk_Reject_Risk * 0.25) + 
+                  (Reviewer_Expectations * 0.25) + 
+                  (Writing_Quality * 0.20) + 
+                  (Ethics_Compliance * 0.30)
+  
+  scale: "0-100"
+  rounding: "to nearest integer"
+
+dimensions:
+  
+  dimension_1:
+    name: "Desk Reject Risk"
+    weight: 0.25
+    importance: "CRITICAL - 編輯甚至不看論文就拒稿"
+    description: "評估論文範圍、新穎性是否符合期刊期望"
+    
+    scoring_scale:
+      90_100: 
+        label: "極低風險"
+        interpretation: "期刊高度匹配，新穎性清晰，desk reject 機率 <5%"
+      
+      75_89:
+        label: "低風險"
+        interpretation: "範圍基本匹配，新穎性合理，desk reject 機率 10-20%"
+      
+      60_74:
+        label: "中等風險"
+        interpretation: "範圍邊界匹配，新穎性說得不夠清楚，desk reject 機率 30-50%"
+      
+      45_59:
+        label: "高風險"
+        interpretation: "範圍有較大偏差或新穎性模糊，desk reject 機率 50-70%"
+      
+      below_45:
+        label: "極高風險"
+        interpretation: "強烈不建議投稿此期刊，desk reject 機率 >70%"
+    
+    sub_metrics:
+      scope_match:
+        name: "期刊範圍符合度"
+        weight: 0.40
+        assessment_criteria:
+          perfect_match: "論文主題出現在期刊近20篇論文中"
+          good_match: "論文主題在期刊的相關領域，但不是核心"
+          marginal_match: "論文邊界在期刊範圍內，但有些偏"
+          poor_match: "論文超出期刊通常發表的範圍"
+        
+        scoring_rubric:
+          10: "完美匹配，該期刊經常發表類似論文"
+          8: "很好的匹配"
+          6: "基本匹配，邊界偏差"
+          4: "範圍有些偏差"
+          2: "範圍差異大"
+          0: "完全不匹配"
+      
+      novelty_clarity:
+        name: "新穎性清晰度"
+        weight: 0.35
+        assessment_criteria:
+          very_clear: "在 Abstract/Intro 中明確說出'首次'或'改進[指標]至[數字]'"
+          clear: "新穎性清楚，但表述可更精確"
+          somewhat_clear: "有點清楚，但需要讀者推斷"
+          unclear: "新穎性不清楚"
+          not_present: "沒有明確的新穎性聲稱"
+        
+        scoring_rubric:
+          10: "新穎性 extremely clear，審稿人一眼就看出差異"
+          8: "清楚，但表述略有改進空間"
+          6: "基本清楚，但需要推斷"
+          4: "模糊"
+          2: "非常模糊"
+          0: "無法識別新穎性"
+      
+      problem_importance:
+        name: "問題重要性"
+        weight: 0.25
+        assessment_criteria:
+          highly_important: "解決業界/學術重大挑戰，有應用價值"
+          important: "解決已知的重要問題"
+          reasonable: "解決有一定價值的問題"
+          minor: "解決的問題相對較小"
+          trivial: "問題重要性不明確或很小"
+        
+        scoring_rubric:
+          10: "解決人類/業界重大挑戰"
+          8: "解決學術/工業界已知的重要問題"
+          6: "解決有相當價值的問題"
+          4: "解決的問題有點小"
+          2: "問題重要性不太清楚"
+          0: "問題非常瑣碎"
+  
+  dimension_2:
+    name: "Reviewer Expectations"
+    weight: 0.25
+    importance: "高 - 審稿人對論文品質的期待"
+    description: "評估論文是否滿足審稿人對方法論、實驗、清晰度的期望"
+    
+    scoring_scale:
+      90_100:
+        label: "超預期"
+        interpretation: "審稿人期望驚喜，可能推薦 Accept"
+      
+      80_89:
+        label: "符合預期"
+        interpretation: "審稿人認為論文完成度高，小修或直接接受"
+      
+      70_79:
+        label: "基本符合"
+        interpretation: "審稿人要求小改或中等修改"
+      
+      60_69:
+        label: "低於預期"
+        interpretation: "審稿人要求大幅修改或拒稿"
+      
+      below_60:
+        label: "遠低於預期"
+        interpretation: "審稿人可能推薦拒稿"
+    
+    sub_metrics:
+      methodology_rigor:
+        name: "方法論嚴謹性"
+        weight: 0.25
+        scoring_rubric:
+          10: "方法論創新，嚴謹，有理論基礎或強大的實驗驗證"
+          8: "方法論合理，基本正確"
+          6: "方法論基本合理，有些細節可改進"
+          4: "方法論有缺陷或不夠嚴謹"
+          2: "方法論有較大漏洞"
+          0: "方法論有根本性問題"
+      
+      experiment_completeness:
+        name: "實驗完整性"
+        weight: 0.25
+        checks:
+          - "消融研究覆蓋所有提出的模塊"
+          - "與SOTA的對比完整"
+          - "多個數據集驗證"
+          - "統計顯著性報告"
+          - "邊界情況或失敗案例分析"
+        
+        scoring_rubric:
+          10: "實驗非常完整，所有檢查點都有"
+          8: "實驗完整度高"
+          6: "實驗基本完整，有某個檢查點缺失"
+          4: "實驗不夠完整，多個檢查點缺失"
+          2: "實驗明顯不完整"
+          0: "實驗嚴重不足"
+      
+      clarity:
+        name: "清晰度與可理解性"
+        weight: 0.25
+        checks:
+          - "論文邏輯流程清晰"
+          - "技術內容易於理解"
+          - "圖表清晰有效"
+          - "寫作簡潔流暢"
+        
+        scoring_rubric:
+          10: "寫作極清晰，容易理解，無需多次閱讀"
+          8: "清晰度高"
+          6: "基本清晰，有些部分需要重新理解"
+          4: "有些內容較難理解"
+          2: "多處不清楚"
+          0: "非常難理解"
+      
+      reproducibility:
+        name: "可重現性"
+        weight: 0.25
+        checks:
+          - "超參數報告完整"
+          - "實驗環境描述詳細"
+          - "代碼開源或可複現性聲明"
+          - "足夠細節讓他人複現"
+        
+        scoring_rubric:
+          10: "極易複現，代碼開源，所有細節完整"
+          8: "可複現性高"
+          6: "基本可複現，有些細節缺失"
+          4: "複現可能困難"
+          2: "多個關鍵細節缺失"
+          0: "無法複現"
+  
+  dimension_3:
+    name: "Writing Quality"
+    weight: 0.20
+    importance: "中 - 寫作質量和呈現方式"
+    description: "評估論文的呈現、邏輯、英文質量、圖表設計"
+    
+    scoring_scale:
+      90_100:
+        label: "出色"
+        interpretation: "寫作專業，呈現精美，閱讀體驗佳"
+      
+      80_89:
+        label: "良好"
+        interpretation: "寫作清晰，結構合理，小瑕疵"
+      
+      70_79:
+        label: "可接受"
+        interpretation: "寫作基本清晰，但有改進空間"
+      
+      60_69:
+        label: "有缺陷"
+        interpretation: "寫作有明顯問題，影響理解"
+      
+      below_60:
+        label: "需要大修"
+        interpretation: "寫作問題嚴重，需要大幅修改"
+    
+    sub_metrics:
+      structure_and_logic:
+        name: "結構與邏輯流程"
+        weight: 0.25
+        checks:
+          - "IMRAD 結構完整清晰"
+          - "各章節銜接順暢"
+          - "邏輯遞進合理"
+          - "無邏輯跳躍或矛盾"
+        
+        scoring_rubric:
+          10: "結構完美，邏輯清晰，易於跟隨"
+          8: "結構清晰"
+          6: "結構基本合理，邏輯通順"
+          4: "結構有些混亂，邏輯不太順"
+          2: "邏輯有跳躍"
+          0: "邏輯混亂"
+      
+      clarity_and_conciseness:
+        name: "清晰與簡潔"
+        weight: 0.25
+        checks:
+          - "段落開場句明確主題"
+          - "句子簡潔易懂"
+          - "無冗餘表述"
+          - "技術術語準確"
+        
+        scoring_rubric:
+          10: "表達非常清晰簡潔，無冗餘"
+          8: "清晰簡潔度高"
+          6: "基本清晰，有些冗餘"
+          4: "有些段落較冗長或不清楚"
+          2: "多處不清楚或冗長"
+          0: "表達不清或冗長"
+      
+      figure_and_table_quality:
+        name: "圖表質量"
+        weight: 0.25
+        checks:
+          - "圖表清晰美觀"
+          - "軸標籤和圖例完整清晰"
+          - "字號足夠大"
+          - "顏色區分清楚（色盲友善）"
+          - "圖表標題和說明充分"
+        
+        scoring_rubric:
+          10: "圖表專業精美，清晰易讀"
+          8: "圖表質量高"
+          6: "圖表基本清晰，有改進空間"
+          4: "某些圖表不夠清晰"
+          2: "多個圖表問題"
+          0: "圖表質量很差"
+      
+      language_and_formatting:
+        name: "語言與格式"
+        weight: 0.25
+        checks:
+          - "英文語法正確"
+          - "拼寫無誤"
+          - "引用格式一致"
+          - "方程式編號正確"
+          - "頁面格式整潔"
+        
+        scoring_rubric:
+          10: "英文專業，無語法錯誤，格式完美"
+          8: "英文良好，格式規範"
+          6: "英文基本正確，格式基本規範"
+          4: "有英文或格式錯誤"
+          2: "英文或格式問題較多"
+          0: "英文或格式問題嚴重"
+  
+  dimension_4:
+    name: "Ethics & Compliance"
+    weight: 0.30
+    importance: "CRITICAL - 倫理違規導致直接拒稿"
+    description: "評估倫理、法律、合規方面的風險"
+    
+    scoring_scale:
+      95_100:
+        label: "完全合規"
+        interpretation: "所有倫理和法規要求都滿足，零風險"
+      
+      80_94:
+        label: "基本合規"
+        interpretation: "有輕微缺陷但可快速補救"
+      
+      60_79:
+        label: "需要修正"
+        interpretation: "缺乏某些必要聲明，投稿前必須補全"
+      
+      40_59:
+        label: "高度風險"
+        interpretation: "存在明顯合規問題，投稿前必須解決"
+      
+      below_40:
+        label: "無法投稿"
+        interpretation: "存在根本性倫理問題，需先解決後再投稿"
+    
+    sub_metrics:
+      ethics_approval:
+        name: "倫理批准 (如適用)"
+        weight: 0.40
+        conditional: "只有涉及人類受試者/敏感數據時才評估"
+        
+        scoring_rubric:
+          10: "有有效的倫理委員會批准，批准號清楚"
+          8: "有倫理批准，信息基本完整"
+          6: "有倫理批准但信息不夠清楚"
+          0: "無倫理批准（若需要）"
+          -10: "涉及敏感倫理問題但無批准"
+      
+      data_availability:
+        name: "數據可用性聲明"
+        weight: 0.30
+        requirements:
+          available: "數據已開源，提供存取鏈接"
+          on_request: "數據可按要求提供，說明聯絡方式"
+          unavailable: "解釋為何無法發佈（隱私、保密等）"
+          synthetic: "數據是合成的，說明生成方式"
+        
+        scoring_rubric:
+          10: "數據完全開源，可直接存取"
+          8: "數據可按要求提供，流程明確"
+          6: "有聲明但不夠詳細"
+          4: "聲明模糊"
+          0: "無聲明或無法存取"
+      
+      reproducibility_declaration:
+        name: "可重現性聲明"
+        weight: 0.20
+        requirements:
+          code_available: "代碼已開源（GitHub 等）"
+          code_available_on_request: "代碼可按要求提供"
+          cannot_release: "解釋為何無法開源（如商業代碼）"
+        
+        scoring_rubric:
+          10: "代碼完全開源，可直接存取"
+          8: "代碼可按要求提供，流程明確"
+          6: "有聲明但執行不清"
+          4: "無聲明"
+          0: "無聲明且無法複現"
+      
+      conflict_of_interest:
+        name: "利益衝突披露"
+        weight: 0.10
+        requirements:
+          - "聲明是否有利益衝突"
+          - "如有，詳細說明"
+          - "資助來源披露"
+        
+        scoring_rubric:
+          10: "清晰披露利益衝突（或聲明無）"
+          8: "基本披露"
+          6: "披露不夠清晰"
+          0: "未披露"
+
+acceptance_prediction:
+  formula: |
+    Acceptance Probability = 
+      IF Final_Score >= 90: 0.95-0.99
+      ELSE IF Final_Score >= 80: 0.80-0.95
+      ELSE IF Final_Score >= 70: 0.50-0.80
+      ELSE IF Final_Score >= 60: 0.20-0.50
+      ELSE: 0.00-0.20
+  
+  prediction_brackets:
+    
+    very_high:
+      score_range: [90, 100]
+      acceptance_rate: 0.95
+      expected_outcome: "接受 or 小修"
+      timeline: "2-4 個月審稿周期"
+      typical_feedback: "審稿人認為論文完成度高，可能無修或小修"
+      action: "準備投稿，預期通過"
+    
+    high:
+      score_range: [80, 89]
+      acceptance_rate: 0.85
+      expected_outcome: "接受 + 小修 or 中修"
+      timeline: "3-6 個月含修改"
+      typical_feedback: "審稿人提出建設性修改意見"
+      action: "可投稿；預期修改工作量 1-2 週"
+    
+    moderate:
+      score_range: [70, 79]
+      acceptance_rate: 0.65
+      expected_outcome: "小修 or 中修"
+      timeline: "4-8 個月含修改"
+      typical_feedback: "審稿人要求補充實驗或澄清某些部分"
+      action: "可投稿；但建議先改進，預期修改 2-4 週"
+    
+    lower:
+      score_range: [60, 69]
+      acceptance_rate: 0.35
+      expected_outcome: "拒稿 or 大修"
+      timeline: "2-3 個月後可能拒稿"
+      typical_feedback: "審稿人認為工作創新性或完整性不足"
+      action: "建議改投其他期刊或進行重大修改"
+    
+    very_low:
+      score_range: [0, 59]
+      acceptance_rate: 0.05
+      expected_outcome: "可能拒稿"
+      timeline: "快速拒稿（1-2 月內）"
+      typical_feedback: "超出期刊範圍 or 新穎性不足"
+      action: "強烈建議改投更合適的期刊"
+
+risk_assessment_rules:
+  rule_1_ethics_critical:
+    condition: "Dimension 4 Score < 60"
+    action: "MUST FIX before submission"
+    examples:
+      - "涉及人類受試者但無倫理批准"
+      - "涉及敏感個人數據但無隱私聲明"
+      - "代碼/數據發佈有法律風險但未聲明"
+  
+  rule_2_desk_reject_warning:
+    condition: "Dimension 1 Score < 60"
+    action: "Consider changing journal"
+    warning: "Desk reject probability > 50%"
+  
+  rule_3_emergency_timeline:
+    condition: "Final Score < 70 AND timeline = 'rush'"
+    action: "Recommend not submitting"
+    reason: "Not enough time to improve & expect high rejection"
+  
+  rule_4_reviewer_expectations_gap:
+    condition: "Dimension 2 Score < 60 AND Final_Score > 70"
+    action: "Focus improvement on methodology & experiments"
+    improvement_potential: "High - fixing experiments could raise score 10-15 points"
+
+output_format:
+  report_structure:
+    - section: "Executive Summary"
+      content: "Overall score, acceptance prediction, top recommendation"
+    
+    - section: "Dimension Breakdown"
+      content: "Detail score for each dimension with interpretation"
+    
+    - section: "Key Findings"
+      content: "Strengths and weaknesses across dimensions"
+    
+    - section: "Risk Assessment"
+      content: "Identified risks with severity levels"
+    
+    - section: "Actionable Recommendations"
+      content: "Specific improvement suggestions, prioritized"
+    
+    - section: "Journal Comparison (if applicable)"
+      content: "Scores across multiple candidate journals"

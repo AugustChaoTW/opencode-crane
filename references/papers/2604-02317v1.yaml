@@ -1,0 +1,70 @@
+key: 2604-02317v1
+title: A Simple Baseline for Streaming Video Understanding
+authors:
+- Yujiao Shen
+- Shulin Tian
+- Jingkang Yang
+- Ziwei Liu
+year: 2026
+doi: arxiv:2604.02317v1
+url: http://arxiv.org/abs/2604.02317v1
+pdf_url: https://arxiv.org/pdf/2604.02317v1
+pdf_path: ''
+abstract: 'Recent streaming video understanding methods increasingly rely on complex
+  memory mechanisms to handle long video streams. We challenge this trend with a simple
+  finding: a sliding-window baseline that feeds only the most recent N frames to an
+  off-the-shelf VLM already matches or surpasses published streaming models. We formalize
+  this baseline as SimpleStream and evaluate it against 13 major offline and online
+  video LLM baselines on OVO-Bench and StreamingBench. Despite its simplicity, SimpleStream
+  delivers consistently strong performance. With only 4 recent frames, it reaches
+  67.7% average accuracy on OVO-Bench and 80.59% on StreamingBench. Controlled ablations
+  further show that the value of longer context is backbone-dependent rather than
+  uniformly increasing with model scale, and reveal a consistent perception-memory
+  trade-off: adding more historical context can improve recall, but often weakens
+  real-time perception. This suggests that stronger memory, retrieval, or compression
+  modules should not be taken as evidence of progress unless they clearly outperform
+  SimpleStream under the same protocol. We therefore argue that future streaming benchmarks
+  should separate recent-scene perception from long-range memory, so that performance
+  improvements from added complexity can be evaluated more clearly.'
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- cs.CV
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+cited_by: []
+cites: []
+bibtex: "@inproceedings{2604-02317v1,\n  title={A Simple Baseline for Streaming Video\
+  \ Understanding},\n  author={Yujiao Shen and Shulin Tian and Jingkang Yang and Ziwei\
+  \ Liu},\n  booktitle={arXiv},\n  year={2026},\n  doi={arxiv:2604.02317v1}\n}"
+ai_annotations:
+  summary: 'Recent streaming video understanding methods increasingly rely on complex
+    memory mechanisms to handle long video streams. We challenge this trend with a
+    simple finding: a sliding-window baseline that feeds only the most recent N frames
+    to an off-the-shelf VLM already matches or surpasses published streaming models.
+    We formalize this baseline as SimpleStream and evaluate it against 13 major offline
+    and online video LLM baselines on OVO-Bench and StreamingBench. Despite its simplicity,
+    SimpleStream delivers consistently strong performance. With only 4 recent frames,
+    it reaches 67.7% average accuracy on OVO-Bench and 80.59% on StreamingBench. Controlled
+    ablations further show that the value of longer context is backbone-dependent
+    rather than uniformly increasing with model scale, and reveal a consistent perception-memory
+    trade-off: adding more historical context can improve recall, but often weakens
+    real-time perception. This suggests that stronger memory, retrieval, or compression
+    modules should not be taken as evidence of progress unless they clearly outperform
+    SimpleStream under the same protocol. We therefore argue that future streaming
+    benchmarks should separate recent-scene perception from long-range memory, so
+    that performance improvements from added complexity can be evaluated more clearly.'
+  key_contributions: []
+  contribution_types: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-04-05'

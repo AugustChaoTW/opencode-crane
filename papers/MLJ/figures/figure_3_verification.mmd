@@ -1,0 +1,38 @@
+
+flowchart TD
+    classDef input fill:#fdfefe,stroke:#bdc3c7,stroke-width:2px,color:#2c3e50,rx:5px,ry:5px;
+    classDef llm fill:#f5eef8,stroke:#9b59b6,stroke-width:2px,color:#2c3e50,rx:8px,ry:8px;
+    classDef stage fill:#ebf5fb,stroke:#3498db,stroke-width:2px,color:#2c3e50,rx:8px,ry:8px;
+    classDef decision fill:#fef5e7,stroke:#f39c12,stroke-width:2px,color:#2c3e50;
+    classDef output fill:#eafaf1,stroke:#2ecc71,stroke-width:2px,color:#2c3e50,rx:5px,ry:5px;
+    
+    In["Raw Document/Claim"]:::input
+    
+    subgraph Pipeline ["3-LLM Verification Pipeline (Consensus Model)"]
+        direction TB
+        
+        subgraph Models ["Parallel Evaluators"]
+            direction LR
+            M1["GPT-4o<br/><small>(Primary Logic)</small>"]:::llm
+            M2["Claude 3.5 Sonnet<br/><small>(Nuance & Tone)</small>"]:::llm
+            M3["Gemini 1.5 Pro<br/><small>(Fact Checking)</small>"]:::llm
+        end
+        
+        subgraph Stages ["Verification Stages"]
+            direction LR
+            S1["Relevance Check<br/><small>(0-100)</small>"]:::stage
+            S2["Quality Assessment<br/><small>(0-100)</small>"]:::stage
+            S3["Citation Worthiness<br/><small>(Yes/No)</small>"]:::stage
+            
+            S1 --> S2 --> S3
+        end
+        
+        Consensus{"Majority Voting<br/>& Scoring Engine"}:::decision
+        
+        Models --> Stages
+        Stages --> Consensus
+    end
+    
+    In --> Models
+    Consensus -->|Pass| OutA["Verified Knowledge Base"]:::output
+    Consensus -->|Fail| OutB["Rejected / Flagged for Human"]:::input

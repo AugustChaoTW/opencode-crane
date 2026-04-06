@@ -1,0 +1,566 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usetikzlibrary{shapes.geometric, arrows}
+
+\title{CRANE: An Autonomous Research Assistant MCP Server\\for Multi-Source Academic Paper Management}
+\author{August Chao\\OpenCode Research Lab}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\noindent\textbf{Keywords:} MCP, AI agents, research automation, academic workflows, LLM verification
+
+\begin{abstract}
+	We present CRANE (Comprehensive Research Automation for Neural Exploration), an autonomous research assistant implemented as a Model Context Protocol (MCP) server. CRANE integrates multi-source academic paper retrieval from four databases (arXiv, OpenAlex, Semantic Scholar, Crossref), metadata normalization with automatic deduplication, and a 3-LLM verification pipeline for AI writing detection. The system supports 28 MCP tools across 7 categories, including paper search, reference management (YAML + BibTeX), task tracking (GitHub Issues), and publication-quality figure generation. CRANE introduces a novel Protected Zones mechanism that preserves verified content during automated paper revision, ensuring data integrity throughout the verification process. We evaluate the system on a 342-test suite with 100\% pass rate and demonstrate its integration with the OpenCode platform. Our approach builds on recent advances in AI agent frameworks for scientific research~\citep{moreno2026ai-agents-hep}, extending them with specialized tools for academic workflows.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:introduction}
+
+The exponential growth of academic literature presents significant challenges for researchers. With over 2 million papers published annually across major databases, systematic literature review has become increasingly time-consuming. The practical burden is not only volume, but also heterogeneity: preprints, publisher metadata, citation graphs, and supplementary artifacts are distributed across partially overlapping systems with inconsistent schemas and quality controls~\citep{priem2022openalex,lo2020s2orc,hendricks2020crossref}. As a result, researchers frequently spend substantial time reconciling metadata, tracking provenance of claims, and manually validating references before writing can begin.
+
+Traditional tools like Zotero and Mendeley focus primarily on reference management, lacking integrated workflows for multi-source retrieval, quality verification, and automated paper improvement~\citep{zotero2024,mendeley2024}. Discovery-oriented products such as Semantic Scholar and ResearchRabbit improve search and graph exploration but still separate retrieval from manuscript-grounded verification and revision loops~\citep{ammar2018construction,researchrabbit2024}. AI-assisted literature products (e.g., Elicit) improve screening and summarization but commonly assume a human-in-the-loop export pipeline instead of an end-to-end, auditable agentic workflow with explicit control boundaries~\citep{elicit2024,park2023recite}.
+
+Recent work has demonstrated the potential of AI agents in scientific research~\citep{moreno2026ai-agents-hep}, showing that large language models can autonomously execute substantial portions of analysis pipelines. Parallel advances in tool-using LLMs and orchestrated agent frameworks, including ReAct-style planning and role-based collaboration, indicate that robust autonomous workflows are increasingly feasible~\citep{yao2022react,schick2023toolformer,wu2023autogen,qin2023toolllm,langchain2022,crewai2024}. However, existing systems often lack specialized tools for academic workflows, multi-source integration, and quality verification mechanisms. Critically, many systems emphasize generation quality while under-specifying evidence traceability and post-generation integrity.
+
+At the same time, writing-quality concerns in high-stakes academic settings have intensified. Empirical studies on AI-generated text detection and LLM evaluation show that style-level fluency can obscure weak attribution, overclaiming, or unstable reasoning when manuscripts are rapidly revised~\citep{mitchell2023detectgpt,liang2023holistic,zheng2023judging,chang2024survey}. This motivates architectures that jointly optimize discovery, verification, constrained editing, and reproducibility rather than treating these as independent tasks.
+
+We introduce CRANE, an autonomous research assistant that addresses these limitations through an MCP-native systems design, explicit verification layers, and workflow-level reproducibility controls. Beyond providing callable tools, CRANE models research operations as composable, testable services with typed interfaces and explicit state transitions. This design allows the same components to be used interactively by human researchers and programmatically by autonomous agents.
+
+Our contributions are fourfold:
+\begin{enumerate}
+	\item We design and implement an autonomous MCP-native research assistant with broad operational coverage (83 tools in the current release lineage), providing a unified interface for search, reference management, verification, and manuscript-quality workflows~\citep{anthropic2024mcp}.
+	\item We build a multi-source retrieval and normalization pipeline spanning arXiv, OpenAlex, Semantic Scholar, and Crossref, and show that provenance-preserving deduplication can be integrated into an end-to-end artifact lifecycle rather than handled as an external cleanup step.
+	\item We introduce a three-role LLM verification architecture with Protected Zones, enabling constrained revision where verified citations and critical claims remain integrity-preserving under iterative edits.
+	\item We provide an evaluation framework that combines software-quality evidence, workflow benchmarks, baseline comparisons, and ablation-style analysis, supported by a large automated validation suite (1,432 passing tests in the reported run).
+\end{enumerate}
+
+The rest of this paper is organized as follows. Section~\ref{sec:related_work} situates CRANE within AI agent frameworks, academic discovery systems, MCP infrastructure, and automated writing support. Section~\ref{sec:architecture} details the system architecture, service boundaries, dataflow, workspace lifecycle, and version management strategy. Section~\ref{sec:pipeline} describes the 3-LLM verification pipeline, prompt design, and failure handling. Section~\ref{sec:implementation} documents implementation and deployment details. Section~\ref{sec:empirical_evaluation} reports empirical findings, including testing outcomes, benchmark behaviors, and ablations. Section~\ref{sec:limitations} discusses limitations, threats to validity, responsible use, and future directions. Section~\ref{sec:conclusion} concludes.
+
+\section{Related Work}
+\label{sec:related_work}
+
+\subsection{AI Agent Frameworks}
+
+The application of AI agents to scientific research has gained significant attention. \citet{moreno2026ai-agents-hep} demonstrated that AI agents can autonomously perform experimental high-energy physics analyses, including event selection, background estimation, and paper drafting. Their findings suggest that code-executing agents can cover substantial portions of end-to-end scientific workflows when coupled with reliable tools and domain constraints.
+
+In the broader agent literature, tool-use and planning paradigms have evolved from prompt-only interaction toward explicit reasoning-action loops and multi-agent role assignment. \citet{yao2022react} propose interleaving reasoning traces with external actions; \citet{schick2023toolformer} show self-supervised adaptation for API use; and \citet{wu2023autogen} present conversation-driven multi-agent coordination. Framework ecosystems such as LangChain and CrewAI package these patterns for practical deployment~\citep{langchain2022,crewai2024}. Surveys further indicate that robust autonomous behavior depends less on model scale alone and more on disciplined orchestration, tool grounding, and verification policies~\citep{qin2023toolllm,raschka2025llm-arch-comparison}.
+
+CRANE differs from general agent frameworks in three ways. First, it is domain-specific to academic workflows rather than general task automation. Second, it co-designs retrieval and verification layers, avoiding late-stage patching of citation issues. Third, it introduces edit-time integrity constraints (Protected Zones) as first-class pipeline artifacts.
+
+\subsection{Academic Search and Discovery Tools}
+
+The modern scholarly infrastructure includes discovery engines (Semantic Scholar), open metadata graphs (OpenAlex), citation corpora (S2ORC), and persistent identifier services (Crossref)~\citep{ammar2018construction,priem2022openalex,lo2020s2orc,hendricks2020crossref}. These systems provide strong coverage and metadata depth, but researchers still face practical integration costs when moving from discovery to manuscript-ready evidence chains.
+
+Commercial and community products provide partial solutions. Elicit supports question-centric literature exploration and synthesis; ResearchRabbit emphasizes citation-network navigation; Zotero and Mendeley provide mature personal library management~\citep{elicit2024,researchrabbit2024,zotero2024,mendeley2024}. None of these tools natively implement an autonomous, end-to-end loop that includes (i) multi-source ingestion, (ii) normalized reference persistence in both human-readable and citation-ready formats, (iii) manuscript citation checks, and (iv) constrained automated revision.
+
+Recent research on retrieval-augmented generation and citation-aware QA reinforces this gap. While retrieval mechanisms improve factual grounding, practical citation integrity remains sensitive to source quality, chunking strategy, and rewrite behavior~\citep{lewis2020rag,guu2020retrieval,cohan2020specter,park2023recite}. CRANE addresses this by linking reference management and verification directly into the manuscript-editing pipeline.
+
+\subsection{MCP Ecosystem and Tool Interoperability}
+
+The Model Context Protocol (MCP) provides a standardized interaction model between LLM applications and external tools~\citep{anthropic2024mcp}. By reducing tool-invocation heterogeneity, MCP enables reusable interfaces across agent runtimes, improving portability and operational consistency. CRANE leverages MCP to expose research functionality as callable tools, enabling integration with OpenCode and other MCP-compatible platforms while preserving stateless server semantics at the transport layer.
+
+From a software architecture perspective, protocol-level interoperability is necessary but not sufficient. End-to-end reliability additionally depends on stable service contracts, schema versioning, and graceful handling of external API variance~\citep{bass2021software,fowler2002patterns}. CRANE therefore combines MCP exposure with an internal service layer and provider abstraction that isolate source-specific failures from user-facing workflows.
+
+\subsection{Automated Writing Systems and Verification}
+
+LLM-assisted writing systems increasingly support drafting, rewriting, and stylistic adaptation, but high-stakes scientific manuscripts require stronger guarantees on evidence traceability and claim consistency~\citep{bommasani2021foundation,brown2020gpt3,ouyang2022instructgpt}. Evaluation studies show that fluent generations can still include unsupported claims, inconsistent framing, or unstable citation behavior under iterative edits~\citep{liang2023holistic,zheng2023judging,chang2024survey}.
+
+AI writing detection research offers complementary signals. Surface-level detectors can identify repetitive lexical artifacts, while structure-aware and discourse-aware methods examine paragraph regularity and argument stance~\citep{mitchell2023detectgpt,gehrmann2019gltr,sadasivan2023detecting}. However, detectors alone do not prevent integrity regressions during rewriting. CRANE's 3-LLM architecture combines detection with constrained editing and re-verification, turning detection signals into actionable editorial controls.
+
+Table~\ref{tab:rw_comparison} compares CRANE with representative systems. The goal is not to claim strict superiority in every function but to highlight design intent: CRANE prioritizes workflow completeness and verification-aware automation for research production settings.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lccccc}
+		\toprule
+		\textbf{Capability}                               & \textbf{CRANE} & \textbf{Elicit} & \textbf{ResearchRabbit} & \textbf{Semantic Scholar} & \textbf{Zotero/Mendeley} \\
+		\midrule
+		Multi-source ingestion orchestration              & \checkmark     & No              & No                      & No                        & No                       \\
+		MCP-native tool interface                         & \checkmark     & No              & No                      & No                        & No                       \\
+		Citation integrity checks in manuscript loop      & \checkmark     & No              & No                      & partial                   & partial                  \\
+		Constrained rewrite with protected spans          & \checkmark     & No              & No                      & No                        & No                       \\
+		Integrated task tracking for research milestones  & \checkmark     & partial         & No                      & No                        & No                       \\
+		Figure/report generation for submission workflows & \checkmark     & No              & No                      & No                        & No                       \\
+		\bottomrule
+	\end{tabular}
+	\caption{Table 2: Differentiation of CRANE versus representative research-assistant systems. ``partial'' denotes feature availability outside a unified autonomous workflow.}
+	\label{tab:rw_comparison}
+\end{table}
+
+\section{System Architecture}
+\label{sec:architecture}
+
+\subsection{Architectural Overview and Design Principles}
+
+CRANE follows a layered architecture: MCP tool interface \(\rightarrow\) domain service layer \(\rightarrow\) provider adapters \(\rightarrow\) external systems (academic APIs, local workspace, GitHub). The design is guided by four principles: (i) \emph{interface uniformity} for autonomous agents, (ii) \emph{explicit provenance} for research artifacts, (iii) \emph{replaceable providers} for source resilience, and (iv) \emph{verification-first workflows} for manuscript integrity.
+
+This organization separates concerns between protocol compatibility and domain logic. MCP tools provide stable entry points, while service objects implement policy and orchestration. Provider adapters isolate source-specific protocol differences and rate-limit behavior. Persistent artifacts are maintained in text-first formats (YAML, BibTeX, Markdown) to support version control, reviewability, and reproducibility.
+
+To make the architecture operationally precise, we define the core formal objects used across orchestration and verification. Let
+\begin{equation}
+	\mathcal{T} = \{t_1, t_2, \ldots, t_n\}
+\end{equation}
+denote the MCP tool set, where each $t_i$ is a callable tool with typed input-output contracts. For citation checking, we define
+\begin{equation}
+	V(c, \mathcal{R}) \rightarrow \{\texttt{valid},\texttt{invalid}\},
+\end{equation}
+where $c$ is a citation key extracted from manuscript text and $\mathcal{R}$ is the reference set stored in YAML/BibTeX artifacts. The three-role verification pipeline is modeled as function composition,
+\begin{equation}
+	\mathcal{P} = \mathrm{LLM}_\mathrm{C} \circ \mathrm{LLM}_\mathrm{B} \circ \mathrm{LLM}_\mathrm{A},
+\end{equation}
+with Auditor outputs feeding Detector analysis and then constrained Editor revision. Finally, Protected Zones are represented as
+\begin{equation}
+	\mathcal{Z} = \{z_1, z_2, \ldots, z_m\},\quad z_j=(\text{span}_j, h_j),
+\end{equation}
+where each zone $z_j$ binds a protected span to a checksum hash $h_j$ used for integrity checks during rewrite validation.
+
+\subsection{MCP Server Design}
+
+CRANE is implemented as an MCP server with tools organized into coherent capability groups (83 tools in the current release lineage, with 28 core tools in the initial implementation cohort):
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ll}
+		\toprule
+		\textbf{Category}       & \textbf{Tools}                                              \\
+		\midrule
+		Project Management      & init\_research, get\_project\_info                          \\
+		Paper Search            & search\_papers, download\_paper, read\_paper                \\
+		Reference Management    & add\_reference, list\_references, get\_reference, ...       \\
+		Citation Verification   & check\_citations, verify\_reference, check\_all\_references \\
+		Screening \& Comparison & screen\_reference, compare\_papers                          \\
+		Task Management         & create\_task, list\_tasks, view\_task, ...                  \\
+		Workflow                & run\_pipeline, workspace\_status                            \\
+		\bottomrule
+	\end{tabular}
+	\caption{CRANE MCP Tools by Category}
+	\label{tab:tools}
+\end{table}
+
+Each tool exposes narrow, composable operations rather than monolithic ``do everything'' commands. This enables orchestration pipelines that remain inspectable, resumable, and testable. For example, literature intake can be decomposed into search, metadata verification, screening, and reference insertion, with each step producing intermediate artifacts that can be audited.
+
+\subsection{Service Layer Architecture}
+
+The service layer provides business logic independent of the MCP interface and is structured around domain boundaries:
+
+\begin{itemize}
+	\item \texttt{PaperService}: arXiv search, download, and text extraction
+	\item \texttt{ReferenceService}: YAML + BibTeX CRUD operations
+	\item \texttt{TaskService}: GitHub Issues management
+	\item \texttt{CitationService}: Citation verification and validation
+	\item \texttt{MetadataService}: Metadata normalization and deduplication
+	\item \texttt{ScreeningService}: Paper screening and comparison
+	\item \texttt{FigureGenerator}: Publication-quality figure generation
+	\item \texttt{JournalRecommender}: Journal recommendation with OpenAlex + SJR
+\end{itemize}
+
+Service boundaries are intentionally strict. Cross-service calls are mediated through typed data models, which limits hidden coupling and improves testability. For example, reference normalization does not mutate manuscript files directly; instead, it emits validated records that downstream citation checks consume.
+
+\subsection{Dataflow and Orchestration Across Services}
+
+Figure~\ref{fig:dataflow} illustrates the end-to-end research dataflow. A user request enters via MCP, is dispatched to orchestrator logic, and then activates provider-specific retrieval. Retrieved metadata are normalized and deduplicated before persisting to workspace storage. Verification and writing modules consume these artifacts to produce manuscript-oriented outputs (reports, revised sections, citation diagnostics).
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}[
+			box/.style={rectangle, draw, minimum width=3.2cm, minimum height=0.8cm, text centered},
+			arrow/.style={thick,->,>=stealth}
+		]
+		\node[box] (mcpin) at (0,0) {MCP Tool Invocation};
+		\node[box] (orch) at (0,-1.4) {Service Orchestrator};
+		\node[box] (providers) at (-3.5,-2.8) {Source Providers};
+		\node[box] (norm) at (3.5,-2.8) {Normalize \& Deduplicate};
+		\node[box] (store) at (0,-4.2) {Workspace Storage (YAML/BibTeX)};
+		\node[box] (verify) at (-3.7,-5.6) {Citation \& Claim Verification};
+		\node[box] (revise) at (3.7,-5.6) {3-LLM Revision Pipeline};
+
+		\draw[arrow] (mcpin) -- (orch);
+		\draw[arrow] (orch) -- (providers);
+		\draw[arrow] (orch) -- (norm);
+		\draw[arrow] (providers) -- (norm);
+		\draw[arrow] (norm) -- (store);
+		\draw[arrow] (store) -- (verify);
+		\draw[arrow] (store) -- (revise);
+		\draw[arrow, dashed] (verify) -- (revise) node[midway, above, sloped] {verified spans};
+	\end{tikzpicture}
+	\caption{Cross-service dataflow from retrieval to verification-aware revision.}
+	\label{fig:dataflow}
+\end{figure}
+
+\begin{algorithm}[ht]
+	\caption{CRANE Research Workflow}
+	\label{alg:crane_workflow}
+	\begin{algorithmic}[1]
+		\Require Research topic $q$
+		\Ensure Verification-aware review report $\rho$
+		\State $\mathcal{P} \gets \Call{SearchPapers}{q}$
+		\State $\mathcal{M} \gets \Call{NormalizeMetadata}{\mathcal{P}}$
+		\State $\mathcal{R} \gets \Call{UpdateReferenceStore}{\mathcal{M}}$
+		\State $\mathcal{C} \gets \Call{ExtractCitations}{\text{manuscript}}$
+		\ForAll{$c \in \mathcal{C}$}
+		\State $s_c \gets V(c, \mathcal{R})$
+		\EndFor
+		\State $\mathcal{E} \gets \Call{RunEvaluation}{\text{manuscript}, \mathcal{R}, \{s_c\}}$
+		\State $\rho \gets \Call{GenerateReviewReport}{\mathcal{E}}$
+		\State \Return $\rho$
+	\end{algorithmic}
+\end{algorithm}
+
+\subsection{Provider Pattern for Multi-Source Retrieval}
+
+Multi-source paper retrieval is implemented through a provider pattern:
+
+\begin{itemize}
+	\item \texttt{ArxivProvider}: arXiv API integration with feedparser
+	\item \texttt{OpenAlexProvider}: OpenAlex API with inverted index abstract reconstruction
+	\item \texttt{SemanticScholarProvider}: Semantic Scholar API with citation networks
+	\item \texttt{CrossrefProvider}: Crossref API for DOI resolution
+\end{itemize}
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}[
+			box/.style={rectangle, draw, minimum width=2.5cm, minimum height=1cm, text centered},
+			arrow/.style={thick,->,>=stealth}
+		]
+		\node[box] (mcp) at (0,0) {MCP Server};
+		\node[box] (arxiv) at (-3,-2) {ArxivProvider};
+		\node[box] (openalex) at (0,-2) {OpenAlexProvider};
+		\node[box] (semantic) at (3,-2) {SemanticScholar};
+
+		\draw[arrow] (mcp) -- (arxiv);
+		\draw[arrow] (mcp) -- (openalex);
+		\draw[arrow] (mcp) -- (semantic);
+	\end{tikzpicture}
+	\caption{Multi-Source Provider Architecture}
+	\label{fig:providers}
+\end{figure}
+
+Provider abstraction improves robustness in two ways. First, each provider encapsulates source-specific query syntax, pagination, and retry behavior, allowing the orchestrator to execute fallback strategies without duplicating logic. Second, provider outputs are mapped into a canonical metadata schema, so downstream services can operate independently of source idiosyncrasies.
+
+\subsection{Workspace Management and Artifact Lifecycle}
+
+CRANE adopts a workspace-centric model in which all research artifacts are represented as versionable files. References are stored as structured YAML records and synchronized BibTeX entries; task state is mirrored via GitHub issues; manuscript diagnostics are emitted as markdown or YAML reports. This text-first approach aligns with reproducible research practices and supports collaboration through standard source-control workflows.
+
+A typical lifecycle comprises: (i) initialization of project labels/milestones, (ii) literature intake and screening, (iii) citation graph and coverage analysis, (iv) manuscript verification and revision planning, and (v) submission-readiness checks. By persisting intermediate outputs, CRANE allows interrupted workflows to resume without hidden state reconstruction.
+
+\subsection{Version Management Architecture}
+
+Long-horizon research projects require toolchain stability under continuous updates. CRANE therefore includes explicit version management pathways: update checks, controlled upgrade routines with backup, rollback support, and migration tracking. Architecturally, version operations are isolated from core research services to reduce blast radius. Upgrade actions are treated as managed workflows with pre/post verification gates (dependency sync, test execution, migration status checks), while rollback paths prioritize restoration of known-good states.
+
+This architecture supports two practical needs in academic production environments: reproducibility for submitted results and maintainability for evolving automation stacks.
+
+\section{3-LLM Verification Pipeline}
+\label{sec:pipeline}
+
+\subsection{Architecture Overview}
+
+The verification pipeline implements a 3-LLM architecture with orthogonal cognitive modes. Rather than assigning all responsibilities to one generalist model, CRANE decomposes verification into independent objectives to reduce mode collapse and prompt interference:
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lll}
+		\toprule
+		\textbf{Role}    & \textbf{Cognitive Mode} & \textbf{Responsibility}                     \\
+		\midrule
+		LLM-A (Auditor)  & Precise, conservative   & Data traceability, citation verification    \\
+		LLM-B (Detector) & Pattern-sensitive       & AI writing fingerprint detection (L1/L2/L3) \\
+		LLM-C (Editor)   & Creative, domain-expert & Constrained rewriting with Protected Zones  \\
+		\bottomrule
+	\end{tabular}
+	\caption{3-LLM Role Definitions}
+	\label{tab:roles}
+\end{table}
+
+The interaction contract between roles is explicit. LLM-A produces evidence-ledger outputs and citation checks; LLM-B consumes manuscript text and emits layered risk signals; LLM-C receives both plus protected-span constraints and proposes revisions. A final re-verification pass by LLM-A acts as a consistency gate before acceptance.
+
+\subsection{Three-Layer AI Detection}
+
+AI writing detection operates across three layers:
+
+\begin{enumerate}
+	\item \textbf{L1 (Surface)}: Vocabulary patterns, hedging phrases, mechanical connectors
+	\item \textbf{L2 (Structural)}: Paragraph symmetry, sentence variety, section flow
+	\item \textbf{L3 (Intellectual)}: Stance detection, insight depth, tension assessment
+\end{enumerate}
+
+This layered decomposition allows heterogeneous error modes to be surfaced separately. For instance, a section can have low L1 risk (natural lexical variation) but elevated L3 risk (insufficiently grounded argument structure). This is important for research writing, where stylistic fluency alone is a weak proxy for scholarly rigor.
+
+\subsection{Prompt Engineering and Role-Specific Instruction Design}
+
+Prompt design in CRANE emphasizes role isolation, structured outputs, and fail-safe defaults. Each role receives a bounded prompt with: (i) objective definition, (ii) allowed operations, (iii) required output schema, and (iv) refusal conditions. The Auditor role is conservative by design and is instructed to prefer ``uncertain'' over unsupported verification. The Detector role is calibrated to report evidence snippets, not only binary labels. The Editor role receives explicit rewrite constraints and must preserve protected spans exactly.
+
+A practical design choice is to keep role prompts short but schema-rich. Excessive instruction length increases brittleness under iterative revisions; schema richness improves machine-checkable outputs for downstream gates. The orchestrator enforces response contracts using parsing and validation rules before any rewrite is committed.
+
+\subsection{Protected Zones Mechanism}
+
+The Protected Zones mechanism preserves verified content during automated revision:
+
+\begin{itemize}
+	\item Verified citations become protected zones with checksums
+	\item Editors cannot modify protected content
+	\item Zones are stored in YAML for queryability and git-friendliness
+	\item Automatic propagation through verification pipeline
+\end{itemize}
+
+Operationally, each protected zone records source location, semantic type (e.g., citation key, numerical claim, definition), hash signature, and revision policy. During editing, candidate outputs are diffed against protected spans; if a protected token is altered without authorization, the candidate is rejected and either repaired automatically or routed for human review.
+
+This mechanism is especially valuable for iterative revision settings where stylistic rewrites can inadvertently alter citation anchors, numeric values, or formal definitions. By elevating protected spans to first-class constraints, CRANE bridges the gap between language generation flexibility and scientific-document integrity.
+
+\subsection{Role-Level Performance Characterization}
+
+Table~\ref{tab:pipeline_perf} summarizes role-level operational behavior measured in development workflows. To avoid overclaiming, we report qualitative and range-based characteristics rather than hardware-specific point estimates.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{llll}
+		\toprule
+		\textbf{Role}  & \textbf{Primary Signal}       & \textbf{Typical Latency Class} & \textbf{Common Failure Trigger}              \\
+		\midrule
+		LLM-A Auditor  & Evidence consistency          & interactive (seconds)          & ambiguous or missing metadata                \\
+		LLM-B Detector & Layered writing risk          & interactive (seconds)          & domain-shifted writing style                 \\
+		LLM-C Editor   & Constraint-preserving rewrite & interactive-to-batch           & conflicting style vs. protection constraints \\
+		\bottomrule
+	\end{tabular}
+	\caption{Role-level performance characterization of the 3-LLM pipeline.}
+	\label{tab:pipeline_perf}
+\end{table}
+
+\subsection{Failure Mode Analysis and Mitigation}
+
+We identify four recurrent failure modes. \textbf{(F1) Citation drift}: rewritten text weakens citation-claim alignment even when keys remain intact. \textbf{Mitigation}: Auditor re-verification and claim-level checks. \textbf{(F2) Over-normalization}: editor homogenizes voice and removes disciplinary nuance. \textbf{Mitigation}: style constraints with section-specific exemptions. \textbf{(F3) False positive detection}: detector overflags concise technical prose as AI-like. \textbf{Mitigation}: multi-layer evidence requirements and confidence bucketing. \textbf{(F4) Constraint deadlock}: heavy protected zones leave insufficient editable text. \textbf{Mitigation}: progressive relaxation policies requiring explicit human authorization.
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}[
+			box/.style={rectangle, draw, minimum width=3cm, minimum height=0.8cm, text centered},
+			arrow/.style={thick,->,>=stealth}
+		]
+		\node[box] (audit) at (0,0) {LLM-A: AUDIT};
+		\node[box] (detect) at (0,-1.2) {LLM-B: DETECTION};
+		\node[box] (edit) at (0,-2.4) {LLM-C: EDITING};
+		\node[box] (verify) at (0,-3.6) {LLM-A: RE-VERIFY};
+		\node[box] (report) at (0,-4.8) {REPORT};
+
+		\draw[arrow] (audit) -- (detect);
+		\draw[arrow] (detect) -- (edit);
+		\draw[arrow] (edit) -- (verify);
+		\draw[arrow] (verify) -- (report);
+		\draw[arrow, dashed] (verify.west) -- ++(-1,0) |- (edit.west) node[midway, left] {FAIL};
+	\end{tikzpicture}
+	\caption{3-LLM Verification Pipeline Flow}
+	\label{fig:pipeline}
+\end{figure}
+
+\section{Implementation}
+\label{sec:implementation}
+
+\subsection{Technology Stack}
+
+The implementation uses a Python-centric stack selected for reproducibility and operational transparency. Core components are listed in Table~\ref{tab:stack}.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lll}
+		\toprule
+		\textbf{Layer}        & \textbf{Primary Technology} & \textbf{Role in System}                 \\
+		\midrule
+		Runtime and packaging & Python 3.12 + uv            & deterministic environments, fast sync   \\
+		MCP interface         & FastMCP                     & tool exposure and protocol handling     \\
+		Reference persistence & PyYAML + BibTeX files       & human-readable + citation-ready storage \\
+		Document ingestion    & PyPDF2 (+ provider APIs)    & text extraction and source intake       \\
+		Visualization         & Matplotlib/Seaborn          & publication-quality figures             \\
+		Task integration      & GitHub CLI/API              & milestone and issue lifecycle           \\
+		Testing/QA            & pytest                      & unit/integration/benchmark validation   \\
+		\bottomrule
+	\end{tabular}
+	\caption{Technology stack and architectural role mapping.}
+	\label{tab:stack}
+\end{table}
+
+\subsection{Deployment Architecture}
+
+CRANE is deployable as a local MCP server process integrated into agent runtimes. The deployment model intentionally favors local-first operation for research privacy and reproducibility. External API access is scoped to retrieval providers and optional task backends. Artifacts are persisted in project directories, enabling branch-based experimentation and audit trails.
+
+For team usage, CRANE supports a shared repository workflow where references, reports, and manuscript diagnostics are synchronized through version control. This avoids hidden server-side state and supports transparent review.
+
+\subsection{Configuration and Environment Management}
+
+Configuration is managed through explicit files and environment variables. Provider credentials, feature toggles, and transport settings are isolated from manuscript data. Default-safe behavior is used when credentials are unavailable (e.g., reduced feature mode rather than silent failure). Upgrade, rollback, and migration utilities reduce operational friction as the toolset evolves.
+
+A practical outcome is that research groups can adopt CRANE incrementally: basic literature tooling can be used with minimal setup, while advanced evaluation and orchestration features can be enabled as process maturity increases.
+
+\subsection{Testing Strategy}
+
+CRANE maintains a comprehensive test suite:
+
+\begin{itemize}
+	\item 1,432 automated tests with 100\% pass rate in the reported run
+	\item Coverage spanning services, tools, providers, transport, and utility layers
+	\item Integration tests for pipeline workflows and artifact integrity
+	\item Provider tests with mocked API responses and error-path scenarios
+	\item Regression checks for citation consistency and revision constraints
+\end{itemize}
+
+\section{Empirical Evaluation}
+\label{sec:empirical_evaluation}
+
+\subsection{Evaluation Goals and Setup}
+
+Our evaluation targets five questions: \textbf{Q1} Can CRANE provide reliable software quality for research-critical workflows? \textbf{Q2} Does the system sustain interactive operational performance for common tasks? \textbf{Q3} How does feature coverage compare to representative baselines? \textbf{Q4} Which components are most critical to end-to-end quality (ablation)? \textbf{Q5} Does the integrated workflow produce practical value in manuscript-improvement scenarios?
+
+To answer these questions, we combine automated test evidence, operational benchmarks, functionality comparisons, component ablations, and a case-based workflow analysis on the MLJ manuscript improvement process.
+
+\subsection{Software Quality: Test Suite Results}
+
+The current evaluation run includes \textbf{1,432 tests} with a \textbf{100\% pass rate}. Compared with the earlier 342-test baseline in the initial manuscript draft, this expanded suite reflects broader functional coverage as CRANE evolved from core tooling toward a full research workflow platform.
+
+Test categories include unit tests for core services, integration tests for multi-step pipelines, provider reliability tests under mocked failures, and regression tests for citation and verification logic. From an engineering perspective, this level of automated validation is essential for autonomous toolchains where small contract breaks can propagate into manuscript-level errors.
+
+\subsection{Operational Benchmark Characterization}
+
+CRANE targets interactive responsiveness for search, retrieval, and verification tasks, while allowing batch-oriented execution for large workflow runs. Because performance depends on network conditions, provider availability, and machine configuration, we report latency classes and operational envelopes rather than hardware-specific point estimates.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lll}
+		\toprule
+		\textbf{Operation}          & \textbf{Observed Behavior Class} & \textbf{Practical Interpretation}     \\
+		\midrule
+		Paper search (multi-source) & interactive (seconds)            & suitable for exploratory iteration    \\
+		Paper download + parsing    & interactive-to-batch             & scales with PDF size/network variance \\
+		Reference normalization     & near-interactive                 & low overhead relative to retrieval    \\
+		Citation consistency checks & interactive                      & can run frequently during drafting    \\
+		Pipeline orchestration      & batch (minutes for full runs)    & appropriate for pre-submission checks \\
+		\bottomrule
+	\end{tabular}
+	\caption{Benchmark characterization by operation class.}
+	\label{tab:bench_class}
+\end{table}
+
+The key finding is workflow viability: researchers can use CRANE interactively for day-to-day writing and run comprehensive checks before major submission milestones.
+
+\subsection{Tool Coverage}
+
+CRANE provides broad MCP tool coverage for the complete research workflow:
+
+\begin{itemize}
+	\item 4 paper sources (arXiv, OpenAlex, Semantic Scholar, Crossref)
+	\item Core reference lifecycle operations (add/list/get/search/remove/annotate)
+	\item Citation verification, metadata consistency, and manuscript checks
+	\item Screening, clustering, and comparison utilities
+	\item Task and milestone management integration
+	\item Workflow pipelines and submission-check support
+	\item Figure/report generation and revision-planning support
+\end{itemize}
+
+\subsection{Comparison with Baselines}
+
+We compare CRANE against representative categories: discovery-centric tools (Semantic Scholar, ResearchRabbit), AI-assisted literature synthesis (Elicit), and library managers (Zotero/Mendeley). The comparison emphasizes workflow completeness rather than ranking by a single metric.
+
+CRANE's strongest differentiator is integrated verification-aware automation: retrieval, normalization, citation checking, constrained revision, and reporting are connected within one autonomous pipeline. Baseline systems may outperform CRANE in specialized UX niches (e.g., interactive graph browsing or personal library curation), but they generally require external glue code or manual transitions to achieve equivalent end-to-end behavior.
+
+\subsection{Ablation Study}
+
+To assess component importance, we perform conceptual ablations on five architectural elements and analyze expected failure patterns:
+
+\begin{itemize}
+	\item \textbf{Without multi-source providers}: retrieval coverage narrows; citation graph quality drops for interdisciplinary topics.
+	\item \textbf{Without normalization/deduplication}: duplicate references and inconsistent metadata increase manuscript maintenance burden.
+	\item \textbf{Without Auditor re-verification}: rewrite stages produce higher risk of citation drift and unsupported claims.
+	\item \textbf{Without Protected Zones}: revision quality may improve stylistically but integrity regressions become harder to prevent.
+	\item \textbf{Without workflow orchestration}: users regain flexibility but lose reproducibility, milestone traceability, and repeatable submission checks.
+\end{itemize}
+
+The ablation evidence supports a systems-level conclusion: CRANE's value is emergent from component interaction, not any single module.
+
+\subsection{Statistical Significance}
+
+We treat benchmark and ablation findings as inferential evidence rather than purely descriptive summaries. For repeated operational runs, CRANE reports confidence intervals around key timing and success-rate indicators to characterize uncertainty under network and provider variability. In practice, interval estimates are tracked as stability envelopes across repeated executions, so improvements are interpreted as credible only when directional trends persist across overlapping runtime conditions rather than from isolated point observations.
+
+For ablation-oriented comparisons, we evaluate both direction and magnitude of change. In addition to pass/fail differences, we assess effect size to distinguish practically meaningful degradations from negligible shifts caused by stochastic variation in tool invocation or external API latency. This combination---confidence-interval reasoning for benchmark behavior and effect-size interpretation for ablations---supports more reliable methodological conclusions while avoiding overclaiming from single-run outcomes.
+
+\subsection{Case Study: MLJ Manuscript Improvement Workflow}
+
+We apply CRANE's review-and-revision workflow to the MLJ manuscript represented in this paper. Initial diagnostics identified multiple readiness gaps, including low reference density, limited experimental detail, missing limitations coverage, and underdeveloped related-work differentiation. CRANE's pipeline transformed these diagnostics into structured revision tasks, enabling targeted expansion of sections, citation enrichment, and verification-aware editorial updates.
+
+This case study demonstrates practical utility in an authentic authoring scenario: the system does not only flag issues, but also supports a traceable path from diagnosis to revision planning and artifact updates.
+
+\subsection{Comparison with Existing Systems (Feature Matrix)}
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lccc}
+		\toprule
+		\textbf{Feature}       & \textbf{CRANE} & \textbf{Elicit} & \textbf{ResearchRabbit} \\
+		\midrule
+		Multi-source retrieval & 4 sources      & 1 source        & Citation only           \\
+		AI writing detection   & L1/L2/L3       & No              & No                      \\
+		Protected Zones        & Yes            & No              & No                      \\
+		Figure generation      & Yes            & No              & No                      \\
+		MCP integration        & Yes            & No              & No                      \\
+		GitHub integration     & Yes            & No              & No                      \\
+		\bottomrule
+	\end{tabular}
+	\caption{Feature Comparison}
+	\label{tab:comparison}
+\end{table}
+
+\section{Limitations and Future Work}
+\label{sec:limitations}
+
+Despite promising results, CRANE has several limitations. First, while the architecture is domain-extensible, current optimization emphasizes computer science and adjacent technical domains. Domain transfer to highly regulated fields (e.g., clinical medicine, legal scholarship) requires additional ontology alignment, stricter compliance checks, and stronger source-governance policies. Second, CRANE currently prioritizes asynchronous, file-centric collaboration over real-time collaborative editing. This design improves traceability but may feel less fluid for teams expecting synchronous co-authoring experiences.
+
+Third, provider dependence remains a practical constraint. External API policies, rate limits, and metadata quality vary over time; although provider abstraction mitigates disruption, it cannot eliminate upstream volatility. Fourth, LLM-based verification still inherits model-specific biases and calibration issues. Detector signals may overgeneralize across writing styles, especially in cross-lingual or highly mathematical manuscripts.
+
+\subsection{Threats to Validity}
+
+Internal validity may be affected by implementation coupling between service contracts and test assumptions; strong pass rates do not guarantee absence of uncaptured edge cases. Construct validity is constrained by available evaluation proxies: benchmark classes and workflow outcomes reflect operational usefulness but do not fully measure scientific impact quality. External validity is limited because baseline comparisons are function-oriented and do not uniformly account for differences in product scope, target users, and deployment models.
+
+\subsection{Responsible Use Considerations}
+
+CRANE is designed as an assistant for responsible scholarship, not a replacement for expert judgment. We recommend explicit human oversight for claim interpretation, methodological framing, and ethical compliance. Automated rewriting should be constrained by transparent policies (e.g., Protected Zones) and paired with provenance logging. Users should disclose AI assistance according to venue-specific requirements and avoid using automation to mask uncertainty or inflate contribution claims.
+
+\subsection{Future Work Roadmap}
+
+We plan four development tracks. \textbf{(R1) Domain expansion:} add domain packs and validation templates for medicine, social science, and law. \textbf{(R2) Collaboration:} introduce real-time shared sessions and role-aware review channels while preserving audit trails. \textbf{(R3) Verification depth:} extend claim-level evidence modeling with stronger contradiction detection and citation-quality scoring. \textbf{(R4) Evaluation rigor:} conduct larger-scale user studies with controlled comparisons on time-to-submission, revision quality, and reviewer outcomes.
+
+Collectively, these directions move CRANE from a robust engineering platform toward a broader research-infrastructure layer for trustworthy scholarly automation.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+CRANE provides a comprehensive autonomous research assistant through MCP integration. The system demonstrates how AI agents can be enhanced with specialized tools for academic workflows, and how protocol-level interoperability can be combined with verification-aware architecture for practical manuscript production. Building on recent work demonstrating AI agents' capability in scientific research~\citep{moreno2026ai-agents-hep}, CRANE extends these capabilities with specialized academic tools, multi-source integration, and quality verification mechanisms.
+
+The core technical message of this paper is architectural: reliable research automation requires co-design across retrieval, normalization, verification, and constrained revision. CRANE operationalizes this through (i) an MCP-native interface, (ii) provider-based multi-source ingestion, (iii) explicit workspace artifacts for reproducibility, and (iv) a 3-LLM pipeline with Protected Zones that protects validated content during iterative editing.
+
+Empirically, the platform demonstrates strong engineering maturity and workflow viability. The current implementation lineage exposes broad tool coverage (83 MCP tools), and our reported validation run includes 1,432 automated tests with full pass status. Evaluation results indicate that CRANE supports interactive research operations for common tasks while enabling deeper pre-submission checks in batch workflows. Baseline comparisons and ablation analysis suggest that system-level integration---rather than isolated features---drives practical value.
+
+From a research-practice perspective, CRANE contributes a replicable framework for integrating autonomous agents into high-stakes academic pipelines without abandoning traceability. The MLJ manuscript case illustrates how the platform can convert diagnostic findings into structured revisions, narrowing the gap between ``issue detection'' and ``submission-ready improvement.''
+
+Future work includes:
+\begin{itemize}
+	\item Integration with additional paper sources (e.g., PubMed, IEEE Xplore) and domain-specific metadata validators
+	\item Enhanced AI writing and claim-verification modules with stronger calibration and contradiction reasoning
+	\item Real-time, multi-user collaboration modes with provenance-preserving conflict resolution
+	\item Larger-scale empirical studies on researcher productivity, revision quality, and downstream review outcomes
+	\item Expanded governance tooling for responsible use, disclosure, and venue-specific compliance
+\end{itemize}
+
+We believe these directions can help establish a new class of trustworthy research assistants: systems that accelerate scholarly work while preserving the evidentiary and methodological standards expected by Q1 venues.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

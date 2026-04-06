@@ -1,0 +1,18 @@
+research_field: ML
+target_journals:
+- IEEE TPAMI
+paper_constraints:
+  page_limit: 16
+  figure_limit: 8
+submission_strategy:
+  timeline: normal
+  acceptance_target: 0.75
+  revision_tolerance: moderate
+paper_characteristics:
+  has_code_release: true
+  has_dataset_release: false
+  has_human_subjects: false
+  ethics_approval_number: null
+  replicability_score: 7
+created_at: '2026-04-06T01:42:29.775210'
+stage: setup

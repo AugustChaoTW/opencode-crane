@@ -1,4 +1,5 @@
 journals:
+  # ===== EXISTING: COMPUTER SCIENCE Q1 JOURNALS (18) =====
   - name: "IEEE Transactions on Pattern Analysis and Machine Intelligence"
     abbreviation: "IEEE TPAMI"
     publisher: "IEEE"
@@ -340,3 +341,710 @@ journals:
     waiver_available: true
     desk_reject_signals: ["insufficient vision novelty", "weak experimental validation", "poor positioning against sota"]
     citation_venues: ["CVPR", "ICCV", "ECCV", "IJCV"]
+
+  # ===== NEW: CYBERSECURITY Q1 JOURNALS (7) =====
+  - name: "IEEE Transactions on Information Forensics and Security"
+    abbreviation: "IEEE TIFS"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 6.8
+    scope_keywords: ["digital forensics", "network security", "biometrics", "multimedia security", "privacy"]
+    preferred_paper_types: ["empirical", "system"]
+    preferred_method_families: ["cryptography", "machine learning", "signal processing", "adversarial analysis"]
+    preferred_evidence_patterns: ["benchmark_heavy", "systems_benchmark"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.20
+    apc_usd: 2800
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no real-world threat model", "insufficient security analysis", "weak adversarial evaluation"]
+    citation_venues: ["IEEE S&P", "CCS", "NDSS", "USENIX Security"]
+
+  - name: "IEEE Transactions on Dependable and Secure Computing"
+    abbreviation: "IEEE TDSC"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 7.3
+    scope_keywords: ["dependable computing", "secure computing", "fault tolerance", "intrusion detection", "trusted systems"]
+    preferred_paper_types: ["empirical", "system"]
+    preferred_method_families: ["formal verification", "anomaly detection", "distributed security", "trusted execution"]
+    preferred_evidence_patterns: ["systems_benchmark", "industrial_case"]
+    typical_word_count: [7000, 12000]
+    review_timeline_months: [3, 7]
+    acceptance_rate: 0.18
+    apc_usd: 2800
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no real-world threat model", "insufficient reliability analysis", "missing formal guarantees"]
+    citation_venues: ["IEEE S&P", "CCS", "DSN", "NDSS"]
+
+  - name: "Computers & Security"
+    abbreviation: "COSE"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 4.8
+    scope_keywords: ["computer security", "cyber threats", "malware analysis", "access control", "risk assessment"]
+    preferred_paper_types: ["empirical", "system", "survey"]
+    preferred_method_families: ["machine learning", "statistical analysis", "network analysis", "threat modeling"]
+    preferred_evidence_patterns: ["benchmark_heavy", "application_validation"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.22
+    apc_usd: 3100
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no real-world threat model", "outdated attack scenarios", "weak comparative evaluation"]
+    citation_venues: ["CCS", "NDSS", "ACSAC", "RAID"]
+
+  - name: "ACM Transactions on Privacy and Security"
+    abbreviation: "ACM TOPS"
+    publisher: "ACM"
+    quartile: "Q1"
+    impact_factor: 3.9
+    scope_keywords: ["privacy", "access control", "authentication", "security protocols", "information flow"]
+    preferred_paper_types: ["empirical", "theoretical", "system"]
+    preferred_method_families: ["formal methods", "cryptographic protocols", "privacy-preserving computation", "access control"]
+    preferred_evidence_patterns: ["theory_plus_eval", "systems_benchmark"]
+    typical_word_count: [8000, 13000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.17
+    apc_usd: 0
+    open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
+    desk_reject_signals: ["no formal threat model", "insufficient privacy guarantees", "weak adversarial evaluation"]
+    citation_venues: ["CCS", "IEEE S&P", "USENIX Security", "PETS"]
+
+  - name: "Journal of Information Security and Applications"
+    abbreviation: "JISA"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 4.5
+    scope_keywords: ["information security", "applied cryptography", "network security", "IoT security", "security applications"]
+    preferred_paper_types: ["empirical", "system", "application"]
+    preferred_method_families: ["machine learning", "cryptography", "intrusion detection", "security engineering"]
+    preferred_evidence_patterns: ["application_validation", "benchmark_heavy"]
+    typical_word_count: [6000, 10000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.24
+    apc_usd: 3000
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no real-world threat model", "limited practical applicability", "weak security guarantees"]
+    citation_venues: ["CCS", "NDSS", "ACSAC", "SecureComm"]
+
+  - name: "International Journal of Information Security"
+    abbreviation: "IJIS"
+    publisher: "Springer"
+    quartile: "Q1"
+    impact_factor: 3.9
+    scope_keywords: ["information security", "cryptography", "network security", "security management", "digital trust"]
+    preferred_paper_types: ["empirical", "theoretical", "system"]
+    preferred_method_families: ["cryptographic protocols", "formal verification", "risk analysis", "machine learning"]
+    preferred_evidence_patterns: ["theory_plus_eval", "benchmark_heavy"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.22
+    apc_usd: 3390
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no real-world threat model", "insufficient theoretical grounding", "narrow security scope"]
+    citation_venues: ["IEEE S&P", "CCS", "ESORICS", "ACSAC"]
+
+  - name: "Journal of Cybersecurity"
+    abbreviation: "JoC"
+    publisher: "Oxford University Press"
+    quartile: "Q1"
+    impact_factor: 3.9
+    scope_keywords: ["cybersecurity", "cyber policy", "security economics", "human factors in security", "cyber risk"]
+    preferred_paper_types: ["empirical", "theoretical", "survey"]
+    preferred_method_families: ["empirical analysis", "game theory", "behavioral security", "risk modeling"]
+    preferred_evidence_patterns: ["empirical_study", "theory_plus_eval"]
+    typical_word_count: [7000, 12000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.20
+    apc_usd: 2985
+    open_access: true
+    open_access_type: "gold_oa"
+    waiver_available: true
+    desk_reject_signals: ["no real-world threat model", "limited interdisciplinary perspective", "purely technical without policy implications"]
+    citation_venues: ["IEEE S&P", "USENIX Security", "WEIS", "NDSS"]
+
+  # ===== NEW: INTERNET OF THINGS Q1 JOURNALS (7) =====
+  - name: "IEEE Internet of Things Journal"
+    abbreviation: "IEEE IoTJ"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 10.6
+    scope_keywords: ["internet of things", "smart systems", "edge computing", "sensor networks", "IoT architecture"]
+    preferred_paper_types: ["system", "application", "empirical"]
+    preferred_method_families: ["edge computing", "machine learning", "communication protocols", "embedded systems"]
+    preferred_evidence_patterns: ["systems_benchmark", "application_validation"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.15
+    apc_usd: 2800
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no IoT-specific contribution", "missing real-device evaluation", "insufficient scalability analysis"]
+    citation_venues: ["IEEE IoTJ", "SenSys", "IoTDI", "PerCom"]
+
+  - name: "Computer Networks"
+    abbreviation: "COMNET"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 5.6
+    scope_keywords: ["computer networks", "network protocols", "wireless networks", "network security", "SDN"]
+    preferred_paper_types: ["system", "empirical", "application"]
+    preferred_method_families: ["network simulation", "protocol design", "optimization", "machine learning"]
+    preferred_evidence_patterns: ["systems_benchmark", "application_validation"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.20
+    apc_usd: 3300
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no network-specific contribution", "insufficient protocol evaluation", "missing real-network validation"]
+    citation_venues: ["SIGCOMM", "INFOCOM", "CoNEXT", "NSDI"]
+
+  - name: "Journal of Network and Computer Applications"
+    abbreviation: "JNCA"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 8.0
+    scope_keywords: ["network applications", "distributed computing", "cloud networking", "mobile computing", "network management"]
+    preferred_paper_types: ["system", "application", "empirical"]
+    preferred_method_families: ["distributed systems", "machine learning", "network optimization", "cloud computing"]
+    preferred_evidence_patterns: ["application_validation", "systems_benchmark"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.18
+    apc_usd: 3300
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no application-level contribution", "limited network evaluation", "insufficient scalability testing"]
+    citation_venues: ["INFOCOM", "WWW", "Middleware", "ICDCS"]
+
+  - name: "Ad Hoc Networks"
+    abbreviation: "ADHOC"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 4.8
+    scope_keywords: ["ad hoc networks", "wireless sensor networks", "mesh networks", "vehicular networks", "delay-tolerant networks"]
+    preferred_paper_types: ["system", "empirical", "application"]
+    preferred_method_families: ["routing protocols", "MAC protocols", "energy harvesting", "network simulation"]
+    preferred_evidence_patterns: ["systems_benchmark", "application_validation"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.22
+    apc_usd: 3200
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no real-device evaluation", "simulation-only without validation", "limited mobility analysis"]
+    citation_venues: ["MobiHoc", "MobiCom", "SenSys", "MASS"]
+
+  - name: "Pervasive and Mobile Computing"
+    abbreviation: "PMC"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 4.3
+    scope_keywords: ["pervasive computing", "mobile computing", "ubiquitous computing", "wearable computing", "context awareness"]
+    preferred_paper_types: ["system", "application", "empirical"]
+    preferred_method_families: ["mobile sensing", "context recognition", "edge intelligence", "human-computer interaction"]
+    preferred_evidence_patterns: ["application_validation", "empirical_study"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.23
+    apc_usd: 3200
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no mobile/pervasive contribution", "missing user study", "insufficient real-world deployment"]
+    citation_venues: ["UbiComp", "PerCom", "MobiSys", "SenSys"]
+
+  - name: "IEEE Sensors Journal"
+    abbreviation: "IEEE Sensors"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 4.3
+    scope_keywords: ["sensors", "sensor systems", "signal processing", "IoT sensing", "wearable sensors"]
+    preferred_paper_types: ["system", "application", "empirical"]
+    preferred_method_families: ["signal processing", "embedded systems", "machine learning", "sensor fusion"]
+    preferred_evidence_patterns: ["application_validation", "systems_benchmark"]
+    typical_word_count: [6000, 10000]
+    review_timeline_months: [2, 4]
+    acceptance_rate: 0.25
+    apc_usd: 2800
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no sensor-specific contribution", "missing hardware validation", "insufficient signal analysis"]
+    citation_venues: ["IEEE Sensors", "SenSys", "IPSN", "IEEE IoTJ"]
+
+  - name: "ACM Transactions on Sensor Networks"
+    abbreviation: "ACM TOSN"
+    publisher: "ACM"
+    quartile: "Q1"
+    impact_factor: 3.5
+    scope_keywords: ["sensor networks", "embedded sensing", "networked systems", "cyber-physical systems", "energy efficiency"]
+    preferred_paper_types: ["system", "empirical", "application"]
+    preferred_method_families: ["network protocols", "embedded systems", "distributed algorithms", "machine learning"]
+    preferred_evidence_patterns: ["systems_benchmark", "application_validation"]
+    typical_word_count: [8000, 13000]
+    review_timeline_months: [3, 7]
+    acceptance_rate: 0.20
+    apc_usd: 0
+    open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
+    desk_reject_signals: ["no sensor network contribution", "missing real-deployment evaluation", "insufficient energy analysis"]
+    citation_venues: ["SenSys", "IPSN", "MobiCom", "INFOCOM"]
+
+  # ===== NEW: MANAGEMENT INFORMATION SYSTEMS Q1 JOURNALS (7) =====
+  - name: "MIS Quarterly"
+    abbreviation: "MISQ"
+    publisher: "Management Information Systems Research Center"
+    quartile: "Q1"
+    impact_factor: 7.3
+    scope_keywords: ["management information systems", "IT governance", "digital transformation", "technology adoption", "IS strategy"]
+    preferred_paper_types: ["empirical", "theoretical"]
+    preferred_method_families: ["structural equation modeling", "econometrics", "qualitative methods", "design science"]
+    preferred_evidence_patterns: ["empirical_study", "theory_plus_eval"]
+    typical_word_count: [10000, 16000]
+    review_timeline_months: [4, 9]
+    acceptance_rate: 0.08
+    apc_usd: 0
+    open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
+    desk_reject_signals: ["insufficient theoretical contribution", "weak research design", "limited IS relevance"]
+    citation_venues: ["ICIS", "ECIS", "AMCIS", "HICSS"]
+
+  - name: "Information Systems Research"
+    abbreviation: "ISR"
+    publisher: "INFORMS"
+    quartile: "Q1"
+    impact_factor: 5.0
+    scope_keywords: ["information systems", "digital platforms", "business analytics", "IS economics", "IT value"]
+    preferred_paper_types: ["empirical", "theoretical"]
+    preferred_method_families: ["econometrics", "causal inference", "analytical modeling", "machine learning"]
+    preferred_evidence_patterns: ["empirical_study", "theory_plus_eval"]
+    typical_word_count: [10000, 16000]
+    review_timeline_months: [4, 9]
+    acceptance_rate: 0.10
+    apc_usd: 0
+    open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
+    desk_reject_signals: ["insufficient theoretical contribution", "weak causal identification", "limited IS novelty"]
+    citation_venues: ["ICIS", "CIST", "WISE", "HICSS"]
+
+  - name: "Journal of Management Information Systems"
+    abbreviation: "JMIS"
+    publisher: "Taylor & Francis"
+    quartile: "Q1"
+    impact_factor: 5.8
+    scope_keywords: ["management information systems", "e-commerce", "knowledge management", "IT management", "decision support"]
+    preferred_paper_types: ["empirical", "theoretical"]
+    preferred_method_families: ["survey methods", "econometrics", "design science", "case study"]
+    preferred_evidence_patterns: ["empirical_study", "theory_plus_eval"]
+    typical_word_count: [9000, 14000]
+    review_timeline_months: [3, 8]
+    acceptance_rate: 0.12
+    apc_usd: 3200
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["insufficient theoretical contribution", "weak empirical design", "limited managerial implications"]
+    citation_venues: ["ICIS", "ECIS", "AMCIS", "HICSS"]
+
+  - name: "European Journal of Information Systems"
+    abbreviation: "EJIS"
+    publisher: "Taylor & Francis"
+    quartile: "Q1"
+    impact_factor: 4.5
+    scope_keywords: ["information systems", "digital innovation", "sociotechnical systems", "IS design", "European IS research"]
+    preferred_paper_types: ["empirical", "theoretical", "survey"]
+    preferred_method_families: ["qualitative methods", "mixed methods", "design science", "action research"]
+    preferred_evidence_patterns: ["empirical_study", "theory_plus_eval"]
+    typical_word_count: [9000, 14000]
+    review_timeline_months: [3, 7]
+    acceptance_rate: 0.15
+    apc_usd: 3300
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["insufficient theoretical contribution", "weak methodological rigor", "limited conceptual novelty"]
+    citation_venues: ["ECIS", "ICIS", "AMCIS", "HICSS"]
+
+  - name: "Journal of the Association for Information Systems"
+    abbreviation: "JAIS"
+    publisher: "Association for Information Systems"
+    quartile: "Q1"
+    impact_factor: 4.5
+    scope_keywords: ["information systems", "IS theory", "digital strategy", "IS methodology", "sociotechnical design"]
+    preferred_paper_types: ["empirical", "theoretical"]
+    preferred_method_families: ["qualitative methods", "survey methods", "design science", "conceptual modeling"]
+    preferred_evidence_patterns: ["empirical_study", "theory_plus_eval"]
+    typical_word_count: [10000, 16000]
+    review_timeline_months: [4, 8]
+    acceptance_rate: 0.12
+    apc_usd: 0
+    open_access: true
+    open_access_type: "diamond_oa"
+    waiver_available: false
+    desk_reject_signals: ["insufficient theoretical contribution", "limited IS discipline relevance", "weak research design"]
+    citation_venues: ["ICIS", "ECIS", "AMCIS", "PACIS"]
+
+  - name: "Information & Management"
+    abbreviation: "I&M"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 10.3
+    scope_keywords: ["information management", "digital transformation", "IT adoption", "business intelligence", "organizational IS"]
+    preferred_paper_types: ["empirical", "theoretical"]
+    preferred_method_families: ["structural equation modeling", "econometrics", "survey methods", "meta-analysis"]
+    preferred_evidence_patterns: ["empirical_study", "application_validation"]
+    typical_word_count: [8000, 13000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.12
+    apc_usd: 3300
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["insufficient theoretical contribution", "weak empirical methodology", "limited practical relevance"]
+    citation_venues: ["ICIS", "ECIS", "AMCIS", "HICSS"]
+
+  - name: "Journal of Strategic Information Systems"
+    abbreviation: "JSIS"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 8.5
+    scope_keywords: ["strategic IS", "IT strategy", "digital innovation", "platform strategy", "IT governance"]
+    preferred_paper_types: ["empirical", "theoretical"]
+    preferred_method_families: ["case study", "qualitative methods", "econometrics", "grounded theory"]
+    preferred_evidence_patterns: ["empirical_study", "theory_plus_eval"]
+    typical_word_count: [9000, 14000]
+    review_timeline_months: [3, 7]
+    acceptance_rate: 0.10
+    apc_usd: 3300
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["insufficient strategic framing", "weak theoretical contribution", "limited organizational impact"]
+    citation_venues: ["ICIS", "ECIS", "AMCIS", "Academy of Management"]
+
+  # ===== ADDITIONAL: COMPUTER SCIENCE Q1 JOURNALS (16) =====
+  - name: "Journal of the ACM"
+    abbreviation: "JACM"
+    publisher: "ACM"
+    quartile: "Q1"
+    impact_factor: 2.4
+    scope_keywords: ["theoretical computer science", "algorithms", "computational complexity", "logic in computer science", "formal methods"]
+    preferred_paper_types: ["theoretical", "empirical"]
+    preferred_method_families: ["algorithm design", "complexity theory", "formal verification", "mathematical proofs"]
+    preferred_evidence_patterns: ["theory_plus_eval", "benchmark_heavy"]
+    typical_word_count: [10000, 18000]
+    review_timeline_months: [4, 10]
+    acceptance_rate: 0.10
+    apc_usd: 0
+    open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
+    desk_reject_signals: ["insufficient theoretical depth", "weak formal proofs", "limited CS theory contribution"]
+    citation_venues: ["STOC", "FOCS", "SODA", "ICALP"]
+
+  - name: "Communications of the ACM"
+    abbreviation: "CACM"
+    publisher: "ACM"
+    quartile: "Q1"
+    impact_factor: 11.1
+    scope_keywords: ["computer science", "technology trends", "computing practice", "research highlights", "policy"]
+    preferred_paper_types: ["survey", "empirical", "system"]
+    preferred_method_families: ["broad CS methods", "systems design", "empirical analysis", "policy analysis"]
+    preferred_evidence_patterns: ["coverage_heavy", "high_impact_novelty"]
+    typical_word_count: [3000, 6000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.08
+    apc_usd: 0
+    open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
+    desk_reject_signals: ["limited broad CS impact", "overly narrow scope", "insufficient accessibility for general audience"]
+    citation_venues: ["ACM", "IEEE", "NeurIPS", "SIGCOMM"]
+
+  - name: "ACM Transactions on Information Systems"
+    abbreviation: "ACM TOIS"
+    publisher: "ACM"
+    quartile: "Q1"
+    impact_factor: 5.4
+    scope_keywords: ["information retrieval", "recommender systems", "text mining", "search engines", "natural language processing"]
+    preferred_paper_types: ["empirical", "system"]
+    preferred_method_families: ["information retrieval", "machine learning", "natural language processing", "user modeling"]
+    preferred_evidence_patterns: ["benchmark_heavy", "ablation_heavy"]
+    typical_word_count: [8000, 13000]
+    review_timeline_months: [3, 7]
+    acceptance_rate: 0.18
+    apc_usd: 0
+    open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
+    desk_reject_signals: ["limited IR contribution", "weak evaluation methodology", "insufficient baseline comparisons"]
+    citation_venues: ["SIGIR", "WWW", "WSDM", "CIKM"]
+
+  - name: "ACM Transactions on Graphics"
+    abbreviation: "ACM TOG"
+    publisher: "ACM"
+    quartile: "Q1"
+    impact_factor: 7.8
+    scope_keywords: ["computer graphics", "rendering", "animation", "geometric modeling", "visual computing"]
+    preferred_paper_types: ["system", "empirical", "theoretical"]
+    preferred_method_families: ["rendering", "geometric algorithms", "physics simulation", "deep learning"]
+    preferred_evidence_patterns: ["qualitative_plus_quantitative", "benchmark_heavy"]
+    typical_word_count: [8000, 12000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.20
+    apc_usd: 0
+    open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
+    desk_reject_signals: ["insufficient visual quality", "weak technical novelty", "limited graphics contribution"]
+    citation_venues: ["SIGGRAPH", "SIGGRAPH Asia", "Eurographics", "Pacific Graphics"]
+
+  - name: "IEEE Transactions on Visualization and Computer Graphics"
+    abbreviation: "IEEE TVCG"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 5.2
+    scope_keywords: ["visualization", "computer graphics", "visual analytics", "scientific visualization", "virtual reality"]
+    preferred_paper_types: ["system", "empirical", "application"]
+    preferred_method_families: ["visual analytics", "rendering", "interaction design", "deep learning"]
+    preferred_evidence_patterns: ["qualitative_plus_quantitative", "empirical_study"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.22
+    apc_usd: 2800
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["limited visualization contribution", "weak user evaluation", "insufficient visual design justification"]
+    citation_venues: ["IEEE VIS", "EuroVis", "SIGGRAPH", "CHI"]
+
+  - name: "IEEE Transactions on Parallel and Distributed Systems"
+    abbreviation: "IEEE TPDS"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 5.6
+    scope_keywords: ["parallel computing", "distributed systems", "high-performance computing", "cloud computing", "GPU computing"]
+    preferred_paper_types: ["system", "empirical"]
+    preferred_method_families: ["parallel algorithms", "distributed computing", "performance modeling", "scheduling"]
+    preferred_evidence_patterns: ["systems_benchmark", "scalability_heavy"]
+    typical_word_count: [7000, 12000]
+    review_timeline_months: [3, 7]
+    acceptance_rate: 0.20
+    apc_usd: 2800
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no scalability evaluation", "insufficient parallel speedup analysis", "limited distributed systems contribution"]
+    citation_venues: ["SC", "PPoPP", "IPDPS", "EuroSys"]
+
+  - name: "ACM Transactions on Computer-Human Interaction"
+    abbreviation: "ACM TOCHI"
+    publisher: "ACM"
+    quartile: "Q1"
+    impact_factor: 5.0
+    scope_keywords: ["human-computer interaction", "user experience", "interaction design", "accessibility", "collaborative systems"]
+    preferred_paper_types: ["empirical", "system", "application"]
+    preferred_method_families: ["user studies", "interaction design", "qualitative methods", "mixed methods"]
+    preferred_evidence_patterns: ["empirical_study", "qualitative_plus_quantitative"]
+    typical_word_count: [9000, 14000]
+    review_timeline_months: [3, 7]
+    acceptance_rate: 0.18
+    apc_usd: 0
+    open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
+    desk_reject_signals: ["missing user study", "insufficient HCI contribution", "weak interaction design rationale"]
+    citation_venues: ["CHI", "UIST", "CSCW", "UbiComp"]
+
+  - name: "IEEE Transactions on Cloud Computing"
+    abbreviation: "IEEE TCC"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 5.0
+    scope_keywords: ["cloud computing", "virtualization", "serverless", "resource management", "multi-cloud"]
+    preferred_paper_types: ["system", "empirical", "application"]
+    preferred_method_families: ["resource scheduling", "distributed systems", "machine learning", "optimization"]
+    preferred_evidence_patterns: ["systems_benchmark", "scalability_heavy"]
+    typical_word_count: [7000, 12000]
+    review_timeline_months: [3, 7]
+    acceptance_rate: 0.20
+    apc_usd: 2800
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no cloud-specific contribution", "insufficient cloud deployment evaluation", "missing cost analysis"]
+    citation_venues: ["SoCC", "CLOUD", "Middleware", "ICDCS"]
+
+  - name: "IEEE Transactions on Services Computing"
+    abbreviation: "IEEE TSC"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 5.5
+    scope_keywords: ["services computing", "microservices", "service composition", "web services", "service-oriented architecture"]
+    preferred_paper_types: ["system", "empirical", "application"]
+    preferred_method_families: ["service orchestration", "workflow optimization", "machine learning", "formal methods"]
+    preferred_evidence_patterns: ["systems_benchmark", "application_validation"]
+    typical_word_count: [7000, 12000]
+    review_timeline_months: [3, 7]
+    acceptance_rate: 0.20
+    apc_usd: 2800
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no service computing contribution", "missing service-level evaluation", "insufficient QoS analysis"]
+    citation_venues: ["ICSOC", "ICWS", "SCC", "CLOUD"]
+
+  - name: "Neurocomputing"
+    abbreviation: "NEUCOM"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 6.0
+    scope_keywords: ["neurocomputing", "deep learning", "neural network applications", "bio-inspired computing", "cognitive computing"]
+    preferred_paper_types: ["empirical", "system", "application"]
+    preferred_method_families: ["deep learning", "evolutionary computation", "neural architecture", "optimization"]
+    preferred_evidence_patterns: ["benchmark_heavy", "ablation_heavy"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.24
+    apc_usd: 3300
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["weak neural computing contribution", "insufficient experimental comparisons", "limited novelty"]
+    citation_venues: ["NeurIPS", "ICML", "IJCNN", "Neurocomputing"]
+
+  - name: "Applied Soft Computing"
+    abbreviation: "ASOC"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 7.2
+    scope_keywords: ["soft computing", "fuzzy systems", "evolutionary algorithms", "swarm intelligence", "hybrid intelligent systems"]
+    preferred_paper_types: ["empirical", "application", "system"]
+    preferred_method_families: ["evolutionary computation", "fuzzy logic", "swarm optimization", "machine learning"]
+    preferred_evidence_patterns: ["benchmark_heavy", "application_validation"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.22
+    apc_usd: 3300
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["limited soft computing contribution", "weak application validation", "insufficient algorithm comparisons"]
+    citation_venues: ["GECCO", "CEC", "FUZZ-IEEE", "ESWA"]
+
+  - name: "Future Generation Computer Systems"
+    abbreviation: "FGCS"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 7.5
+    scope_keywords: ["future computing", "distributed systems", "grid computing", "fog computing", "quantum computing"]
+    preferred_paper_types: ["system", "empirical", "application"]
+    preferred_method_families: ["distributed systems", "cloud computing", "machine learning", "optimization"]
+    preferred_evidence_patterns: ["systems_benchmark", "application_validation"]
+    typical_word_count: [7000, 11000]
+    review_timeline_months: [2, 5]
+    acceptance_rate: 0.20
+    apc_usd: 3300
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["limited future computing vision", "insufficient scalability analysis", "narrow systems impact"]
+    citation_venues: ["SC", "ICDCS", "CLOUD", "CCGrid"]
+
+  - name: "Journal of Systems and Software"
+    abbreviation: "JSS"
+    publisher: "Elsevier"
+    quartile: "Q1"
+    impact_factor: 3.7
+    scope_keywords: ["software systems", "software development", "software architecture", "DevOps", "software maintenance"]
+    preferred_paper_types: ["empirical", "system", "application"]
+    preferred_method_families: ["empirical software engineering", "mining software repositories", "software analytics", "process improvement"]
+    preferred_evidence_patterns: ["empirical_study", "industrial_case"]
+    typical_word_count: [7000, 12000]
+    review_timeline_months: [3, 6]
+    acceptance_rate: 0.22
+    apc_usd: 3200
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["limited software systems contribution", "weak empirical methodology", "insufficient industrial relevance"]
+    citation_venues: ["ICSE", "FSE", "ICSME", "SANER"]
+
+  - name: "IEEE Transactions on Big Data"
+    abbreviation: "IEEE TBD"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 7.2
+    scope_keywords: ["big data", "data analytics", "large-scale systems", "data management", "streaming data"]
+    preferred_paper_types: ["system", "empirical", "application"]
+    preferred_method_families: ["distributed computing", "machine learning", "data management", "streaming algorithms"]
+    preferred_evidence_patterns: ["scalability_heavy", "benchmark_heavy"]
+    typical_word_count: [7000, 12000]
+    review_timeline_months: [3, 7]
+    acceptance_rate: 0.18
+    apc_usd: 2800
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no big data-specific contribution", "insufficient scalability demonstration", "limited data volume analysis"]
+    citation_venues: ["KDD", "VLDB", "SIGMOD", "IEEE BigData"]
+
+  - name: "ACM Transactions on Database Systems"
+    abbreviation: "ACM TODS"
+    publisher: "ACM"
+    quartile: "Q1"
+    impact_factor: 2.2
+    scope_keywords: ["database systems", "query processing", "data management", "transaction processing", "data models"]
+    preferred_paper_types: ["system", "theoretical", "empirical"]
+    preferred_method_families: ["database algorithms", "query optimization", "distributed data management", "formal methods"]
+    preferred_evidence_patterns: ["systems_benchmark", "theory_plus_eval"]
+    typical_word_count: [9000, 15000]
+    review_timeline_months: [4, 9]
+    acceptance_rate: 0.15
+    apc_usd: 0
+    open_access: false
+    open_access_type: "subscription"
+    waiver_available: false
+    desk_reject_signals: ["insufficient database contribution", "weak query/transaction evaluation", "limited systems novelty"]
+    citation_venues: ["SIGMOD", "VLDB", "ICDE", "PODS"]
+
+  - name: "IEEE Transactions on Computers"
+    abbreviation: "IEEE TC"
+    publisher: "IEEE"
+    quartile: "Q1"
+    impact_factor: 3.6
+    scope_keywords: ["computer architecture", "hardware design", "embedded systems", "VLSI", "reconfigurable computing"]
+    preferred_paper_types: ["system", "empirical", "theoretical"]
+    preferred_method_families: ["architecture design", "hardware simulation", "formal verification", "optimization"]
+    preferred_evidence_patterns: ["systems_benchmark", "theory_plus_eval"]
+    typical_word_count: [7000, 12000]
+    review_timeline_months: [3, 7]
+    acceptance_rate: 0.20
+    apc_usd: 2800
+    open_access: false
+    open_access_type: "hybrid"
+    waiver_available: true
+    desk_reject_signals: ["no architecture contribution", "insufficient hardware evaluation", "limited performance analysis"]
+    citation_venues: ["ISCA", "MICRO", "HPCA", "DAC"]

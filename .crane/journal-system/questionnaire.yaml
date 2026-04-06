@@ -1,0 +1,476 @@
+# CRANE 論文投稿流程 - 前置問卷
+# Questionnaire for Journal Submission Setup
+# Version: 1.0
+# Purpose: 動態確定期刊標準、檢查項、評分權重
+
+version: "1.0"
+name: "Journal Submission Pre-Setup Questionnaire"
+description: "確定論文領域、目標期刊、限制條件和投稿策略"
+
+# ============================================================================
+# 問卷邏輯配置
+# ============================================================================
+questionnaire_flow:
+  entry_point: "Q1_research_field"
+  validation_on_complete: true
+  allow_skip: false
+  save_state: true
+
+# ============================================================================
+# 問題組：Q1 - 研究領域
+# ============================================================================
+questions:
+  Q1_research_field:
+    order: 1
+    type: "single_select"
+    category: "domain"
+    text: "您的論文研究領域是什麼？"
+    description: "選擇最接近的領域。這將影響評審維度的優先級和檢查重點。"
+    required: true
+    options:
+      - id: "ai_ml_dl"
+        label: "AI/機器學習/深度學習"
+        value: "ai_ml_dl"
+      - id: "cv"
+        label: "計算機視覺 (Computer Vision)"
+        value: "cv"
+      - id: "nlp"
+        label: "自然語言處理 (NLP)"
+        value: "nlp"
+      - id: "systems"
+        label: "系統 (作業系統、資料庫、分散系統)"
+        value: "systems"
+      - id: "ir"
+        label: "資訊檢索 (Information Retrieval)"
+        value: "ir"
+      - id: "hci"
+        label: "人機互動 (Human-Computer Interaction)"
+        value: "hci"
+      - id: "bioinformatics"
+        label: "生物資訊/生命科學"
+        value: "bioinformatics"
+      - id: "other"
+        label: "其他（請指定）"
+        value: "other"
+    conditional_questions:
+      - if_selected: "other"
+        then_ask: "Q1_other_field"
+    next_question: "Q2_target_journals"
+
+  Q1_other_field:
+    order: 1.5
+    type: "text"
+    category: "domain"
+    text: "請指定您的研究領域"
+    required_if: ["Q1_research_field", "==", "other"]
+    placeholder: "例：量子計算、晶片設計、網路安全"
+    next_question: "Q2_target_journals"
+
+  # ========================================================================
+  # 問題組：Q2 - 目標期刊
+  # ========================================================================
+  Q2_target_journals:
+    order: 2
+    type: "multi_select"
+    category: "journal"
+    text: "您的目標期刊是什麼？"
+    description: "可選 1-3 個期刊。系統會對比不同期刊的評審標準。"
+    required: true
+    min_selections: 1
+    max_selections: 3
+    
+    # 預設期刊清單（按領域過濾）
+    options:
+      # 頂級期刊 (Tier 1)
+      - id: "nature"
+        label: "Nature"
+        value: "nature"
+        tier: "top-tier"
+        fields: ["all"]
+      
+      - id: "science"
+        label: "Science"
+        value: "science"
+        tier: "top-tier"
+        fields: ["all"]
+      
+      - id: "nature_methods"
+        label: "Nature Methods"
+        value: "nature_methods"
+        tier: "top-tier"
+        fields: ["ai_ml_dl", "cv", "nlp", "bioinformatics"]
+      
+      # 領域頂級 (Tier 2)
+      - id: "jmlr"
+        label: "Journal of Machine Learning Research (JMLR)"
+        value: "jmlr"
+        tier: "leading"
+        fields: ["ai_ml_dl"]
+      
+      - id: "ieee_tpami"
+        label: "IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI)"
+        value: "ieee_tpami"
+        tier: "leading"
+        fields: ["cv", "ai_ml_dl"]
+      
+      - id: "acm_tist"
+        label: "ACM Transactions on Intelligent Systems and Technology (TIST)"
+        value: "acm_tist"
+        tier: "leading"
+        fields: ["ai_ml_dl", "nlp"]
+      
+      - id: "acm_csur"
+        label: "ACM Computing Surveys (CSUR)"
+        value: "acm_csur"
+        tier: "leading"
+        fields: ["all"]
+      
+      - id: "ieee_tse"
+        label: "IEEE Transactions on Software Engineering (TSE)"
+        value: "ieee_tse"
+        tier: "leading"
+        fields: ["systems"]
+      
+      - id: "sigmod"
+        label: "SIGMOD"
+        value: "sigmod"
+        tier: "conference-top"
+        fields: ["systems", "ir"]
+      
+      - id: "icml"
+        label: "ICML"
+        value: "icml"
+        tier: "conference-top"
+        fields: ["ai_ml_dl"]
+      
+      - id: "nips"
+        label: "NeurIPS"
+        value: "nips"
+        tier: "conference-top"
+        fields: ["ai_ml_dl"]
+      
+      - id: "iccv"
+        label: "ICCV"
+        value: "iccv"
+        tier: "conference-top"
+        fields: ["cv"]
+      
+      - id: "acl"
+        label: "ACL"
+        value: "acl"
+        tier: "conference-top"
+        fields: ["nlp"]
+      
+      - id: "custom"
+        label: "自定義期刊（未在列表中）"
+        value: "custom"
+        tier: "custom"
+        fields: ["all"]
+    
+    conditional_questions:
+      - if_selected: "custom"
+        then_ask: "Q2_custom_journal_name"
+    
+    next_question: "Q3_paper_constraints"
+
+  Q2_custom_journal_name:
+    order: 2.5
+    type: "text"
+    category: "journal"
+    text: "請輸入自定義期刊名稱"
+    required_if: ["Q2_target_journals", "contains", "custom"]
+    placeholder: "例：IEEE Transactions on XXXX"
+    next_question: "Q2_custom_journal_tier"
+
+  Q2_custom_journal_tier:
+    order: 2.6
+    type: "single_select"
+    category: "journal"
+    text: "此期刊的層級是？"
+    required_if: ["Q2_target_journals", "contains", "custom"]
+    options:
+      - id: "top-tier"
+        label: "Top-tier (Nature, Science 同級)"
+        value: "top-tier"
+      - id: "leading"
+        label: "Leading (JMLR, TPAMI 同級)"
+        value: "leading"
+      - id: "specialist"
+        label: "Specialist (專業期刊)"
+        value: "specialist"
+      - id: "open-access"
+        label: "Open Access (PLoS ONE 同級)"
+        value: "open-access"
+    next_question: "Q3_paper_constraints"
+
+  # ========================================================================
+  # 問題組：Q3 - 論文限制條件
+  # ========================================================================
+  Q3_paper_constraints:
+    order: 3
+    type: "section_header"
+    category: "constraints"
+    text: "論文限制條件"
+    description: "這些條件會影響評分的「及格線」和投稿可行性"
+    next_question: "Q3_page_limit"
+
+  Q3_page_limit:
+    order: 3.1
+    type: "number"
+    category: "constraints"
+    text: "您的論文頁數限制是多少？"
+    description: "包括引言、方法、結果、討論。不包括補充材料。"
+    required: true
+    unit: "pages"
+    min: 1
+    max: 50
+    step: 1
+    placeholder: "16"
+    help_text: "IEEE/ACM 期刊通常 16-20 頁；Nature Methods 無嚴格限制"
+    next_question: "Q3_figure_limit"
+
+  Q3_figure_limit:
+    order: 3.2
+    type: "number"
+    category: "constraints"
+    text: "圖表最多幾個？"
+    required: true
+    unit: "個"
+    min: 1
+    max: 50
+    step: 1
+    placeholder: "8"
+    next_question: "Q3_has_supplementary"
+
+  Q3_has_supplementary:
+    order: 3.3
+    type: "yes_no"
+    category: "constraints"
+    text: "您有補充材料 (Supplementary Material) 嗎？"
+    description: "補充材料可包含額外實驗、證明、數據"
+    default: true
+    next_question: "Q3_language"
+
+  Q3_language:
+    order: 3.4
+    type: "single_select"
+    category: "constraints"
+    text: "論文語言是？"
+    required: true
+    options:
+      - id: "english"
+        label: "English"
+        value: "english"
+      - id: "chinese"
+        label: "繁體中文"
+        value: "chinese"
+      - id: "simplified"
+        label: "簡體中文"
+        value: "simplified"
+    next_question: "Q3_submission_format"
+
+  Q3_submission_format:
+    order: 3.5
+    type: "single_select"
+    category: "constraints"
+    text: "預計的投稿格式是？"
+    required: true
+    options:
+      - id: "pdf"
+        label: "PDF"
+        value: "pdf"
+      - id: "latex"
+        label: "LaTeX"
+        value: "latex"
+      - id: "word"
+        label: "Word"
+        value: "word"
+      - id: "undecided"
+        label: "未決定"
+        value: "undecided"
+    next_question: "Q4_submission_strategy"
+
+  # ========================================================================
+  # 問題組：Q4 - 投稿策略
+  # ========================================================================
+  Q4_submission_strategy:
+    order: 4
+    type: "section_header"
+    category: "strategy"
+    text: "投稿策略"
+    description: "這將影響風險評分的容忍度和備選方案"
+    next_question: "Q4_timeline"
+
+  Q4_timeline:
+    order: 4.1
+    type: "single_select"
+    category: "strategy"
+    text: "您的投稿時間表是？"
+    required: true
+    options:
+      - id: "rush"
+        label: "緊急 (1-2 週內投稿)"
+        value: "rush"
+        description: "沒有時間大幅修改"
+      - id: "normal"
+        label: "正常 (1-2 個月內投稿)"
+        value: "normal"
+        description: "有時間進行中等規模修改"
+      - id: "flexible"
+        label: "靈活 (無時間限制)"
+        value: "flexible"
+        description: "可進行大幅優化"
+    next_question: "Q4_acceptance_target"
+
+  Q4_acceptance_target:
+    order: 4.2
+    type: "single_select"
+    category: "strategy"
+    text: "您的目標接受概率是多少？"
+    description: "影響建議的期刊選擇和改進優先級"
+    required: true
+    options:
+      - id: "very_high"
+        label: "非常高 (90%+)"
+        value: "very_high"
+        description: "寧願選擇排名略低的期刊也要確保接受"
+      - id: "high"
+        label: "高 (75-90%)"
+        value: "high"
+        description: "平衡排名和接受率"
+      - id: "moderate"
+        label: "中等 (50-75%)"
+        value: "moderate"
+        description: "接受更高的風險換取更高排名"
+      - id: "explorer"
+        label: "探索性 (<50%)"
+        value: "explorer"
+        description: "衝擊頂級期刊，做好被拒準備"
+    next_question: "Q4_revision_tolerance"
+
+  Q4_revision_tolerance:
+    order: 4.3
+    type: "single_select"
+    category: "strategy"
+    text: "您能接受多大程度的修改工作？"
+    required: true
+    options:
+      - id: "none"
+        label: "無修改 (接受或拒稿，不願二審)"
+        value: "none"
+      - id: "minor"
+        label: "小修 (1-2 週修改時間)"
+        value: "minor"
+      - id: "moderate"
+        label: "中修 (2-4 週修改時間)"
+        value: "moderate"
+      - id: "major"
+        label: "大修 (1-2 個月修改時間)"
+        value: "major"
+    next_question: "Q5_paper_characteristics"
+
+  # ========================================================================
+  # 問題組：Q5 - 論文特點
+  # ========================================================================
+  Q5_paper_characteristics:
+    order: 5
+    type: "section_header"
+    category: "characteristics"
+    text: "論文特點"
+    description: "這將用於個性化檢查和風險評估"
+    next_question: "Q5_has_code"
+
+  Q5_has_code:
+    order: 5.1
+    type: "yes_no"
+    category: "characteristics"
+    text: "您是否計劃開源代碼？"
+    description: "開源代碼提高可信度和接受率"
+    default: true
+    next_question: "Q5_has_dataset"
+
+  Q5_has_dataset:
+    order: 5.2
+    type: "yes_no"
+    category: "characteristics"
+    text: "您是否計劃開源數據集？"
+    default: false
+    next_question: "Q5_human_subjects"
+
+  Q5_human_subjects:
+    order: 5.3
+    type: "yes_no"
+    category: "characteristics"
+    text: "論文涉及人類受試者或敏感個人數據嗎？"
+    description: "涉及則需倫理批准"
+    default: false
+    conditional_questions:
+      - if_selected: true
+        then_ask: "Q5_ethics_approval"
+    next_question: "Q5_ethics_approval"
+
+  Q5_ethics_approval:
+    order: 5.4
+    type: "text"
+    category: "characteristics"
+    text: "倫理批准號碼"
+    required_if: ["Q5_human_subjects", "==", true]
+    placeholder: "例：IRB-2024-001234"
+    conditional_show: ["Q5_human_subjects", "==", true]
+    next_question: "Q5_replicability_score"
+
+  Q5_replicability_score:
+    order: 5.5
+    type: "slider"
+    category: "characteristics"
+    text: "您對論文可重現性的自評 (1-10)"
+    description: "1=很難重現，10=完全可重現"
+    required: true
+    min: 1
+    max: 10
+    step: 1
+    default: 7
+    next_question: null
+
+# ============================================================================
+# 邏輯驗證規則
+# ============================================================================
+validation_rules:
+  - id: "emergency_timeline_check"
+    trigger: ["Q4_timeline", "==", "rush"]
+    message: "時間緊張。建議選擇評審週期短的期刊，並優先修改 Critical 缺陷。"
+    severity: "warning"
+  
+  - id: "high_acceptance_check"
+    trigger: ["Q4_acceptance_target", "==", "very_high"]
+    warning: "目標接受率 90%+，系統會推薦保守的期刊選擇，可能犧牲排名。"
+  
+  - id: "ethics_compliance_check"
+    trigger: ["Q5_human_subjects", "==", true]
+    and: ["Q5_ethics_approval", "==", ""]
+    message: "論文涉及人類受試者但缺乏倫理批准號，投稿前必須補全。"
+    severity: "critical"
+
+# ============================================================================
+# 輸出配置
+# ============================================================================
+output_config:
+  save_path: ".crane/journal-project/submission-config.yaml"
+  format: "yaml"
+  include_timestamp: true
+  include_questionnaire_hash: true
+  
+# ============================================================================
+# 後續流程觸發
+# ============================================================================
+next_workflow:
+  on_complete: "load_journal_standards"
+  parameters:
+    - field: "research_field"
+      from_question: "Q1_research_field"
+    - field: "target_journals"
+      from_question: "Q2_target_journals"
+    - field: "constraints"
+      from_questions: ["Q3_page_limit", "Q3_figure_limit", "Q3_has_supplementary"]
+    - field: "strategy"
+      from_questions: ["Q4_timeline", "Q4_acceptance_target", "Q4_revision_tolerance"]

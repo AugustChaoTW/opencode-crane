@@ -1,0 +1,43 @@
+journal_name: "IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI)"
+tier: "leading"
+impact_factor: 24.31
+acceptance_rate: 0.12
+
+scope_keywords:
+  - "pattern recognition"
+  - "machine learning"
+  - "computer vision"
+  - "image processing"
+  - "object detection"
+  - "deep learning"
+
+review_criteria:
+  novelty_weight: 0.25
+  methodology_weight: 0.25
+  evaluation_weight: 0.25
+  clarity_weight: 0.15
+  reproducibility_weight: 0.10
+
+desk_reject_signals:
+  - "out of scope (biology, chemistry, etc.)"
+  - "incremental work without significant novelty"
+  - "poor writing quality"
+  - "missing related work section"
+
+formatting_requirements:
+  page_limit: 20
+  supplementary_material_allowed: true
+  double_column_format: true
+  reference_format: "IEEE standard"
+
+evaluation_dimensions:
+  - "Technical Innovation"
+  - "Experimental Validation"
+  - "Clarity of Presentation"
+  - "Reproducibility"
+  - "Practical Significance"
+
+typical_review_timeline:
+  first_decision: "3-4 months"
+  revision_deadline: "2 months"
+  final_decision: "1 month after revision"

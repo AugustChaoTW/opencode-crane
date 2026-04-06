@@ -3,44 +3,44 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: MLJ-MAIN.aux
 The style file: plainnat.bst
 Database file #1: references.bib
-You've used 2 entries,
+You've used 32 entries,
             2773 wiz_defined-function locations,
-            601 strings with 5184 characters,
-and the built_in function-call counts, 829 in all, are:
-= -- 63
-> -- 58
-< -- 1
-+ -- 20
-- -- 18
-* -- 61
-:= -- 137
-add.period$ -- 5
-call.type$ -- 2
-change.case$ -- 12
-chr.to.int$ -- 2
-cite$ -- 4
-duplicate$ -- 35
-empty$ -- 64
-format.name$ -- 20
-if$ -- 164
+            733 strings with 11239 characters,
+and the built_in function-call counts, 18276 in all, are:
+= -- 1428
+> -- 1715
+< -- 12
++ -- 581
+- -- 549
+* -- 1590
+:= -- 2983
+add.period$ -- 95
+call.type$ -- 32
+change.case$ -- 268
+chr.to.int$ -- 32
+cite$ -- 64
+duplicate$ -- 639
+empty$ -- 1110
+format.name$ -- 581
+if$ -- 3675
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 1
-newline$ -- 17
-num.names$ -- 8
-pop$ -- 29
+missing$ -- 25
+newline$ -- 167
+num.names$ -- 128
+pop$ -- 583
 preamble$ -- 1
-purify$ -- 10
+purify$ -- 237
 quote$ -- 0
-skip$ -- 32
+skip$ -- 606
 stack$ -- 0
-substring$ -- 4
-swap$ -- 2
-text.length$ -- 0
+substring$ -- 259
+swap$ -- 62
+text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 22
+type$ -- 342
 warning$ -- 0
-while$ -- 6
+while$ -- 111
 width$ -- 0
-write$ -- 29
+write$ -- 396

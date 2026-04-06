@@ -1,0 +1,64 @@
+key: 2604-02328v1
+title: 'Modulate-and-Map: Crossmodal Feature Mapping with Cross-View Modulation for
+  3D Anomaly Detection'
+authors:
+- Alex Costanzino
+- Pierluigi Zama Ramirez
+- Giuseppe Lisanti
+- Luigi Di Stefano
+year: 2026
+doi: arxiv:2604.02328v1
+url: http://arxiv.org/abs/2604.02328v1
+pdf_url: https://arxiv.org/pdf/2604.02328v1
+pdf_path: ''
+abstract: We present ModMap, a natively multiview and multimodal framework for 3D
+  anomaly detection and segmentation. Unlike existing methods that process views independently,
+  our method draws inspiration from the crossmodal feature mapping paradigm to learn
+  to map features across both modalities and views, while explicitly modelling view-dependent
+  relationships through feature-wise modulation. We introduce a cross-view training
+  strategy that leverages all possible view combinations, enabling effective anomaly
+  scoring through multiview ensembling and aggregation. To process high-resolution
+  3D data, we train and publicly release a foundational depth encoder tailored to
+  industrial datasets. Experiments on SiM3D, a recent benchmark that introduces the
+  first multiview and multimodal setup for 3D anomaly detection and segmentation,
+  demonstrate that ModMap attains state-of-the-art performance by surpassing previous
+  methods by wide margins.
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- cs.CV
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+cited_by: []
+cites: []
+bibtex: "@inproceedings{2604-02328v1,\n  title={Modulate-and-Map: Crossmodal Feature\
+  \ Mapping with Cross-View Modulation for 3D Anomaly Detection},\n  author={Alex\
+  \ Costanzino and Pierluigi Zama Ramirez and Giuseppe Lisanti and Luigi Di Stefano},\n\
+  \  booktitle={arXiv},\n  year={2026},\n  doi={arxiv:2604.02328v1}\n}"
+ai_annotations:
+  summary: We present ModMap, a natively multiview and multimodal framework for 3D
+    anomaly detection and segmentation. Unlike existing methods that process views
+    independently, our method draws inspiration from the crossmodal feature mapping
+    paradigm to learn to map features across both modalities and views, while explicitly
+    modelling view-dependent relationships through feature-wise modulation. We introduce
+    a cross-view training strategy that leverages all possible view combinations,
+    enabling effective anomaly scoring through multiview ensembling and aggregation.
+    To process high-resolution 3D data, we train and publicly release a foundational
+    depth encoder tailored to industrial datasets. Experiments on SiM3D, a recent
+    benchmark that introduces the first multiview and multimodal setup for 3D anomaly
+    detection and segmentation, demonstrate that ModMap attains state-of-the-art performance
+    by surpassing previous methods by wide margins.
+  key_contributions: []
+  contribution_types: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-04-05'

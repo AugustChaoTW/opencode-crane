@@ -1,0 +1,405 @@
+dataset_name: neurips_pipeline_benchmark_2024_2025
+source: openreview_curated_synthetic
+description: End-to-end CS research pipeline benchmark split with accepted and rejected controls.
+paper_count: 100
+papers:
+  - id: neurips24-acc-001
+    label: accept
+    profile: accepted
+    title: Adaptive Sparse Attention for Long-Context Reasoning
+  - id: neurips24-acc-002
+    label: accept
+    profile: accepted
+    title: Self-Reflective Planning for Tool-Augmented Agents
+  - id: neurips24-acc-003
+    label: accept
+    profile: accepted
+    title: Robust World Models with Counterfactual Supervision
+  - id: neurips24-acc-004
+    label: accept
+    profile: accepted
+    title: Energy-Aware Foundation Model Compression
+  - id: neurips24-acc-005
+    label: accept
+    profile: accepted
+    title: Certifiable Safety Filters for LLM Decision Systems
+  - id: neurips24-acc-006
+    label: accept
+    profile: accepted
+    title: Meta-Regularized Test-Time Adaptation in Vision
+  - id: neurips24-acc-007
+    label: accept
+    profile: accepted
+    title: Latent Program Distillation for Symbolic Reasoning
+  - id: neurips24-acc-008
+    label: accept
+    profile: accepted
+    title: Bayesian Retrieval Calibration for RAG
+  - id: neurips24-acc-009
+    label: accept
+    profile: accepted
+    title: Benchmarking Preference Models under Distribution Shift
+  - id: neurips24-acc-010
+    label: accept
+    profile: accepted
+    title: Unified Multimodal Debiasing via Causal Prompts
+  - id: neurips24-acc-011
+    label: accept
+    profile: accepted
+    title: Neural Solvers for PDE Control with Guarantees
+  - id: neurips24-acc-012
+    label: accept
+    profile: accepted
+    title: Dynamic Memory Routing in Transformer Encoders
+  - id: neurips24-acc-013
+    label: accept
+    profile: accepted
+    title: Multi-Objective RL for Safe Robotic Navigation
+  - id: neurips24-acc-014
+    label: accept
+    profile: accepted
+    title: Fast Diffusion Decoding with Learned Schedules
+  - id: neurips24-acc-015
+    label: accept
+    profile: accepted
+    title: Graph Foundation Models for Molecular Design
+  - id: neurips24-acc-016
+    label: accept
+    profile: accepted
+    title: Fine-Grained Hallucination Detection in Agents
+  - id: neurips24-acc-017
+    label: accept
+    profile: accepted
+    title: Controllable Synthetic Data for Medical AI
+  - id: neurips24-acc-018
+    label: accept
+    profile: accepted
+    title: Learned Optimizers for Federated Hyperparameter Search
+  - id: neurips24-acc-019
+    label: accept
+    profile: accepted
+    title: Uncertainty-Aware Diffusion for Forecasting
+  - id: neurips24-acc-020
+    label: accept
+    profile: accepted
+    title: Mechanistic Probes of In-Context Learning Circuits
+  - id: neurips24-acc-021
+    label: accept
+    profile: accepted
+    title: Synthetic Curriculum Generation for Reasoning LMs
+  - id: neurips24-acc-022
+    label: accept
+    profile: accepted
+    title: Efficient Video Tokenization with Temporal Experts
+  - id: neurips24-acc-023
+    label: accept
+    profile: accepted
+    title: Robust Human Preference Alignment at Scale
+  - id: neurips24-acc-024
+    label: accept
+    profile: accepted
+    title: End-to-End Program Repair with Verifier Feedback
+  - id: neurips24-acc-025
+    label: accept
+    profile: accepted
+    title: Data-Centric Benchmarking of Vision-Language Models
+  - id: neurips25-acc-026
+    label: accept
+    profile: accepted
+    title: Adaptive Test-Time Retrieval for Scientific QA
+  - id: neurips25-acc-027
+    label: accept
+    profile: accepted
+    title: Causal Evaluation Protocols for Foundation Agents
+  - id: neurips25-acc-028
+    label: accept
+    profile: accepted
+    title: Hardware-Aware Sparse MoE Training
+  - id: neurips25-acc-029
+    label: accept
+    profile: accepted
+    title: Privacy-Preserving Personalization for LLMs
+  - id: neurips25-acc-030
+    label: accept
+    profile: accepted
+    title: Unified Checklists for Reproducible AI Research
+  - id: neurips25-acc-031
+    label: accept
+    profile: accepted
+    title: Multi-Hop Planning with Structured Memory Graphs
+  - id: neurips25-acc-032
+    label: accept
+    profile: accepted
+    title: Long-Horizon Control with Diffusion Policies
+  - id: neurips25-acc-033
+    label: accept
+    profile: accepted
+    title: Interpretable Token Pruning in Large Models
+  - id: neurips25-acc-034
+    label: accept
+    profile: accepted
+    title: Safety-Constrained Optimization for Agentic Systems
+  - id: neurips25-acc-035
+    label: accept
+    profile: accepted
+    title: Robust Grounded Dialogue via Retrieval Critics
+  - id: neurips25-acc-036
+    label: accept
+    profile: accepted
+    title: Domain-General Vision Transfer with Causal Invariance
+  - id: neurips25-acc-037
+    label: accept
+    profile: accepted
+    title: Scalable Verification for Neural Program Synthesis
+  - id: neurips25-acc-038
+    label: accept
+    profile: accepted
+    title: Adaptive Compression for Continual Foundation Models
+  - id: neurips25-acc-039
+    label: accept
+    profile: accepted
+    title: Open-World Evaluation for Autonomous Research Agents
+  - id: neurips25-acc-040
+    label: accept
+    profile: accepted
+    title: Structured Deliberation in Multi-Agent LLM Teams
+  - id: neurips25-acc-041
+    label: accept
+    profile: accepted
+    title: Causal Data Selection for Efficient Pretraining
+  - id: neurips25-acc-042
+    label: accept
+    profile: accepted
+    title: Learned Reward Models with Uncertainty Controls
+  - id: neurips25-acc-043
+    label: accept
+    profile: accepted
+    title: Verifiable Retrieval-Augmented Scientific Discovery
+  - id: neurips25-acc-044
+    label: accept
+    profile: accepted
+    title: Multilingual Alignment for Open Foundation Models
+  - id: neurips25-acc-045
+    label: accept
+    profile: accepted
+    title: Efficient Benchmark Curation with Active Labeling
+  - id: neurips25-acc-046
+    label: accept
+    profile: accepted
+    title: Robust Tool Use in Adversarial Environments
+  - id: neurips25-acc-047
+    label: accept
+    profile: accepted
+    title: Neuro-Symbolic Planning for Scientific Workflows
+  - id: neurips25-acc-048
+    label: accept
+    profile: accepted
+    title: Self-Correcting Evaluation Pipelines for LLMs
+  - id: neurips25-acc-049
+    label: accept
+    profile: accepted
+    title: Unified Latent Spaces for Multi-Agent Coordination
+  - id: neurips25-acc-050
+    label: accept
+    profile: accepted
+    title: Reproducibility-First Benchmarks for AI Systems
+  - id: neurips24-rej-001
+    label: reject
+    profile: rejected
+    title: Cool AI Trick for Better Models
+  - id: neurips24-rej-002
+    label: reject
+    profile: rejected
+    title: Stuff About Bigger Networks
+  - id: neurips24-rej-003
+    label: reject
+    profile: rejected
+    title: Random Prompting Works Sometimes
+  - id: neurips24-rej-004
+    label: reject
+    profile: rejected
+    title: Fast Method without Baseline Discussion
+  - id: neurips24-rej-005
+    label: reject
+    profile: rejected
+    title: Small Dataset Study with Bold Claims
+  - id: neurips24-rej-006
+    label: reject
+    profile: rejected
+    title: A Nice Idea without Experiments
+  - id: neurips24-rej-007
+    label: reject
+    profile: rejected
+    title: Improving Accuracy Maybe
+  - id: neurips24-rej-008
+    label: reject
+    profile: rejected
+    title: New-ish Architecture Notes
+  - id: neurips24-rej-009
+    label: reject
+    profile: rejected
+    title: Preliminary Findings on a Toy Task
+  - id: neurips24-rej-010
+    label: reject
+    profile: rejected
+    title: Another Attempt at Better LLMs
+  - id: neurips24-rej-011
+    label: reject
+    profile: rejected
+    title: Sparse Model Draft
+  - id: neurips24-rej-012
+    label: reject
+    profile: rejected
+    title: Unclear Objective and No Controls
+  - id: neurips24-rej-013
+    label: reject
+    profile: rejected
+    title: Weak Baseline Comparison for Vision
+  - id: neurips24-rej-014
+    label: reject
+    profile: rejected
+    title: Noisy Results for Tool Learning
+  - id: neurips24-rej-015
+    label: reject
+    profile: rejected
+    title: Quick Experiments without Reproducibility
+  - id: neurips24-rej-016
+    label: reject
+    profile: rejected
+    title: Informal Report on Agent Behavior
+  - id: neurips24-rej-017
+    label: reject
+    profile: rejected
+    title: Unpositioned Work on Retrieval
+  - id: neurips24-rej-018
+    label: reject
+    profile: rejected
+    title: Missing Prior Art in Diffusion Modeling
+  - id: neurips24-rej-019
+    label: reject
+    profile: rejected
+    title: Weakly Motivated Loss Function
+  - id: neurips24-rej-020
+    label: reject
+    profile: rejected
+    title: Casual Note on Scaling Laws
+  - id: neurips24-rej-021
+    label: reject
+    profile: rejected
+    title: Incomplete System Description
+  - id: neurips24-rej-022
+    label: reject
+    profile: rejected
+    title: Benchmark with Unfair Comparison
+  - id: neurips24-rej-023
+    label: reject
+    profile: rejected
+    title: Unreliable Evaluation with No Significance Tests
+  - id: neurips24-rej-024
+    label: reject
+    profile: rejected
+    title: Minimal Ablation Study Draft
+  - id: neurips24-rej-025
+    label: reject
+    profile: rejected
+    title: Unclear Contribution in Foundation Models
+  - id: neurips25-rej-026
+    label: reject
+    profile: rejected
+    title: Tiny Experiment on Planning Agents
+  - id: neurips25-rej-027
+    label: reject
+    profile: rejected
+    title: Ambiguous Method for Scientific QA
+  - id: neurips25-rej-028
+    label: reject
+    profile: rejected
+    title: Informal Benchmarking of Preferences
+  - id: neurips25-rej-029
+    label: reject
+    profile: rejected
+    title: Noisy Prompt Search without Controls
+  - id: neurips25-rej-030
+    label: reject
+    profile: rejected
+    title: Weak Positioning in Related Work
+  - id: neurips25-rej-031
+    label: reject
+    profile: rejected
+    title: Limited Reporting in Multi-Agent Study
+  - id: neurips25-rej-032
+    label: reject
+    profile: rejected
+    title: Early Draft on Compression
+  - id: neurips25-rej-033
+    label: reject
+    profile: rejected
+    title: Vague Claims on Robustness
+  - id: neurips25-rej-034
+    label: reject
+    profile: rejected
+    title: No Reproducibility Checklist Included
+  - id: neurips25-rej-035
+    label: reject
+    profile: rejected
+    title: Lacking Methodology for Causal Evaluation
+  - id: neurips25-rej-036
+    label: reject
+    profile: rejected
+    title: Missing Code for Claimed Gains
+  - id: neurips25-rej-037
+    label: reject
+    profile: rejected
+    title: Unclear Scope and Journal Fit
+  - id: neurips25-rej-038
+    label: reject
+    profile: rejected
+    title: Benchmark Shortcut without Fairness Controls
+  - id: neurips25-rej-039
+    label: reject
+    profile: rejected
+    title: Unsupported Statements in Discussion
+  - id: neurips25-rej-040
+    label: reject
+    profile: rejected
+    title: Sparse Evidence in Ablation Results
+  - id: neurips25-rej-041
+    label: reject
+    profile: rejected
+    title: Insufficient Details for Replication
+  - id: neurips25-rej-042
+    label: reject
+    profile: rejected
+    title: Weak Problem Motivation in Abstract
+  - id: neurips25-rej-043
+    label: reject
+    profile: rejected
+    title: Incomplete Error Analysis
+  - id: neurips25-rej-044
+    label: reject
+    profile: rejected
+    title: No Supplementary Material Provided
+  - id: neurips25-rej-045
+    label: reject
+    profile: rejected
+    title: Casual Tone and Overclaiming
+  - id: neurips25-rej-046
+    label: reject
+    profile: rejected
+    title: Missing Threats to Validity
+  - id: neurips25-rej-047
+    label: reject
+    profile: rejected
+    title: Limited Baselines on Small Data
+  - id: neurips25-rej-048
+    label: reject
+    profile: rejected
+    title: Weak Experimental Setup Description
+  - id: neurips25-rej-049
+    label: reject
+    profile: rejected
+    title: Unverified Claims on Generalization
+  - id: neurips25-rej-050
+    label: reject
+    profile: rejected
+    title: Partial Draft with Missing Sections

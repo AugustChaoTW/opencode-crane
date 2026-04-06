@@ -1,0 +1,75 @@
+key: 2604-02315v1
+title: 'Beyond the Assistant Turn: User Turn Generation as a Probe of Interaction
+  Awareness in Language Models'
+authors:
+- Sarath Shekkizhar
+- Romain Cosentino
+- Adam Earle
+year: 2026
+doi: arxiv:2604.02315v1
+url: http://arxiv.org/abs/2604.02315v1
+pdf_url: https://arxiv.org/pdf/2604.02315v1
+pdf_path: ''
+abstract: 'Standard LLM benchmarks evaluate the assistant turn: the model generates
+  a response to an input, a verifier scores correctness, and the analysis ends. This
+  paradigm leaves unmeasured whether the LLM encodes any awareness of what follows
+  the assistant response. We propose user-turn generation as a probe of this gap:
+  given a conversation context of user query and assistant response, we let a model
+  generate under the user role. If the model''s weights encode interaction awareness,
+  the generated user turn will be a grounded follow-up that reacts to the preceding
+  context. Through experiments across $11$ open-weight LLMs (Qwen3.5, gpt-oss, GLM)
+  and $5$ datasets (math reasoning, instruction following, conversation), we show
+  that interaction awareness is decoupled from task accuracy. In particular, within
+  the Qwen3.5 family, GSM8K accuracy scales from $41\%$ ($0.8$B) to $96.8\%$ ($397$B-A$17$B),
+  yet genuine follow-up rates under deterministic generation remain near zero. In
+  contrast, higher temperature sampling reveals interaction awareness is latent with
+  follow up rates reaching $22\%$. Controlled perturbations validate that the proposed
+  probe measures a real property of the model, and collaboration-oriented post-training
+  on Qwen3.5-2B demonstrates an increase in follow-up rates. Our results show that
+  user-turn generation captures a dimension of LLM behavior, interaction awareness,
+  that is unexplored and invisible with current assistant-only benchmarks.'
+venue: arXiv
+source: arxiv
+paper_type: conference
+categories:
+- cs.AI
+keywords: []
+publication: ''
+publisher: ''
+volume: ''
+issue: ''
+pages: ''
+cited_by: []
+cites: []
+bibtex: "@inproceedings{2604-02315v1,\n  title={Beyond the Assistant Turn: User Turn\
+  \ Generation as a Probe of Interaction Awareness in Language Models},\n  author={Sarath\
+  \ Shekkizhar and Romain Cosentino and Adam Earle},\n  booktitle={arXiv},\n  year={2026},\n\
+  \  doi={arxiv:2604.02315v1}\n}"
+ai_annotations:
+  summary: 'Standard LLM benchmarks evaluate the assistant turn: the model generates
+    a response to an input, a verifier scores correctness, and the analysis ends.
+    This paradigm leaves unmeasured whether the LLM encodes any awareness of what
+    follows the assistant response. We propose user-turn generation as a probe of
+    this gap: given a conversation context of user query and assistant response, we
+    let a model generate under the user role. If the model''s weights encode interaction
+    awareness, the generated user turn will be a grounded follow-up that reacts to
+    the preceding context. Through experiments across $11$ open-weight LLMs (Qwen3.5,
+    gpt-oss, GLM) and $5$ datasets (math reasoning, instruction following, conversation),
+    we show that interaction awareness is decoupled from task accuracy. In particular,
+    within the Qwen3.5 family, GSM8K accuracy scales from $41\%$ ($0.8$B) to $96.8\%$
+    ($397$B-A$17$B), yet genuine follow-up rates under deterministic generation remain
+    near zero. In contrast, higher temperature sampling reveals interaction awareness
+    is latent with follow up rates reaching $22\%$. Controlled perturbations validate
+    that the proposed probe measures a real property of the model, and collaboration-oriented
+    post-training on Qwen3.5-2B demonstrates an increase in follow-up rates. Our results
+    show that user-turn generation captures a dimension of LLM behavior, interaction
+    awareness, that is unexplored and invisible with current assistant-only benchmarks.'
+  key_contributions: []
+  contribution_types: []
+  methodology: ''
+  relevance_notes: Auto-generated from abstract.
+  tags:
+  - auto
+  - pipeline
+  related_issues: []
+  added_date: '2026-04-05'

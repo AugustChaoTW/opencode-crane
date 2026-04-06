@@ -1,0 +1,73 @@
+name: mis
+display_name: "Management Information Systems"
+version: "1.0.0"
+description: "Evaluation rubric optimized for MIS research papers targeting Q1 venues"
+
+dimension_weights:
+  writing_quality: 0.14
+  methodology: 0.18
+  novelty: 0.16
+  evaluation: 0.20
+  presentation: 0.10
+  limitations: 0.10
+  reproducibility: 0.12
+
+gate_dimensions: ["methodology", "evaluation", "novelty"]
+gate_threshold: 60.0
+
+scoring_signals:
+  writing_quality:
+    - "\\b(we demonstrate|we present|in this paper)\\b"
+    - "\\b(theoretical contribution|practical implication|managerial insight)\\b"
+    - "\\b(research question|research gap|motivation)\\b"
+  methodology:
+    - "\\\\section\\{.*[Mm]ethod.*\\}"
+    - "\\\\section\\{.*[Rr]esearch [Dd]esign.*\\}"
+    - "\\b(survey instrument|questionnaire|interview protocol)\\b"
+    - "\\b(structural equation|regression|factor analysis)\\b"
+    - "\\b(case study|mixed method|longitudinal)\\b"
+  novelty:
+    - "\\b[Cc]ontribution"
+    - "\\b(novel|new framework|first to)\\b"
+    - "\\b([Uu]nlike|[Dd]iffer from|[Ii]n contrast)\\b"
+    - "\\b(theoretical lens|conceptual model|research model)\\b"
+  evaluation:
+    - "\\b(sample size|respondent|participant)\\b"
+    - "\\b(validity|reliability|Cronbach)\\b"
+    - "\\b(p-value|significance|confidence interval)\\b"
+    - "\\\\begin\\{table\\}"
+    - "\\b(organization|firm|enterprise|company)\\b"
+    - "\\b(field study|empirical evidence|survey data)\\b"
+  presentation:
+    - "\\\\begin\\{figure\\}"
+    - "\\\\caption\\{"
+    - "\\b(research model|conceptual framework|path diagram)\\b"
+  limitations:
+    - "\\b(limitation|threats to validity|future work)\\b"
+    - "\\b(generalizability|external validity|sampling bias)\\b"
+  reproducibility:
+    - "\\b(survey instrument|appendix|supplementary)\\b"
+    - "\\b(data availability|replication package)\\b"
+    - "\\b(measurement item|construct definition|operationalization)\\b"
+
+recommended_journals:
+  - "MISQ"
+  - "ISR"
+  - "JMIS"
+  - "EJIS"
+  - "I&M"
+  - "JSIS"
+  - "ISJ"
+
+detection_keywords:
+  - "management information systems"
+  - "IT management"
+  - "information strategy"
+  - "digital transformation"
+  - "IT adoption"
+  - "business process"
+  - "IT governance"
+  - "enterprise system"
+  - "technology acceptance"
+  - "organizational IT"
+detection_threshold: 0.15

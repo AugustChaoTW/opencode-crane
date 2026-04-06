@@ -54,3 +54,115 @@ class TestCrossPhaseWorkflow:
     def test_milestone_progress_after_closing_tasks(self, mock_gh):
         """get_milestone_progress reflects closed tasks."""
         pass
+
+
+class TestJournalSubmissionWorkflow:
+    """Phase 3: Journal submission workflow integration."""
+
+    def test_coach_chapter_returns_feedback(self):
+        """Coaching chapter should return feedback structure."""
+        from crane.services.chapter_coach_service import ChapterCoachService
+
+        service = ChapterCoachService()
+        result = service.coach_chapter("abstract")
+
+        assert isinstance(result, dict)
+        assert result["chapter"] == "abstract"
+
+    def test_full_review_detects_defects(self):
+        """Full review should analyze paper and detect issues."""
+        from crane.services.review_inspector_service import ReviewInspectorService
+
+        service = ReviewInspectorService()
+        paper_content = """
+        \\section{Methods}
+        Our method processes data.
+        \\section{Results}
+        We achieve 90% accuracy.
+        """
+        report = service.review_full(paper_content=paper_content)
+
+        assert report is not None
+        assert hasattr(report, "total_defects")
+        assert hasattr(report, "summary")
+
+    def test_assess_risk_calculates_score(self):
+        """Risk assessment should calculate weighted score."""
+        from crane.services.risk_scoring_service import RiskScoringService
+
+        service = RiskScoringService()
+        result = service.calculate_four_dimensional_score(
+            desk_reject_score=80.0,
+            reviewer_expectations_score=75.0,
+            writing_quality_score=85.0,
+            ethics_compliance_score=90.0,
+        )
+
+        assert result is not None
+        assert result.final_score > 0
+        assert result.final_score <= 100
+        assert result.acceptance_probability >= 0
+        assert result.acceptance_probability <= 1
+
+    def test_generate_cover_letter_customizes_journal(self):
+        """Cover letter should be customized for journal."""
+        from crane.services.cover_letter_service import CoverLetterService
+
+        service = CoverLetterService()
+        result = service.generate_cover_letter(
+            journal_name="IEEE TPAMI",
+            paper_highlights=["Novel method", "Strong results"],
+        )
+
+        assert result["status"] == "success"
+        assert "cover_letter" in result
+        assert "IEEE TPAMI" in result["cover_letter"]
+
+    def test_workflow_coach_then_review_then_risk(self):
+        """Integration: coach → review → risk assessment."""
+        from crane.services.chapter_coach_service import ChapterCoachService
+        from crane.services.review_inspector_service import ReviewInspectorService
+        from crane.services.risk_scoring_service import RiskScoringService
+
+        coach = ChapterCoachService()
+        review = ReviewInspectorService()
+        risk = RiskScoringService()
+
+        step1 = coach.coach_chapter("abstract")
+        assert step1["chapter"] == "abstract"
+
+        step2 = review.review_full(paper_content="test")
+        assert step2 is not None
+
+        step3 = risk.calculate_four_dimensional_score(
+            desk_reject_score=75.0,
+            reviewer_expectations_score=75.0,
+            writing_quality_score=75.0,
+            ethics_compliance_score=85.0,
+        )
+        assert step3.final_score > 0
+
+    def test_risk_to_cover_letter_chain(self):
+        """Integration: risk assessment → cover letter generation."""
+        from crane.services.cover_letter_service import CoverLetterService
+        from crane.services.risk_scoring_service import RiskScoringService
+
+        risk_service = RiskScoringService()
+        letter_service = CoverLetterService()
+
+        risk_result = risk_service.calculate_four_dimensional_score(
+            desk_reject_score=80.0,
+            reviewer_expectations_score=75.0,
+            writing_quality_score=85.0,
+            ethics_compliance_score=90.0,
+        )
+        assert risk_result.acceptance_probability > 0
+
+        letter = letter_service.generate_cover_letter(
+            journal_name="IEEE TPAMI",
+            paper_title="Research Study",
+            paper_highlights=[
+                f"Strong risk profile: {risk_result.acceptance_probability * 100:.0f}% acceptance"
+            ],
+        )
+        assert "IEEE TPAMI" in letter["cover_letter"]

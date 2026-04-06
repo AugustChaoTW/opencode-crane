@@ -1,0 +1,44 @@
+
+flowchart LR
+    classDef user fill:#fef5e7,stroke:#f39c12,stroke-width:2px,color:#2c3e50,rx:8px,ry:8px;
+    classDef core fill:#ebf5fb,stroke:#3498db,stroke-width:2px,color:#2c3e50,rx:8px,ry:8px;
+    classDef ret fill:#eafaf1,stroke:#2ecc71,stroke-width:2px,color:#2c3e50,rx:8px,ry:8px;
+    classDef llm fill:#f5eef8,stroke:#9b59b6,stroke-width:2px,color:#2c3e50,rx:8px,ry:8px;
+    classDef ext fill:#ffffff,stroke:#7f8c8d,stroke-width:2px,stroke-dasharray: 5 5,color:#2c3e50,rx:8px,ry:8px;
+    
+    subgraph Users ["User Layer"]
+        UI["User Interface<br/><small>(IDE & Terminal)</small>"]:::user
+        Orch["Workflow Orchestrator<br/><small>(Automates Processes)</small>"]:::user
+    end
+
+    subgraph CRANE ["CRANE Core System"]
+        direction TB
+        MCP["MCP Server<br/><small>(Context & State Management)</small>"]:::core
+        
+        subgraph SubCore ["Execution Engine"]
+            direction LR
+            Ret["Multi-Source Retrieval<br/><small>(Semantic Search & BibTeX)</small>"]:::ret
+            Verify["LLM Verification Pipeline<br/><small>(3-LLM Consensus)</small>"]:::llm
+        end
+        
+        PZ["Protected Zones Manager<br/><small>(Enforces AI/User Boundaries)</small>"]:::core
+        
+        MCP --> SubCore
+        SubCore --> PZ
+        PZ --> MCP
+    end
+
+    subgraph External ["External & Local Resources"]
+        APIs["External Academic APIs<br/><small>(arXiv, Scholar, OpenAlex)</small>"]:::ext
+        Local["Local Workspace<br/><small>(LaTeX, Data, Refs)</small>"]:::ext
+    end
+
+    UI -->|Requests| MCP
+    Orch -->|Triggers| MCP
+    MCP -->|Updates| UI
+    
+    Ret -->|Fetches| APIs
+    APIs -->|Metadata| Ret
+    
+    PZ -->|Accesses| Local
+    Local -->|Content| PZ

@@ -1,0 +1,74 @@
+name: iot
+display_name: "Internet of Things"
+version: "1.0.0"
+description: "Evaluation rubric optimized for IoT research papers targeting Q1 venues"
+
+dimension_weights:
+  writing_quality: 0.12
+  methodology: 0.18
+  novelty: 0.16
+  evaluation: 0.22
+  presentation: 0.08
+  limitations: 0.10
+  reproducibility: 0.14
+
+gate_dimensions: ["evaluation", "methodology", "reproducibility"]
+gate_threshold: 60.0
+
+scoring_signals:
+  writing_quality:
+    - "\\b(we demonstrate|we present|in this paper)\\b"
+    - "\\b(system architecture|deployment|testbed)\\b"
+  methodology:
+    - "\\\\section\\{.*[Mm]ethod.*\\}"
+    - "\\\\section\\{.*[Ss]ystem [Dd]esign.*\\}"
+    - "\\b(we propose|we design|we implement)\\b"
+    - "\\b(protocol|middleware|firmware)\\b"
+    - "\\b(communication protocol|message passing|data pipeline)\\b"
+  novelty:
+    - "\\b[Cc]ontribution"
+    - "\\b(novel|new approach|first to)\\b"
+    - "\\b([Uu]nlike|[Dd]iffer from|[Ii]n contrast)\\b"
+    - "\\b(lightweight|resource-constrained|low-power)\\b"
+  evaluation:
+    - "\\b(testbed|real-world deployment|field trial)\\b"
+    - "\\b(latency|throughput|packet loss|energy consumption)\\b"
+    - "\\b(scalability|node count|device count)\\b"
+    - "\\\\begin\\{table\\}"
+    - "\\b(baseline|benchmark|comparison)\\b"
+    - "\\b(simulation|emulation|ns-3|OMNeT)\\b"
+  presentation:
+    - "\\\\begin\\{figure\\}"
+    - "\\\\caption\\{"
+    - "\\b(system diagram|network topology|deployment layout)\\b"
+  limitations:
+    - "\\b(limitation|threats to validity|future work)\\b"
+    - "\\b(scalability concern|deployment constraint|hardware limitation)\\b"
+  reproducibility:
+    - "\\b(github\\.com|code available|repository|open.source)\\b"
+    - "\\b(hardware specification|platform|microcontroller)\\b"
+    - "\\b(firmware version|SDK|driver)\\b"
+    - "\\b(reproducible|replicate|artifact)\\b"
+
+recommended_journals:
+  - "IEEE IoT"
+  - "ACM TOSN"
+  - "IEEE Sensors"
+  - "ACM ToIT"
+  - "IEEE TMC"
+  - "ComNets"
+  - "IEEE CommMag"
+
+detection_keywords:
+  - "internet of things"
+  - "IoT"
+  - "edge computing"
+  - "sensor network"
+  - "smart system"
+  - "wireless sensor"
+  - "connected device"
+  - "embedded system"
+  - "fog computing"
+  - "MQTT"
+  - "low-power wide-area"
+detection_threshold: 0.15

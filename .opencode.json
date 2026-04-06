@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "crane": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "run",
+        "python",
+        "-m",
+        "crane.server"
+      ],
+      "env": {
+        "PROJECT_DIR": "/home/augchao/opencode-crane"
+      }
+    }
+  }
+}
