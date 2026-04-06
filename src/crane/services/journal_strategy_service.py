@@ -2,6 +2,10 @@
 
 Implements comprehensive journal selection based on paper attributes,
 scope filtering, impact analysis, and submission strategy.
+
+Journals are loaded dynamically from ``q1_journal_profiles.yaml`` via
+:class:`~crane.services.journal_matching_service.JournalMatchingService`,
+eliminating the need for a hardcoded journal database.
 """
 
 from __future__ import annotations
@@ -62,105 +66,95 @@ class SubmissionStrategy:
 
 
 class JournalRecommendationService:
-    """Service for comprehensive journal recommendation workflow."""
+    """Service for comprehensive journal recommendation workflow.
 
-    JOURNAL_DATABASE = {
-        "IEEE_TNNLS": JournalInfo(
-            name="IEEE Transactions on Neural Networks and Learning Systems",
-            abbreviation="TNNLS",
-            impact_factor=13.8,
-            acceptance_rate=0.25,
-            review_timeline_months=(3, 5),
-            scope="Neural networks, representation learning, deep learning",
-            scope_fit=0.0,
-            apc=0.0,
-            desk_rejection_rate=0.15,
-            tier=JournalTier.TIER_1,
-        ),
-        "IEEE_TKDE": JournalInfo(
-            name="IEEE Transactions on Knowledge and Data Engineering",
-            abbreviation="TKDE",
-            impact_factor=8.78,
-            acceptance_rate=0.35,
-            review_timeline_months=(2, 4),
-            scope="Knowledge engineering, data management, AI applications",
-            scope_fit=0.0,
-            apc=0.0,
-            desk_rejection_rate=0.20,
-            tier=JournalTier.TIER_1,
-        ),
-        "ACM_ESWA": JournalInfo(
-            name="Expert Systems with Applications",
-            abbreviation="ESWA",
-            impact_factor=7.5,
-            acceptance_rate=0.40,
-            review_timeline_months=(3, 4),
-            scope="Expert systems, applications, decision support",
-            scope_fit=0.0,
-            apc=0.0,
-            desk_rejection_rate=0.10,
-            tier=JournalTier.TIER_2,
-        ),
-        "IEEE_TAC": JournalInfo(
-            name="IEEE Transactions on Affective Computing",
-            abbreviation="TAC",
-            impact_factor=9.2,
-            acceptance_rate=0.30,
-            review_timeline_months=(4, 6),
-            scope="Affective computing, emotion recognition, HCI",
-            scope_fit=0.0,
-            apc=0.0,
-            desk_rejection_rate=0.12,
-            tier=JournalTier.TIER_1,
-        ),
-        "IEEE_TKDD": JournalInfo(
-            name="IEEE Transactions on Knowledge Discovery from Data",
-            abbreviation="TKDD",
-            impact_factor=7.2,
-            acceptance_rate=0.35,
-            review_timeline_months=(3, 5),
-            scope="Data mining, knowledge discovery, pattern recognition",
-            scope_fit=0.0,
-            apc=0.0,
-            desk_rejection_rate=0.15,
-            tier=JournalTier.TIER_2,
-        ),
-        "IEEE_TAI": JournalInfo(
-            name="IEEE Transactions on Artificial Intelligence",
-            abbreviation="TAI",
-            impact_factor=6.5,
-            acceptance_rate=0.40,
-            review_timeline_months=(3, 4),
-            scope="AI systems, applications, theory",
-            scope_fit=0.0,
-            apc=0.0,
-            desk_rejection_rate=0.10,
-            tier=JournalTier.TIER_3,
-        ),
+    Loads all Q1 journal profiles from YAML via
+    :class:`~crane.services.journal_matching_service.JournalMatchingService`
+    instead of using a hardcoded journal database.
+    """
+
+    _PAPER_TYPE_TO_PREFERRED: dict[PaperType, set[str]] = {
+        PaperType.APPLICATION_SYSTEM: {"application", "system"},
+        PaperType.THEORETICAL_DIAGNOSTIC: {"theoretical"},
+        PaperType.EMPIRICAL_STUDY: {"empirical"},
+        PaperType.SURVEY_REVIEW: {"survey"},
     }
 
-    PAPER_TYPE_MAPPING = {
+    PAPER_TYPE_KEYWORDS: dict[PaperType, dict[str, list[str]]] = {
         PaperType.APPLICATION_SYSTEM: {
-            "suitable_journals": ["ACM_ESWA", "IEEE_TAC", "IEEE_TAI"],
             "keywords": ["application", "system", "engineering", "reliability"],
             "metrics": ["QPS", "latency", "accuracy", "success_rate"],
         },
         PaperType.THEORETICAL_DIAGNOSTIC: {
-            "suitable_journals": ["IEEE_TNNLS", "IEEE_TKDE"],
             "keywords": ["theory", "diagnostic", "framework", "analysis"],
             "metrics": ["CKA", "effective_rank", "linear_probe"],
         },
         PaperType.EMPIRICAL_STUDY: {
-            "suitable_journals": ["IEEE_TNNLS", "IEEE_TKDD", "ACM_ESWA"],
             "keywords": ["empirical", "experiment", "benchmark", "evaluation"],
             "metrics": ["accuracy", "F1", "precision", "recall"],
         },
         PaperType.SURVEY_REVIEW: {
-            "suitable_journals": ["IEEE_TKDE", "ACM_ESWA", "IEEE_TAI"],
             "keywords": ["survey", "review", "taxonomy", "comparison"],
             "metrics": ["coverage", "depth", "organization"],
         },
     }
+
+    def __init__(self, profiles_path: str | Path | None = None):
+        from crane.services.journal_matching_service import JournalMatchingService
+
+        self._matching_service = JournalMatchingService(profiles_path)
+        self._journals: dict[str, JournalInfo] = {}
+        self._profiles_by_key: dict[str, dict[str, Any]] = {}
+        self._build_journal_db()
+
+    def _build_journal_db(self) -> None:
+        for profile in self._matching_service.journals:
+            key = self._make_key(profile["abbreviation"])
+            self._journals[key] = self._profile_to_journal_info(profile)
+            self._profiles_by_key[key] = profile
+
+    @staticmethod
+    def _make_key(abbreviation: str) -> str:
+        return abbreviation.replace(" ", "_").upper()
+
+    @staticmethod
+    def _profile_to_journal_info(profile: dict[str, Any]) -> JournalInfo:
+        """Convert a single YAML journal profile to a :class:`JournalInfo`."""
+        impact = float(profile.get("impact_factor", 0))
+        if impact >= 10:
+            tier = JournalTier.TIER_1
+        elif impact >= 7:
+            tier = JournalTier.TIER_2
+        else:
+            tier = JournalTier.TIER_3
+
+        signals = profile.get("desk_reject_signals", [])
+        desk_rate = round(min(0.05 * len(signals), 0.25), 2)
+
+        review = profile.get("review_timeline_months", [3, 6])
+
+        return JournalInfo(
+            name=str(profile["name"]),
+            abbreviation=str(profile["abbreviation"]),
+            impact_factor=impact,
+            acceptance_rate=float(profile.get("acceptance_rate", 0.2)),
+            review_timeline_months=(int(review[0]), int(review[1])),
+            scope=", ".join(str(kw) for kw in profile.get("scope_keywords", [])),
+            scope_fit=0.0,
+            apc=float(profile.get("apc_usd", 0)),
+            desk_rejection_rate=desk_rate,
+            tier=tier,
+        )
+
+    def _suitable_keys_for_type(self, paper_type: PaperType) -> list[str]:
+        """Return journal keys whose YAML preferred types overlap *paper_type*."""
+        preferred = self._PAPER_TYPE_TO_PREFERRED.get(paper_type, set())
+        keys: list[str] = []
+        for key, profile in self._profiles_by_key.items():
+            yaml_types = {str(t).lower() for t in profile.get("preferred_paper_types", [])}
+            if preferred & yaml_types:
+                keys.append(key)
+        return keys
 
     def analyze_paper_attributes(self, paper_path: str | Path) -> PaperAttributes:
         """Analyze paper to determine its attributes."""
@@ -168,24 +162,38 @@ class JournalRecommendationService:
         content = path.read_text(encoding="utf-8") if path.exists() else ""
 
         paper_type = self._detect_paper_type(content)
-        mapping = self.PAPER_TYPE_MAPPING.get(paper_type, {})
+        keywords_info = self.PAPER_TYPE_KEYWORDS.get(paper_type, {})
 
         return PaperAttributes(
             paper_type=paper_type,
             research_focus=self._extract_research_focus(content),
             core_contribution=self._extract_core_contribution(content),
-            main_metrics=mapping.get("metrics", []),
+            main_metrics=keywords_info.get("metrics", []),
             validation_scale=self._extract_validation_scale(content),
-            suitable_journal_types=mapping.get("suitable_journals", []),
+            suitable_journal_types=self._suitable_keys_for_type(paper_type),
         )
 
     def filter_journals_by_scope(self, paper_attrs: PaperAttributes) -> list[JournalInfo]:
-        """Filter journals based on paper scope."""
-        suitable_keys = paper_attrs.suitable_journal_types
-        journals = []
+        """Filter journals based on paper scope.
 
-        for key, journal in self.JOURNAL_DATABASE.items():
-            if key in suitable_keys:
+        When *suitable_journal_types* is provided and at least one key
+        resolves to a loaded journal, those journals are returned (backward
+        compatible).  Otherwise, journals are selected by matching the
+        paper type against each journal's YAML ``preferred_paper_types``.
+        """
+        # Try explicit keys first (backward compatibility)
+        explicit_keys = {k for k in paper_attrs.suitable_journal_types if k in self._journals}
+
+        if explicit_keys:
+            matched_keys = explicit_keys
+        else:
+            # Fall back to paper-type matching
+            matched_keys = set(self._suitable_keys_for_type(paper_attrs.paper_type))
+
+        journals: list[JournalInfo] = []
+        for key in matched_keys:
+            journal = self._journals.get(key)
+            if journal is not None:
                 journal_copy = JournalInfo(**vars(journal))
                 journal_copy.scope_fit = self._calculate_scope_fit(paper_attrs, journal)
                 journals.append(journal_copy)
@@ -402,8 +410,8 @@ class JournalRecommendationService:
             return "Standard validation"
 
     def _calculate_scope_fit(self, paper_attrs: PaperAttributes, journal: JournalInfo) -> float:
-        mapping = self.PAPER_TYPE_MAPPING.get(paper_attrs.paper_type, {})
-        keywords = mapping.get("keywords", [])
+        keywords_info = self.PAPER_TYPE_KEYWORDS.get(paper_attrs.paper_type, {})
+        keywords = keywords_info.get("keywords", [])
 
         scope_lower = journal.scope.lower()
         matches = sum(1 for kw in keywords if kw in scope_lower)

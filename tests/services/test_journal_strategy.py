@@ -257,3 +257,243 @@ class TestSubmissionStrategy:
         strategy = service.create_submission_strategy(attrs)
 
         assert len(strategy.framing_suggestions) > 0
+
+
+class TestYAMLDrivenJournalDatabase:
+    def test_all_yaml_journals_loaded(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        assert len(service._journals) >= 18
+
+    def test_no_hardcoded_journal_database_attribute(self):
+        svc = _load()
+        assert not hasattr(svc.JournalRecommendationService, "JOURNAL_DATABASE")
+
+    def test_known_journals_present(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        expected_abbrs = {
+            "IEEE TPAMI",
+            "IEEE TNNLS",
+            "IEEE TSE",
+            "IEEE TKDE",
+            "ACM CSUR",
+            "ACM TOCS",
+            "ACM TOSEM",
+            "Nat Mach Intell",
+            "AIJ",
+            "ESWA",
+            "INS",
+            "KBS",
+            "NN",
+            "PR",
+            "CVIU",
+            "JMLR",
+            "MLJ",
+            "IJCV",
+        }
+        loaded_abbrs = {j.abbreviation for j in service._journals.values()}
+
+        assert expected_abbrs.issubset(loaded_abbrs)
+
+    def test_journal_info_fields_populated(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        for key, journal in service._journals.items():
+            assert journal.name, f"{key} missing name"
+            assert journal.abbreviation, f"{key} missing abbreviation"
+            assert journal.impact_factor > 0, f"{key} has zero impact factor"
+            assert journal.acceptance_rate > 0, f"{key} has zero acceptance rate"
+            assert journal.review_timeline_months[0] > 0, f"{key} invalid timeline"
+            assert journal.scope, f"{key} missing scope"
+            assert journal.tier in (
+                svc.JournalTier.TIER_1,
+                svc.JournalTier.TIER_2,
+                svc.JournalTier.TIER_3,
+            )
+
+
+class TestTierAssignment:
+    def test_high_impact_is_tier1(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        tpami = service._journals.get("IEEE_TPAMI")
+        assert tpami is not None
+        assert tpami.impact_factor >= 10
+        assert tpami.tier == svc.JournalTier.TIER_1
+
+    def test_medium_impact_is_tier2(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        eswa = service._journals.get("ESWA")
+        assert eswa is not None
+        assert 7 <= eswa.impact_factor < 10
+        assert eswa.tier == svc.JournalTier.TIER_2
+
+    def test_low_impact_is_tier3(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        tocs = service._journals.get("ACM_TOCS")
+        assert tocs is not None
+        assert tocs.impact_factor < 7
+        assert tocs.tier == svc.JournalTier.TIER_3
+
+    def test_top_journals_by_impact_factor_ranked(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        tier1 = [j for j in service._journals.values() if j.tier == svc.JournalTier.TIER_1]
+        assert len(tier1) >= 5
+        sorted_by_if = sorted(tier1, key=lambda j: -j.impact_factor)
+        assert sorted_by_if[0].impact_factor > sorted_by_if[-1].impact_factor
+
+
+class TestAllPaperTypesGetJournals:
+    def test_application_system_gets_journals(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        keys = service._suitable_keys_for_type(svc.PaperType.APPLICATION_SYSTEM)
+        assert len(keys) >= 3
+        abbrs = {service._journals[k].abbreviation for k in keys}
+        assert "ESWA" in abbrs
+
+    def test_theoretical_gets_journals(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        keys = service._suitable_keys_for_type(svc.PaperType.THEORETICAL_DIAGNOSTIC)
+        assert len(keys) >= 3
+        abbrs = {service._journals[k].abbreviation for k in keys}
+        assert "IEEE TNNLS" in abbrs
+
+    def test_empirical_gets_journals(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        keys = service._suitable_keys_for_type(svc.PaperType.EMPIRICAL_STUDY)
+        assert len(keys) >= 10
+
+    def test_survey_gets_journals(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        keys = service._suitable_keys_for_type(svc.PaperType.SURVEY_REVIEW)
+        assert len(keys) >= 1
+        abbrs = {service._journals[k].abbreviation for k in keys}
+        assert "ACM CSUR" in abbrs
+
+
+class TestAnalyzeAttributesDynamic:
+    def test_empirical_paper_gets_dynamic_keys(self, tmp_path):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        tex = tmp_path / "paper.tex"
+        tex.write_text(
+            r"\title{Benchmark Study}"
+            "\n"
+            r"\section{Experiments}"
+            "\n"
+            "We evaluate on multiple datasets with accuracy and F1 baselines.",
+        )
+
+        attrs = service.analyze_paper_attributes(tex)
+
+        assert attrs.paper_type == svc.PaperType.EMPIRICAL_STUDY
+        for key in attrs.suitable_journal_types:
+            assert key in service._journals, f"key {key} not in loaded journals"
+
+    def test_strategy_from_analyzed_paper(self, tmp_path):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        tex = tmp_path / "paper.tex"
+        tex.write_text(
+            r"\title{Production System}"
+            "\n"
+            r"\section{Introduction}"
+            "\n"
+            "Our system achieves 5000 QPS with sub-millisecond latency.",
+        )
+
+        attrs = service.analyze_paper_attributes(tex)
+        strategy = service.create_submission_strategy(attrs)
+
+        assert strategy.paper_type == svc.PaperType.APPLICATION_SYSTEM
+        all_recommended = (
+            strategy.target_journals + strategy.backup_journals + strategy.safe_journals
+        )
+        assert len(all_recommended) >= 1
+
+
+class TestBackwardCompatibility:
+    def test_existing_key_ieee_tnnls_still_resolves(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        attrs = svc.PaperAttributes(
+            paper_type=svc.PaperType.THEORETICAL_DIAGNOSTIC,
+            research_focus="Representation Learning",
+            core_contribution="Diagnostic Framework",
+            main_metrics=["CKA"],
+            validation_scale="Standard",
+            suitable_journal_types=["IEEE_TNNLS"],
+        )
+
+        journals = service.filter_journals_by_scope(attrs)
+        assert len(journals) == 1
+        assert "TNNLS" in journals[0].abbreviation
+
+    def test_existing_key_ieee_tkde_still_resolves(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        attrs = svc.PaperAttributes(
+            paper_type=svc.PaperType.EMPIRICAL_STUDY,
+            research_focus="Data Mining",
+            core_contribution="Novel Method",
+            main_metrics=["accuracy"],
+            validation_scale="Standard",
+            suitable_journal_types=["IEEE_TKDE"],
+        )
+
+        journals = service.filter_journals_by_scope(attrs)
+        assert len(journals) == 1
+        assert "TKDE" in journals[0].abbreviation
+
+    def test_unknown_legacy_keys_fall_back_to_type_matching(self):
+        svc = _load()
+        service = svc.JournalRecommendationService()
+
+        attrs = svc.PaperAttributes(
+            paper_type=svc.PaperType.APPLICATION_SYSTEM,
+            research_focus="Test",
+            core_contribution="Test",
+            main_metrics=[],
+            validation_scale="Standard",
+            suitable_journal_types=["NONEXISTENT_KEY"],
+        )
+
+        journals = service.filter_journals_by_scope(attrs)
+        assert len(journals) > 0
+
+    def test_public_method_signatures_unchanged(self):
+        svc = _load()
+        import inspect
+
+        service_cls = svc.JournalRecommendationService
+        assert hasattr(service_cls, "analyze_paper_attributes")
+        assert hasattr(service_cls, "filter_journals_by_scope")
+        assert hasattr(service_cls, "calculate_priority_scores")
+        assert hasattr(service_cls, "create_submission_strategy")
+        assert hasattr(service_cls, "to_dict")
+
+        sig = inspect.signature(service_cls.filter_journals_by_scope)
+        assert "paper_attrs" in sig.parameters
