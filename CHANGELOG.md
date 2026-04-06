@@ -4,7 +4,22 @@ All notable changes to **opencode-crane** are documented here.
 
 This file follows [Keep a Changelog](https://keepachangelog.com/) and uses Semantic Versioning.
 
-## [v0.10.0] - Unreleased
+## [v0.10.1] - 2026-04-06
+
+### Added
+- Expanded Q1 journal profiles from 18 to 55, providing broader coverage for submission matching.
+- New domain-specific evaluation packages for Cybersecurity, IoT, and MIS, in addition to the existing AI/ML.
+- Introduced "Journal-Aware Writing Style Optimization" to help researchers align their manuscript phrasing with specific journal traditions.
+- Completed Phase A-D implementation details including robust metadata extraction and multi-stage verification.
+
+### Changed
+- Updated the journal matching algorithm to better handle large-scale profile comparisons.
+- Refined the 7-dimension scoring weights for the new domain packages.
+
+### Fixed
+- Improved LaTeX section parsing for non-standard templates.
+
+## [v0.10.0] - 2026-04-06
 
 ### Breaking
 - breaking: freeze the public MCP tool surface before v1.0.0; legacy aliases will be removed once documentation and prompts are updated.
