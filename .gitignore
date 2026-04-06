@@ -170,4 +170,4 @@ cython_debug/
 
 # CRANE - opencode-crane
 references/pdfs/
-*.pdf
+*.pdf.opencode-crane/opencode
