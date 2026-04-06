@@ -51,6 +51,9 @@ from .tools.trust_calibration import (  # pyright: ignore[reportMissingImports]
 from .tools.workspace import register_tools as register_workspace_tools
 from .tools.version_tools import register_tools as register_version_tools
 from .tools.writing_style_tools import register_tools as register_writing_style_tools
+from .tools.writing_style_tools import (
+    register_phase_d_tools as register_writing_style_phase_d_tools,
+)
 
 register_transport_tools = import_module("crane.tools.transport_tools").register_tools
 
@@ -84,6 +87,7 @@ register_research_pipeline_benchmark_tools(mcp)
 register_version_tools(mcp)
 register_trust_calibration_tools(mcp)
 register_writing_style_tools(mcp)
+register_writing_style_phase_d_tools(mcp)
 register_transport_tools(mcp)
 
 

@@ -164,7 +164,7 @@ class TestYamlLoadingValidation:
     def test_loads_project_profiles_file(self):
         path = Path("data/journals/q1_journal_profiles.yaml")
         svc = JournalMatchingService(path)
-        assert len(svc.journals) == 18
+        assert len(svc.journals) == 55
 
 
 class TestScopeFit:

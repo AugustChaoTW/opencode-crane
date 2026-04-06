@@ -1,4 +1,4 @@
-"""Writing style analysis MCP tools (v0.10.1 Phase C)."""
+"""Writing style analysis MCP tools (v0.10.1 Phase C + D)."""
 
 from __future__ import annotations
 
@@ -14,6 +14,8 @@ from crane.models.writing_style_models import (
     StyleIssue,
     StyleMetrics,
 )
+from crane.services.interactive_rewrite_service import InteractiveRewriteService
+from crane.services.preference_learner_service import PreferenceLearnerService
 from crane.services.writing_style_service import WritingStyleService, _flatten_metrics
 from crane.workspace import resolve_workspace
 
@@ -116,12 +118,19 @@ def register_tools(mcp):
 
             target_section = None
             for sec in sections:
-                if sec.canonical_name.lower() == section_name.lower() or sec.name.lower() == section_name.lower():
+                if (
+                    sec.canonical_name.lower() == section_name.lower()
+                    or sec.name.lower() == section_name.lower()
+                ):
                     target_section = sec
                     break
 
             if target_section is None:
-                return {"error": f"Section '{section_name}' not found in {paper_path}", "section": section_name, "journal": journal_name}
+                return {
+                    "error": f"Section '{section_name}' not found in {paper_path}",
+                    "section": section_name,
+                    "journal": journal_name,
+                }
 
             diagnosis = service.diagnose_section(target_section)
             result = _diagnosis_to_dict(diagnosis)
@@ -201,12 +210,19 @@ def register_tools(mcp):
 
             target_section = None
             for sec in sections:
-                if sec.canonical_name.lower() == section_name.lower() or sec.name.lower() == section_name.lower():
+                if (
+                    sec.canonical_name.lower() == section_name.lower()
+                    or sec.name.lower() == section_name.lower()
+                ):
                     target_section = sec
                     break
 
             if target_section is None:
-                return {"error": f"Section '{section_name}' not found", "section": section_name, "journal": journal_name}
+                return {
+                    "error": f"Section '{section_name}' not found",
+                    "section": section_name,
+                    "journal": journal_name,
+                }
 
             diagnosis = service.diagnose_section(target_section)
             suggestions = service.suggest_rewrites(diagnosis, max_suggestions=count)
@@ -242,12 +258,14 @@ def register_tools(mcp):
                 v1, v2 = targets1.get(metric, 0.0), targets2.get(metric, 0.0)
                 diff = abs(v1 - v2)
                 if diff > 0.01:
-                    differences.append({
-                        "metric": metric,
-                        journal1: round(v1, 3),
-                        journal2: round(v2, 3),
-                        "difference": round(diff, 3),
-                    })
+                    differences.append(
+                        {
+                            "metric": metric,
+                            journal1: round(v1, 3),
+                            journal2: round(v2, 3),
+                            "difference": round(diff, 3),
+                        }
+                    )
             differences.sort(key=lambda x: x["difference"], reverse=True)
 
             recommendation = "Both journals have very similar style expectations for this section."
@@ -352,5 +370,101 @@ def _generate_markdown_report(
         lines.append("")
 
     lines.append("---")
-    lines.append(f"**Summary**: {len(diagnoses)} sections, {total_issues} issues, {total_suggestions} suggestions.")
+    lines.append(
+        f"**Summary**: {len(diagnoses)} sections, {total_issues} issues, {total_suggestions} suggestions."
+    )
     return "\n".join(lines)
+
+
+def register_phase_d_tools(mcp):  # noqa: C901
+    """Register Phase D interactive rewrite and preference learning tools."""
+
+    @mcp.tool()
+    def crane_start_rewrite_session(
+        paper_path: str,
+        journal_name: str,
+        section_name: str,
+        max_suggestions: int = 5,
+        project_dir: str | None = None,
+    ) -> dict[str, Any]:
+        """Start an interactive rewrite session for a paper section."""
+        try:
+            resolved = _resolve_paper_path(paper_path, project_dir)
+            service = InteractiveRewriteService()
+            session = service.start_session(resolved, journal_name, section_name, max_suggestions)
+            pending = service.get_pending_suggestions(session)
+            return {
+                "session_id": session.session_id,
+                "journal": journal_name,
+                "section": section_name,
+                "total_suggestions": len(session.suggestions),
+                "pending": [_rewrite_to_dict(s) for s in pending],
+                "status": session.status,
+            }
+        except (ValueError, FileNotFoundError) as exc:
+            return {"error": str(exc), "paper": paper_path, "journal": journal_name}
+
+    @mcp.tool()
+    def crane_submit_rewrite_choice(
+        session_id: str,
+        suggestion_index: int,
+        decision: str,
+        modified_text: str = "",
+        reason: str = "",
+    ) -> dict[str, Any]:
+        """Submit accept/reject/modify decision for a rewrite suggestion."""
+        try:
+            service = InteractiveRewriteService()
+            session = service._load_session(session_id)
+            session = service.submit_choice(
+                session, suggestion_index, decision, modified_text, reason
+            )
+            summary = service.get_session_summary(session)
+            pending = service.get_pending_suggestions(session)
+            summary["pending_count"] = len(pending)
+            return summary
+        except (ValueError, FileNotFoundError, IndexError) as exc:
+            return {"error": str(exc), "session_id": session_id}
+
+    @mcp.tool()
+    def crane_get_rewrite_session(
+        session_id: str,
+    ) -> dict[str, Any]:
+        """Get current state and summary of a rewrite session."""
+        try:
+            service = InteractiveRewriteService()
+            session = service._load_session(session_id)
+            return service.get_session_summary(session)
+        except (ValueError, FileNotFoundError) as exc:
+            return {"error": str(exc), "session_id": session_id}
+
+    @mcp.tool()
+    def crane_list_rewrite_sessions(
+        status: str = "",
+    ) -> dict[str, Any]:
+        """List all rewrite sessions, optionally filtered by status."""
+        service = InteractiveRewriteService()
+        sessions = service.list_sessions(status=status)
+        return {"sessions": sessions, "count": len(sessions)}
+
+    @mcp.tool()
+    def crane_get_user_preferences(
+        user_id: str = "default",
+    ) -> dict[str, Any]:
+        """Get learned writing preferences for a user."""
+        service = PreferenceLearnerService()
+        return service.get_preference_summary(user_id)
+
+    @mcp.tool()
+    def crane_reset_user_preferences(
+        user_id: str = "default",
+    ) -> dict[str, Any]:
+        """Reset all learned preferences for a user."""
+        service = PreferenceLearnerService()
+        state = service.reset_preferences(user_id)
+        return {
+            "user_id": state.user_id,
+            "status": "reset",
+            "total_sessions": state.total_sessions,
+            "total_choices": state.total_choices,
+        }

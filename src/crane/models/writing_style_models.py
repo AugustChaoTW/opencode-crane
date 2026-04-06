@@ -215,3 +215,105 @@ class SectionDiagnosis:
     deviation_score: float = 0.0
     issues: list[StyleIssue] = field(default_factory=list)
     suggestions: list[RewriteSuggestion] = field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
+# Phase D: Interactive Rewrite & Preference Learning models
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class RewriteChoice:
+    """A user decision on a single rewrite suggestion.
+
+    Attributes:
+        suggestion_id: Unique identifier for the suggestion.
+        decision: ``"accept"``, ``"reject"``, or ``"modify"``.
+        modified_text: User-edited text when decision is ``"modify"``.
+        reason: Optional reason for the decision.
+        timestamp: ISO-8601 timestamp of the decision.
+    """
+
+    suggestion_id: str = ""
+    decision: str = "accept"
+    modified_text: str = ""
+    reason: str = ""
+    timestamp: str = field(default_factory=lambda: datetime.now(tz=timezone.utc).isoformat())
+
+
+@dataclass
+class InteractiveRewriteSession:
+    """State for an interactive rewrite workflow.
+
+    Tracks the paper, journal, current suggestions, and user choices
+    across a multi-step rewrite session.
+
+    Attributes:
+        session_id: Unique session identifier.
+        paper_path: Path to the paper being rewritten.
+        journal_name: Target journal for style alignment.
+        section_name: Section currently being rewritten.
+        suggestions: Pending rewrite suggestions.
+        choices: User decisions made so far.
+        applied_rewrites: Suggestions that were accepted or modified.
+        status: ``"active"``, ``"paused"``, or ``"completed"``.
+        created_at: ISO-8601 creation timestamp.
+        updated_at: ISO-8601 last-update timestamp.
+    """
+
+    session_id: str = ""
+    paper_path: str = ""
+    journal_name: str = ""
+    section_name: str = ""
+    suggestions: list[RewriteSuggestion] = field(default_factory=list)
+    choices: list[RewriteChoice] = field(default_factory=list)
+    applied_rewrites: list[RewriteSuggestion] = field(default_factory=list)
+    status: str = "active"
+    created_at: str = field(default_factory=lambda: datetime.now(tz=timezone.utc).isoformat())
+    updated_at: str = field(default_factory=lambda: datetime.now(tz=timezone.utc).isoformat())
+
+
+@dataclass
+class UserPreference:
+    """A learned writing preference from user choices.
+
+    Attributes:
+        category: Style category (``"readability"``, ``"grammar"``, etc.).
+        metric_name: Specific metric this preference relates to.
+        direction: ``"higher"`` or ``"lower"`` — user's preferred direction.
+        strength: Confidence in this preference (0-1).
+        evidence_count: Number of choices supporting this preference.
+        last_updated: ISO-8601 timestamp.
+    """
+
+    category: str = ""
+    metric_name: str = ""
+    direction: str = ""
+    strength: float = 0.0
+    evidence_count: int = 0
+    last_updated: str = field(default_factory=lambda: datetime.now(tz=timezone.utc).isoformat())
+
+
+@dataclass
+class PreferenceLearnerState:
+    """Persistent state for the preference learning engine.
+
+    Attributes:
+        user_id: Identifier for the user (defaults to ``"default"``).
+        preferences: Learned preferences keyed by metric name.
+        total_sessions: Number of rewrite sessions processed.
+        total_choices: Total accept/reject/modify decisions recorded.
+        acceptance_rate: Overall acceptance rate across all sessions.
+        category_weights: Learned per-category importance weights.
+        created_at: ISO-8601 creation timestamp.
+        updated_at: ISO-8601 last-update timestamp.
+    """
+
+    user_id: str = "default"
+    preferences: dict[str, UserPreference] = field(default_factory=dict)
+    total_sessions: int = 0
+    total_choices: int = 0
+    acceptance_rate: float = 0.0
+    category_weights: dict[str, float] = field(default_factory=dict)
+    created_at: str = field(default_factory=lambda: datetime.now(tz=timezone.utc).isoformat())
+    updated_at: str = field(default_factory=lambda: datetime.now(tz=timezone.utc).isoformat())

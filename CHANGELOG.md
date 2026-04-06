@@ -7,14 +7,22 @@ This file follows [Keep a Changelog](https://keepachangelog.com/) and uses Seman
 ## [v0.10.1] - 2026-04-06
 
 ### Added
+- **Journal-Aware Writing Style Toolkit** (Phase A-D): complete pipeline from style analysis to interactive rewrite with preference learning.
+- **Phase A — Data Models & Section Parsing**: `StyleMetrics` (8 quantitative metrics), `StyleGuide`, `SectionDiagnosis`, `RewriteSuggestion`, `SectionChunker` with canonical section normalisation.
+- **Phase B — WritingStyleService**: core diagnostic engine with per-section deviation scoring, cross-section pattern detection, domain-aware metric weighting, and style guide caching.
+- **Phase C — 7 MCP Tools**: `crane_extract_journal_style_guide`, `crane_diagnose_section`, `crane_diagnose_paper`, `crane_get_style_exemplars`, `crane_suggest_rewrites`, `crane_compare_sections`, `crane_export_style_report`.
+- **Phase D — Interactive Rewrite**: `InteractiveRewriteService` with accept/reject/modify workflow, session persistence, pause/resume support. 6 new MCP tools: `crane_start_rewrite_session`, `crane_submit_rewrite_choice`, `crane_get_rewrite_session`, `crane_list_rewrite_sessions`, `crane_get_user_preferences`, `crane_reset_user_preferences`.
+- **Phase D — Preference Learning**: `PreferenceLearnerService` that learns user writing preferences across sessions, adjusts suggestion confidence, and tracks per-category importance weights.
+- **Phase E — Test Coverage**: 87 new tests (49 Phase D unit tests + 38 integration tests) covering all 13 MCP tools, multi-domain support, session persistence, and cross-session preference learning.
 - Expanded Q1 journal profiles from 18 to 55, providing broader coverage for submission matching.
 - New domain-specific evaluation packages for Cybersecurity, IoT, and MIS, in addition to the existing AI/ML.
-- Introduced "Journal-Aware Writing Style Optimization" to help researchers align their manuscript phrasing with specific journal traditions.
-- Completed Phase A-D implementation details including robust metadata extraction and multi-stage verification.
+- 4 new documentation files: `JOURNAL_INTEGRATION.md`, `WRITING_STYLE_GUIDE.md`, `INTERACTIVE_REWRITE.md`, `PREFERENCE_LEARNING.md`.
 
 ### Changed
 - Updated the journal matching algorithm to better handle large-scale profile comparisons.
 - Refined the 7-dimension scoring weights for the new domain packages.
+- Updated README with v0.10.1 features, 13 new tool descriptions, and updated project structure.
+- Synced `__init__.py` version to match `pyproject.toml`.
 
 ### Fixed
 - Improved LaTeX section parsing for non-standard templates.
