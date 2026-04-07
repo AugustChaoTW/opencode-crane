@@ -54,11 +54,11 @@ class TestReadmeStructure:
             assert section in readme_content, f"Missing section: {section}"
 
     def test_readme_line_count(self, readme_path: Path):
-        """✅ README.md 行數在預期範圍內（v0.12.0: ~819 行）"""
+        """✅ README.md 行數在預期範圍內（v0.12.1: ~923 行）"""
         content = readme_path.read_text(encoding="utf-8")
         lines = content.split("\n")
-        # v0.12.0 should be around 819 lines (+/- 50)
-        assert 769 < len(lines) < 869, f"Line count {len(lines)} not in expected range"
+        # v0.12.1 should be around 923 lines (+/- 50)
+        assert 873 < len(lines) < 973, f"Line count {len(lines)} not in expected range"
 
 
 class TestV0120Features:
