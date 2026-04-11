@@ -4,12 +4,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 
+from crane.services.interactive_rewrite_service import InteractiveRewriteService
 from crane.services.paper_profile_service import PaperProfileService
 from crane.services.revision_planning_service import RevisionPlanningService
-from crane.services.interactive_rewrite_service import InteractiveRewriteService
 
 
 @dataclass

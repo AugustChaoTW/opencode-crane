@@ -11,8 +11,8 @@ from crane.models.paper import AiAnnotations, Paper
 from crane.services.citation_service import CitationService
 from crane.services.evidence_evaluation_service import EvidenceEvaluationService
 from crane.services.paper_service import PaperService
-from crane.services.research_positioning_service import ResearchPositioningService
 from crane.services.reference_service import ReferenceService
+from crane.services.research_positioning_service import ResearchPositioningService
 from crane.services.revision_planning_service import RevisionPlanningService
 from crane.services.section_review_service import SectionReviewService
 from crane.services.submission_simulation_service import SubmissionSimulationService

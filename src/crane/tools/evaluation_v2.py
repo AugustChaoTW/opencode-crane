@@ -14,8 +14,7 @@ from crane.models.paper_profile import (
 )
 from crane.services.apc_analysis_service import APCAnalysisService
 from crane.services.evidence_evaluation_service import EvidenceEvaluationService
-from crane.services.feynman_session_service import FeynmanSession
-from crane.services.feynman_session_service import FeynmanSessionService
+from crane.services.feynman_session_service import FeynmanSession, FeynmanSessionService
 from crane.services.journal_matching_service import JournalMatchingService
 from crane.services.paper_profile_service import PaperProfileService
 from crane.services.revision_planning_service import RevisionPlanningService

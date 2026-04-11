@@ -5,13 +5,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from crane.services.submission_simulation_service import SubmissionSimulationService
-from crane.services.research_positioning_service import ResearchPositioningService
-from crane.services.ideation_service import IdeationService
-from crane.services.first_principles_service import FirstPrinciplesService
 from crane.services.evidence_evaluation_service import EvidenceEvaluationService
+from crane.services.first_principles_service import FirstPrinciplesService
+from crane.services.ideation_service import IdeationService
+from crane.services.research_positioning_service import ResearchPositioningService
 from crane.services.review_simulation_service import ReviewSimulationService
 from crane.services.revision_planning_service import RevisionPlanningService
+from crane.services.submission_simulation_service import SubmissionSimulationService
 from crane.services.trust_calibration_service import TrustCalibrationService
 
 

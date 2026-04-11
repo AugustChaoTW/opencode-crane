@@ -1,8 +1,8 @@
 import math
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from collections.abc import Mapping
 from typing import TypedDict
 
 

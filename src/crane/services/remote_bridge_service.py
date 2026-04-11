@@ -6,10 +6,11 @@ import hmac
 import json
 import threading
 import time
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any, Callable
+from typing import Any
 
 
 class RemoteBridgeService:
@@ -51,7 +52,7 @@ class RemoteBridgeService:
         payload_part = self._b64_encode(
             json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
         )
-        signing_input = f"{header_part}.{payload_part}".encode("utf-8")
+        signing_input = f"{header_part}.{payload_part}".encode()
         signature = hmac.new(
             self._jwt_secret.encode("utf-8"),
             signing_input,
@@ -69,7 +70,7 @@ class RemoteBridgeService:
             raise ValueError("Invalid token format")
 
         header_part, payload_part, signature_part = parts
-        signing_input = f"{header_part}.{payload_part}".encode("utf-8")
+        signing_input = f"{header_part}.{payload_part}".encode()
         expected_signature = hmac.new(
             self._jwt_secret.encode("utf-8"),
             signing_input,

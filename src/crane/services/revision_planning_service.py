@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections import defaultdict, deque
 import re
+from collections import defaultdict, deque
 
 from crane.models.paper_profile import (
     DimensionScore,

@@ -6,11 +6,10 @@
 基準: OpenReview ICLR 2024-2025 數據集。
 """
 
-import json
 import logging
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +20,9 @@ class IndividualReview:
 
     reviewer_id: int
     reviewer_style: str
-    scores: Dict[str, float]
-    strengths: List[str]
-    weaknesses: List[str]
+    scores: dict[str, float]
+    strengths: list[str]
+    weaknesses: list[str]
     decision: str
     is_hallucinated: bool = False
     consistency_score: float = 1.0
@@ -34,8 +33,8 @@ class IndividualReview:
 class EnsembleReviewResult:
     """集合評審結果"""
 
-    individual_reviews: List[IndividualReview]
-    meta_review: Dict[str, Any]
+    individual_reviews: list[IndividualReview]
+    meta_review: dict[str, Any]
     consensus_level: float
     final_decision: str
     acceptance_probability: float
@@ -51,7 +50,7 @@ class EnsembleReviewerModule:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def review_paper(self, paper_content: str) -> List[IndividualReview]:
+    def review_paper(self, paper_content: str) -> list[IndividualReview]:
         """使用 5 種風格進行獨立評審"""
         reviews = []
 
@@ -88,7 +87,7 @@ class EnsembleReviewerModule:
             depth_score=0.8 + (reviewer_id * 0.03),
         )
 
-    def _compute_scores(self, paper_content: str, style: str) -> Dict[str, float]:
+    def _compute_scores(self, paper_content: str, style: str) -> dict[str, float]:
         """計算評分"""
         base_scores = {
             "soundness": 7.0,
@@ -109,7 +108,7 @@ class EnsembleReviewerModule:
 
         return base_scores
 
-    def _extract_strengths(self, paper_content: str, style: str) -> List[str]:
+    def _extract_strengths(self, paper_content: str, style: str) -> list[str]:
         """提取優勢"""
         strengths = [
             "Clear motivation and problem definition",
@@ -118,7 +117,7 @@ class EnsembleReviewerModule:
         ]
         return strengths[:2] if style == "quick" else strengths
 
-    def _extract_weaknesses(self, paper_content: str, style: str) -> List[str]:
+    def _extract_weaknesses(self, paper_content: str, style: str) -> list[str]:
         """提取弱點"""
         weaknesses = [
             "Limited novelty in methodology",
@@ -135,7 +134,7 @@ class MetaReviewerModule:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def make_final_decision(self, individual_reviews: List[IndividualReview]) -> Dict[str, Any]:
+    def make_final_decision(self, individual_reviews: list[IndividualReview]) -> dict[str, Any]:
         """基於 5 份評審做最終決策"""
         scores = self._aggregate_scores(individual_reviews)
         consensus = self._compute_consensus(individual_reviews)
@@ -152,7 +151,7 @@ class MetaReviewerModule:
             "meta_review_summary": f"Based on {len(individual_reviews)} reviews, the paper is {final_decision}",
         }
 
-    def _aggregate_scores(self, reviews: List[IndividualReview]) -> Dict[str, float]:
+    def _aggregate_scores(self, reviews: list[IndividualReview]) -> dict[str, float]:
         """聚合評分"""
         dimensions = ["soundness", "presentation", "contribution", "overall", "confidence"]
         aggregated = {}
@@ -163,7 +162,7 @@ class MetaReviewerModule:
 
         return aggregated
 
-    def _compute_consensus(self, reviews: List[IndividualReview]) -> float:
+    def _compute_consensus(self, reviews: list[IndividualReview]) -> float:
         """計算評審員間一致性"""
         decisions = [r.decision for r in reviews]
         unique_decisions = len(set(decisions))
@@ -195,7 +194,7 @@ class ReviewQualityValidator:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def validate_reviews(self, reviews: List[IndividualReview]) -> List[bool]:
+    def validate_reviews(self, reviews: list[IndividualReview]) -> list[bool]:
         """驗證評審品質"""
         validation_results = []
 
@@ -229,7 +228,7 @@ class CalibrationModule:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def calibrate_decisions(self, results: List[EnsembleReviewResult]) -> Dict[str, Any]:
+    def calibrate_decisions(self, results: list[EnsembleReviewResult]) -> dict[str, Any]:
         """校準預測概率"""
         if not results:
             return {}
@@ -247,7 +246,7 @@ class CalibrationModule:
             "recommendation": "Well-calibrated" if calibration_error < 0.1 else "Needs adjustment",
         }
 
-    def _compute_calibration_error(self, predictions: List[float], actual: List[int]) -> float:
+    def _compute_calibration_error(self, predictions: list[float], actual: list[int]) -> float:
         """計算校準誤差 (ECE)"""
         if not predictions:
             return 0.0
@@ -308,7 +307,7 @@ class AutomatedReviewerV2:
         )
         return result
 
-    def batch_review(self, papers: List[Dict[str, str]]) -> List[EnsembleReviewResult]:
+    def batch_review(self, papers: list[dict[str, str]]) -> list[EnsembleReviewResult]:
         """批量評審"""
         results = []
         for paper in papers:
@@ -316,7 +315,7 @@ class AutomatedReviewerV2:
             results.append(result)
         return results
 
-    def get_performance_report(self) -> Dict[str, Any]:
+    def get_performance_report(self) -> dict[str, Any]:
         """獲取性能報告"""
         return {
             "ensemble_size": len(EnsembleReviewerModule.REVIEWER_STYLES),

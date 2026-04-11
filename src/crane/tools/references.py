@@ -9,7 +9,6 @@ from typing import Any
 from crane.services.reference_service import ReferenceService
 from crane.workspace import resolve_workspace
 
-
 _ANNOTATION_UNSET = "__CRANE_ANNOTATION_UNSET__"
 
 

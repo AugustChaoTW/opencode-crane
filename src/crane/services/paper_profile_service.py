@@ -7,10 +7,10 @@ from crane.models.paper_profile import (
     EvidenceItem,
     EvidenceLedger,
     EvidencePattern,
+    EvidenceSignal,
     NoveltyShape,
     PaperProfile,
     PaperType,
-    EvidenceSignal,
 )
 from crane.services.latex_parser import get_all_sections_flat, parse_latex_sections
 

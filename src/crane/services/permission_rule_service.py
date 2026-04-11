@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import json
 import importlib
+import json
 import os
 import re
 from pathlib import Path

@@ -12,7 +12,6 @@ import math
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 
 from crane.models.writing_style_models import (
     ArgumentationMetrics,

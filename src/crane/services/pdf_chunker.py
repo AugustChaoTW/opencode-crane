@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from importlib import import_module
 from pathlib import Path
-import re
 from typing import Any
 
 import yaml
@@ -37,7 +37,7 @@ class Chunk:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Chunk":
+    def from_dict(cls, data: dict[str, Any]) -> Chunk:
         """Deserialize from dict."""
         return cls(
             chunk_id=data["chunk_id"],

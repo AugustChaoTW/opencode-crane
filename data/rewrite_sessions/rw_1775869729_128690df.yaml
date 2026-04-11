@@ -1,0 +1,35 @@
+session_id: rw_1775869729_128690df
+paper_path: /home/augchao/Work/CGSMT/00_Papers/JMLR/latex/JMLR-Aug.tex
+journal_name: JMLR
+section_name: Abstract
+status: active
+created_at: '2026-04-11T01:08:49.450769+00:00'
+updated_at: '2026-04-11T01:08:49.450774+00:00'
+suggestions:
+- original_text: ''
+  suggested_text: ''
+  rationale: Reduce vocabulary diversity -- use consistent terminology throughout.
+  exemplar_source: JMLR
+  confidence: 0.9
+- original_text: ''
+  suggested_text: ''
+  rationale: Reduce jargon density. Define technical terms on first use.
+  exemplar_source: JMLR
+  confidence: 0.9
+- original_text: plementarity cannot be verified due to data saturat
+  suggested_text: ''
+  rationale: Consider using passive voice for objectivity in Methods/Results sections.
+  exemplar_source: JMLR
+  confidence: 0.9
+- original_text: rigorous empirical validation. This paper present
+  suggested_text: ''
+  rationale: Replace nominalisations with verb forms (e.g. 'utilization' -> 'use').
+  exemplar_source: JMLR
+  confidence: 0.9
+- original_text: ''
+  suggested_text: ''
+  rationale: Combine short sentences for better flow. Vary sentence length.
+  exemplar_source: JMLR
+  confidence: 0.7
+choices: []
+applied_rewrites: []

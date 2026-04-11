@@ -8,10 +8,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from crane.services.chapter_coach_service import ChapterCoachService
 from crane.services.citation_service import CitationService
 from crane.services.paper_service import PaperService
 from crane.services.review_inspector_service import ReviewInspectorService
-from crane.services.chapter_coach_service import ChapterCoachService
 from crane.workspace import resolve_workspace
 
 

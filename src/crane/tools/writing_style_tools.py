@@ -10,7 +10,6 @@ from crane.models.writing_style_models import (
     ExemplarSnippet,
     RewriteSuggestion,
     SectionDiagnosis,
-    StyleGuide,
     StyleIssue,
     StyleMetrics,
 )

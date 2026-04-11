@@ -12,15 +12,11 @@
 5. AblationModule - 消融實驗自動化
 """
 
-import json
 import logging
-import os
 import re
-import tempfile
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +26,7 @@ class ExperimentConfig:
     """實驗配置"""
 
     algorithm: str
-    hyperparameters: Dict[str, Any]
+    hyperparameters: dict[str, Any]
     dataset: str
     implementation_id: str
     seed: int = 42
@@ -42,16 +38,16 @@ class ExperimentResult:
     """單次實驗結果"""
 
     config: ExperimentConfig
-    metrics: Dict[str, float]  # {accuracy, loss, f1, ...}
+    metrics: dict[str, float]  # {accuracy, loss, f1, ...}
     runtime_seconds: float
     code_path: str
     notes: str
     stage: int  # 1-4 對應階段
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
     success: bool = True
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """轉換為字典"""
         return {
             "config": asdict(self.config),
@@ -71,8 +67,8 @@ class ExperimentTree:
     """實驗樹搜索結構"""
 
     root: ExperimentResult
-    children: List["ExperimentTree"] = field(default_factory=list)
-    best_leaf: Optional[ExperimentResult] = None
+    children: list["ExperimentTree"] = field(default_factory=list)
+    best_leaf: ExperimentResult | None = None
 
     def add_child(self, result: ExperimentResult) -> "ExperimentTree":
         """添加子節點"""
@@ -92,7 +88,7 @@ class MethodParsingModule:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def parse_methods_section(self, latex_content: str) -> Dict[str, Any]:
+    def parse_methods_section(self, latex_content: str) -> dict[str, Any]:
         """
         解析 LaTeX 方法章節，提取結構化算法描述
 
@@ -135,7 +131,7 @@ class MethodParsingModule:
                 return algo
         return "UnknownAlgorithm"
 
-    def _extract_datasets(self, text: str) -> List[str]:
+    def _extract_datasets(self, text: str) -> list[str]:
         """提取數據集名稱"""
         datasets = []
         dataset_names = ["CIFAR", "ImageNet", "MNIST", "SQuAD", "WikiText", "Wikipedia"]
@@ -144,7 +140,7 @@ class MethodParsingModule:
                 datasets.append(dataset)
         return datasets
 
-    def _extract_hyperparameters(self, text: str) -> Dict[str, Any]:
+    def _extract_hyperparameters(self, text: str) -> dict[str, Any]:
         """提取超參數"""
         hyperparams = {}
         # 正則表達式匹配 learning_rate, learning rate, lr 等
@@ -164,7 +160,7 @@ class MethodParsingModule:
 
         return hyperparams
 
-    def _extract_loss_functions(self, text: str) -> List[str]:
+    def _extract_loss_functions(self, text: str) -> list[str]:
         """提取損失函數"""
         loss_functions = []
         losses = ["cross entropy", "mse", "bce", "l1", "l2"]
@@ -180,7 +176,7 @@ class CodeGenerationModule:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def generate_baseline_code(self, parsed_methods: Dict[str, Any]) -> str:
+    def generate_baseline_code(self, parsed_methods: dict[str, Any]) -> str:
         """
         生成基線代碼框架
 
@@ -252,14 +248,14 @@ class HyperparameterOptimizationModule:
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.search_history: List[ExperimentResult] = []
+        self.search_history: list[ExperimentResult] = []
 
     def optimize_hyperparameters(
         self,
         base_config: ExperimentConfig,
-        search_space: Dict[str, List[Any]],
+        search_space: dict[str, list[Any]],
         max_trials: int = 10,
-    ) -> Tuple[ExperimentConfig, List[ExperimentResult]]:
+    ) -> tuple[ExperimentConfig, list[ExperimentResult]]:
         """
         使用貝葉斯優化進行超參數調優
 
@@ -298,7 +294,7 @@ class HyperparameterOptimizationModule:
         return best_config, self.search_history
 
     def _generate_trial_config(
-        self, base_config: ExperimentConfig, search_space: Dict[str, List[Any]], trial: int
+        self, base_config: ExperimentConfig, search_space: dict[str, list[Any]], trial: int
     ) -> ExperimentConfig:
         """生成試驗配置"""
         import random
@@ -390,7 +386,7 @@ class AblationModule:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def identify_key_components(self, parsed_methods: Dict[str, Any]) -> List[str]:
+    def identify_key_components(self, parsed_methods: dict[str, Any]) -> list[str]:
         """
         從論文方法描述中識別關鍵組件
 
@@ -412,8 +408,8 @@ class AblationModule:
         return components or ["default_component"]
 
     def generate_ablation_studies(
-        self, config: ExperimentConfig, components: List[str]
-    ) -> List[ExperimentConfig]:
+        self, config: ExperimentConfig, components: list[str]
+    ) -> list[ExperimentConfig]:
         """
         為每個關鍵組件生成消融配置
 
@@ -448,12 +444,12 @@ class ExperimentGenerationService:
         self.tree_searcher = TreeSearchModule()
         self.ablation_module = AblationModule()
 
-        self.experiment_results: List[ExperimentResult] = []
-        self.experiment_tree: Optional[ExperimentTree] = None
+        self.experiment_results: list[ExperimentResult] = []
+        self.experiment_tree: ExperimentTree | None = None
 
     def run_full_pipeline(
-        self, paper_path: str, dataset_info: Dict[str, Any], budget_hours: float = 24.0
-    ) -> Dict[str, Any]:
+        self, paper_path: str, dataset_info: dict[str, Any], budget_hours: float = 24.0
+    ) -> dict[str, Any]:
         """
         執行完整的 4 階段實驗流程
 
@@ -467,7 +463,7 @@ class ExperimentGenerationService:
         """
         try:
             # 讀取論文
-            with open(paper_path, "r", encoding="utf-8") as f:
+            with open(paper_path, encoding="utf-8") as f:
                 latex_content = f.read()
 
             # Stage 1: 基線代碼自動生成
@@ -541,7 +537,7 @@ class ExperimentGenerationService:
         for child in node.children:
             self._collect_tree_results(child)
 
-    def _generate_report(self) -> Dict[str, Any]:
+    def _generate_report(self) -> dict[str, Any]:
         """生成實驗報告"""
         return {
             "success": True,
@@ -560,7 +556,7 @@ class ExperimentGenerationService:
             "timestamp": datetime.now().isoformat(),
         }
 
-    def get_results_summary(self) -> Dict[str, Any]:
+    def get_results_summary(self) -> dict[str, Any]:
         """獲取結果摘要"""
         if not self.experiment_results:
             return {"message": "No experiments run yet"}

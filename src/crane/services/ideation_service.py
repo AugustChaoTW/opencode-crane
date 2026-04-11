@@ -13,14 +13,10 @@
 6. MapElitesArchiveManager - Pareto 檔案管理
 """
 
-import json
 import logging
-import math
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set, Tuple
-
-import numpy as np
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -40,16 +36,16 @@ class ResearchIdea:
     executability_score: float
     impact_score: float
 
-    similar_papers: List[str] = field(default_factory=list)
+    similar_papers: list[str] = field(default_factory=list)
     estimated_compute_hours: float = 0.0
-    required_datasets: List[str] = field(default_factory=list)
+    required_datasets: list[str] = field(default_factory=list)
     estimated_implementation_days: float = 0.0
 
     generated_at: str = field(default_factory=lambda: datetime.now().isoformat())
     generation_stage: int = 0
     status: str = "pending"
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
     def pareto_dominates(self, other: "ResearchIdea") -> bool:
@@ -66,11 +62,11 @@ class ResearchIdea:
 class IdeationArchive:
     """想法檔案 - Pareto 前沿維護"""
 
-    ideas: List[ResearchIdea] = field(default_factory=list)
-    pareto_frontier: List[str] = field(default_factory=list)
-    best_novelty: Optional[ResearchIdea] = None
-    best_executability: Optional[ResearchIdea] = None
-    best_impact: Optional[ResearchIdea] = None
+    ideas: list[ResearchIdea] = field(default_factory=list)
+    pareto_frontier: list[str] = field(default_factory=list)
+    best_novelty: ResearchIdea | None = None
+    best_executability: ResearchIdea | None = None
+    best_impact: ResearchIdea | None = None
     total_ideas_generated: int = 0
 
     def add_idea(self, idea: ResearchIdea) -> bool:
@@ -112,10 +108,10 @@ class DomainKnowledgeGraphBuilder:
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.concepts: Dict[str, Dict[str, Any]] = {}
-        self.relations: Dict[Tuple[str, str], str] = {}
+        self.concepts: dict[str, dict[str, Any]] = {}
+        self.relations: dict[tuple[str, str], str] = {}
 
-    def build_from_references(self, reference_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def build_from_references(self, reference_data: list[dict[str, Any]]) -> dict[str, Any]:
         """從參考文獻庫構建知識圖"""
         for ref in reference_data:
             self._extract_concepts(ref)
@@ -129,7 +125,7 @@ class DomainKnowledgeGraphBuilder:
             "relation_count": len(self.relations),
         }
 
-    def _extract_concepts(self, reference: Dict[str, Any]) -> None:
+    def _extract_concepts(self, reference: dict[str, Any]) -> None:
         """從論文中提取概念"""
         title = reference.get("title", "")
         keywords = reference.get("keywords", [])
@@ -144,7 +140,7 @@ class DomainKnowledgeGraphBuilder:
             self.concepts[keyword]["frequency"] += 1
             self.concepts[keyword]["sources"].append(reference.get("key", ""))
 
-    def find_concept_gaps(self) -> List[Tuple[str, str]]:
+    def find_concept_gaps(self) -> list[tuple[str, str]]:
         """識別未充分探索的概念交叉點"""
         gaps = []
         concepts = list(self.concepts.keys())
@@ -162,11 +158,11 @@ class IdeaGenerationEngine:
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.generated_ideas: List[ResearchIdea] = []
+        self.generated_ideas: list[ResearchIdea] = []
 
     def generate_ideas(
-        self, domain: str, knowledge_graph: Dict[str, Any], num_ideas: int = 20
-    ) -> List[ResearchIdea]:
+        self, domain: str, knowledge_graph: dict[str, Any], num_ideas: int = 20
+    ) -> list[ResearchIdea]:
         """生成想法"""
         ideas = []
 
@@ -182,7 +178,7 @@ class IdeaGenerationEngine:
         return ideas
 
     def _create_idea(
-        self, domain: str, concepts: List[str], gaps: List[Tuple[str, str]], idx: int
+        self, domain: str, concepts: list[str], gaps: list[tuple[str, str]], idx: int
     ) -> ResearchIdea:
         """創建單個想法"""
         import random
@@ -215,15 +211,15 @@ class NoveltyDetectionModule:
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.known_papers: Set[str] = set()
+        self.known_papers: set[str] = set()
 
-    def load_paper_embeddings(self, references: List[Dict[str, Any]]) -> None:
+    def load_paper_embeddings(self, references: list[dict[str, Any]]) -> None:
         """加載論文向量"""
         for ref in references:
             self.known_papers.add(ref.get("key", ""))
         self.logger.info(f"加載 {len(self.known_papers)} 篇論文用於新穎性檢測")
 
-    def compute_novelty_score(self, idea: ResearchIdea, similar_papers: List[str]) -> float:
+    def compute_novelty_score(self, idea: ResearchIdea, similar_papers: list[str]) -> float:
         """計算新穎性分數"""
         if not similar_papers:
             return 1.0
@@ -249,7 +245,7 @@ class ExecutabilityScorer:
         self.logger = logging.getLogger(__name__)
 
     def score_executability(
-        self, idea: ResearchIdea, resource_constraints: Dict[str, float]
+        self, idea: ResearchIdea, resource_constraints: dict[str, float]
     ) -> float:
         """評分可執行性"""
         max_compute_hours = resource_constraints.get("max_compute_hours", 100)
@@ -276,7 +272,7 @@ class ImpactPredictor:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def predict_impact(self, idea: ResearchIdea, domain_trends: Dict[str, Any]) -> float:
+    def predict_impact(self, idea: ResearchIdea, domain_trends: dict[str, Any]) -> float:
         """預測想法的影響"""
         keyword_impact = domain_trends.get("trending_keywords", {})
 
@@ -320,11 +316,11 @@ class MapElitesArchiveManager:
 
         return initial_count - len(self.archive.ideas)
 
-    def get_frontier_ideas(self) -> List[ResearchIdea]:
+    def get_frontier_ideas(self) -> list[ResearchIdea]:
         """獲取 Pareto 前沿上的想法"""
         return [idea for idea in self.archive.ideas if idea.idea_id in self.archive.pareto_frontier]
 
-    def get_archive_snapshot(self) -> Dict[str, Any]:
+    def get_archive_snapshot(self) -> dict[str, Any]:
         """獲取檔案快照"""
         return {
             "total_ideas": len(self.archive.ideas),
@@ -354,9 +350,9 @@ class IdeationService:
     def run_ideation_pipeline(
         self,
         domain: str,
-        references: List[Dict[str, Any]],
-        resource_constraints: Optional[Dict[str, float]] = None,
-    ) -> Dict[str, Any]:
+        references: list[dict[str, Any]],
+        resource_constraints: dict[str, float] | None = None,
+    ) -> dict[str, Any]:
         """執行完整的想法生成管道"""
         if resource_constraints is None:
             resource_constraints = {"max_compute_hours": 100, "max_implementation_days": 30}
@@ -389,7 +385,7 @@ class IdeationService:
 
         return self._generate_ideation_report()
 
-    def _generate_ideation_report(self) -> Dict[str, Any]:
+    def _generate_ideation_report(self) -> dict[str, Any]:
         """生成想法生成報告"""
         frontier_ideas = self.archive_manager.get_frontier_ideas()
 
@@ -402,7 +398,7 @@ class IdeationService:
             "timestamp": datetime.now().isoformat(),
         }
 
-    def get_top_ideas(self, metric: str = "impact", top_k: int = 5) -> List[ResearchIdea]:
+    def get_top_ideas(self, metric: str = "impact", top_k: int = 5) -> list[ResearchIdea]:
         """獲取排名靠前的想法"""
         frontier_ideas = self.archive_manager.get_frontier_ideas()
 

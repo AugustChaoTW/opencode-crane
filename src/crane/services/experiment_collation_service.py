@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import csv
 import json
-import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -145,7 +144,7 @@ class ExperimentCollationService:
         metadata = {}
 
         try:
-            with open(csv_path, "r", encoding="utf-8") as f:
+            with open(csv_path, encoding="utf-8") as f:
                 reader = csv.DictReader(f)
                 fieldnames = reader.fieldnames or []
                 lower_fields = [fn.lower() for fn in fieldnames]
@@ -221,7 +220,7 @@ class ExperimentCollationService:
         metadata = {}
 
         try:
-            with open(json_path, "r", encoding="utf-8") as f:
+            with open(json_path, encoding="utf-8") as f:
                 data = json.load(f)
 
                 if isinstance(data, dict):
@@ -267,7 +266,7 @@ class ExperimentCollationService:
         metadata = {}
 
         try:
-            with open(yaml_path, "r", encoding="utf-8") as f:
+            with open(yaml_path, encoding="utf-8") as f:
                 data = yaml.safe_load(f)
 
                 if isinstance(data, dict):

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
+from crane.services.citation_graph_service import CitationGraphService
 from crane.services.paper_service import PaperService
 from crane.services.semantic_search_service import SemanticSearchService
-from crane.services.citation_graph_service import CitationGraphService
 
 
 @dataclass

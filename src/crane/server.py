@@ -11,11 +11,11 @@ from importlib import import_module
 
 from mcp.server.fastmcp import FastMCP  # pyright: ignore[reportMissingImports]
 
-from .tools.citations import register_tools as register_citation_tools
-from .tools.citation_graph import register_tools as register_citation_graph_tools
-from .tools.evaluation_v2 import register_tools as register_evaluation_v2_tools
-from .tools.ask_library import register_tools as register_ask_library_tools
 from .tools.agent_mgmt import register_tools as register_agent_mgmt_tools
+from .tools.ask_library import register_tools as register_ask_library_tools
+from .tools.citation_graph import register_tools as register_citation_graph_tools
+from .tools.citations import register_tools as register_citation_tools
+from .tools.evaluation_v2 import register_tools as register_evaluation_v2_tools
 from .tools.figures import register_tools as register_figure_tools
 from .tools.first_principles import (  # pyright: ignore[reportMissingImports]
     register_tools as register_first_principles_tools,
@@ -48,12 +48,12 @@ from .tools.tasks import register_tools as register_task_tools
 from .tools.trust_calibration import (  # pyright: ignore[reportMissingImports]
     register_tools as register_trust_calibration_tools,
 )
-from .tools.workspace import register_tools as register_workspace_tools
 from .tools.version_tools import register_tools as register_version_tools
-from .tools.writing_style_tools import register_tools as register_writing_style_tools
+from .tools.workspace import register_tools as register_workspace_tools
 from .tools.writing_style_tools import (
     register_phase_d_tools as register_writing_style_phase_d_tools,
 )
+from .tools.writing_style_tools import register_tools as register_writing_style_tools
 
 register_transport_tools = import_module("crane.tools.transport_tools").register_tools
 

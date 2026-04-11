@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import yaml
-
-from crane.models.paper_profile import PaperProfile, JournalFit
+from crane.models.paper_profile import JournalFit, PaperProfile
 from crane.services.journal_matching_service import JournalMatchingService
 
 

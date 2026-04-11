@@ -13,7 +13,6 @@ from crane.models.writing_style_models import (
     InteractiveRewriteSession,
     RewriteChoice,
     RewriteSuggestion,
-    SectionDiagnosis,
 )
 from crane.services.writing_style_service import WritingStyleService
 
