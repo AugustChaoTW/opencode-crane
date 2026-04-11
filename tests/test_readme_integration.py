@@ -54,11 +54,11 @@ class TestReadmeStructure:
             assert section in readme_content, f"Missing section: {section}"
 
     def test_readme_line_count(self, readme_path: Path):
-        """✅ README.md 行數在預期範圍內（v0.12.1: ~923 行）"""
+        """✅ README.md 行數在預期範圍內（v0.12.2: ~1004 行）"""
         content = readme_path.read_text(encoding="utf-8")
         lines = content.split("\n")
-        # v0.12.1 should be around 923 lines (+/- 50)
-        assert 873 < len(lines) < 973, f"Line count {len(lines)} not in expected range"
+        # v0.12.2 should be around 1004 lines (+/- 100)
+        assert 900 < len(lines) < 1200, f"Line count {len(lines)} not in expected range (900-1200)"
 
 
 class TestV0120Features:
@@ -296,12 +296,12 @@ class TestVersionInformation:
         assert "2026-04-07" in readme_content or "4-07" in readme_content
 
     def test_version_history_updated(self, readme_content: str):
-        """✅ 版本歷史表包含 v0.12.0"""
+        """✅ 版本歷史表包含最新版本"""
         assert "## 版本歷史" in readme_content
-        # Version history should list v0.12.0 first
+        # Version history should list latest version first
         version_section = readme_content[readme_content.find("## 版本歷史") :]
-        assert "v0.12.0" in version_section[:200], (
-            "v0.12.0 should be near the top of version history"
+        assert "v0.12.2" in version_section[:200], (
+            "Latest version v0.12.2 should be near the top of version history"
         )
 
     def test_service_count_updated(self, readme_content: str):

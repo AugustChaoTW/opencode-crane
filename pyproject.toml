@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "opencode-crane"
-version = "0.12.1"
+version = "0.12.2"
 description = "CRANE - Autonomous Research Assistant MCP Server for OpenCode"
 readme = "README.md"
 license = "MIT"
@@ -23,6 +23,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8.0",
+    "pytest-asyncio",
     "pytest-cov",
     "ruff",
 ]

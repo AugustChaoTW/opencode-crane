@@ -604,13 +604,84 @@ CRANE generate cover-letter --journal "IEEE TPAMI"
 CRANE v0.12.0 完成了 4 個關鍵研究缺口（Issues #59-62）的實現，進一步強化研究自動化：
 
 | 特性 | 實現 | 代碼量 | 測試 | 應用階段 |
-|------|------|--------|------|---------|
-| **論文-程式碼對齐驗證** | PaperCodeAlignmentService | 641 行 | ✅ 13 個 | 第 2-3 階段 |
+|------|------|-------|------|-------|
+| **論文 - 程式碼對齊驗證** | PaperCodeAlignmentService | 641 行 | ✅ 13 個 | 第 2-3 階段 |
 | **研究管道基準評估** | ResearchPipelineBenchmarkService | 522 行 | ✅ 16 個 | 第 5-6 階段 |
 | **AI 輔助信任校準** | TrustCalibrationService | 521 行 | ✅ 18 個 | 全階段 |
 | **MCP 工具編排** | MCPToolOrchestrationService | 704 行 | ✅ 19 個 | 全階段 |
 
 **v0.12.0 總計**：2,388 行新增代碼 + 66 個新單元測試（100% 通過）
+
+### 🔥 v0.12.2 新功能：Feynman 整合 (Issues #71-#72)
+
+CRANE v0.12.2 整合了 Feynman 開源 AI 研究代理系統的核心功能，實現證據導向的多 Agent 編排和多來源文獻搜索：
+
+| 特性 | 實現 | 代碼量 | 測試 | 對應 Feynman 命令 |
+|------|------|-----|-----|-------------|
+| **證據導向編排器** | EvidenceOrchestrator | 330 行 | ✅ 15 個 | `deepresearch` + `audit` + `draft` |
+| **多來源證據收集器** | MultiSourceEvidenceCollector | 365 行 | ✅ 22 個 | `lit` |
+
+**核心能力**：
+- **EvidenceOrchestrator**：
+  - Researcher Agent：自動文獻搜索、PDF 下載、內容閱讀
+  - Reviewer Agent：論文缺陷檢測 (Critical/Major/Minor)
+  - Writer Agent：章節寫作指導 (Abstract/Introduction/Methods/Results/Discussion/Conclusion)
+  - Verifier Agent：引用驗證與一致性檢查
+- **MultiSourceEvidenceCollector**：
+  - 多來源聚合搜索 (arXiv + Semantic Scholar + CrossRef)
+  - 自動去重與來源標註
+  - 語義相似性搜索
+  - 引用圖譜雙向擴展
+
+**使用範例**：
+```python
+from crane.services.evidence_orchestrator_service import EvidenceOrchestrator
+from crane.services.multi_source_evidence_service import MultiSourceEvidenceCollector
+
+# 證據導向編排
+orchestrator = EvidenceOrchestrator()
+results = orchestrator.run_full_orchestration(
+    research_query="transformer scaling laws",
+    paper_path="main.tex",
+    chapters=["introduction", "methods", "results"],
+    max_papers=50
+)
+
+# 查看各階段結果
+print(results["stages"]["researcher"])  # 文獻調研結果
+print(results["stages"]["reviewer"])    # 缺陷檢測報告
+print(results["stages"]["writer"])      # 寫作指導建議
+print(results["stages"]["verifier"])    # 引用驗證結果
+
+# 多來源證據收集
+collector = MultiSourceEvidenceCollector()
+evidence = collector.collect_evidence(
+    query="transformer attention mechanisms",
+    sources=["arxiv", "semantic_scholar", "crossref"],
+    max_results=50,
+    deduplicate=True
+)
+
+# 查找相似論文
+similar = collector.find_similar_papers(
+    paper_id="arxiv:1706.03762",  # Attention Is All You Need
+    similarity_threshold=0.7,
+    max_results=20
+)
+
+# 擴展引用關係
+citations = collector.expand_citations(
+    paper_id="arxiv:1706.03762",
+    direction="both",  # forward | backward | both
+    max_depth=2
+)
+
+# 獲取統計信息
+stats = collector.get_evidence_statistics(evidence)
+print(f"Total: {stats['total_count']}, Sources: {stats['by_source']}")
+```
+
+**v0.12.2 總計**：695 行新增代碼 + 37 個單元測試（100% 通過）
 
 ### 📊 Q1 評估引擎
 
@@ -705,9 +776,10 @@ crane start optimization --paper "main.tex" --target-journal "IEEE TPAMI"
 ## 版本歷史
 
 | 版本 | 發佈日期 | 重點 |
-|------|----------|------|
+|------|----------|-------|
+| **v0.12.2** | 2026-04-10 | Feynman 整合 (Issues #71, #72)：EvidenceOrchestrator + MultiSourceEvidenceCollector，實現證據導向的多 Agent 編排和多來源文獻搜索。新增 695 行代碼 + 37 個測試 |
 | **v0.12.1** | 2026-04-07 | v0.12.0 版本同步與文檔增強：更新所有版本檔案、增強新功能說明和 6 個研究階段集成，添加具體使用情境和案例演示 |
-| **v0.12.0** | 2026-04-07 | 4 個研究缺口解決方案：論文-程式碼對齁（#59）、管道基準（#60）、信任校準（#61）、MCP 工具編排（#62）。新增 2,388 行代碼 + 66 個測試 |
+| **v0.12.0** | 2026-04-07 | 4 個研究缺口解決方案：論文 - 程式碼對齁（#59）、管道基準（#60）、信任校準（#61）、MCP 工具編排（#62）。新增 2,388 行代碼 + 66 個測試 |
 | v0.11.0 | 2026-04-06 | 6 個研究階段完整實現：實驗生成、想法生成、自動評審、期刊匹配、因果推理、多輪優化 |
 | v0.10.1 | 2026-04-06 | 期刊感知寫作風格工具包：55 本期刊、8 項量化指標、互動改寫 |
 | v0.10.0 | 2026-04-06 | ACM TOSEM 投稿工具鏈：投稿前檢查、期刊策略、修改追蹤 |
@@ -797,6 +869,9 @@ src/crane/
     research_pipeline_benchmark_service.py (522 行) # Issue #60
     trust_calibration_service.py        (521 行) # Issue #61
     mcp_tool_orchestration_service.py   (704 行) # Issue #62
+    # v0.12.2 新服務（Feynman 整合）
+    evidence_orchestrator_service.py         (330 行) # Issue #71
+    multi_source_evidence_service.py         (365 行) # Issue #72
     # 其他 64 個服務
     [citation_service, q1_evaluation_service, ...]
   models/               # 資料模型（dataclass）
