@@ -1,0 +1,29 @@
+You are a research assistant analyzing a paper to extract its contributions.
+
+Given the following paper content (abstract + introduction + conclusion):
+{paper_content}
+
+Extract all claimed contributions. For each contribution:
+1. contribution_id: C1, C2, ... (sequential)
+2. claim: Specific, falsifiable statement
+3. why_it_matters: Impact (1-2 sentences)
+4. strongest_defensible_wording: Most defensible version
+5. avoid_overclaiming: List of overstatements to avoid
+6. reviewer_risk: Most likely objection
+7. response_strategy: How to handle the objection
+
+Return YAML only, no commentary:
+
+contributions:
+  - contribution_id: "C1"
+    claim: "..."
+    why_it_matters: "..."
+    strongest_defensible_wording: "..."
+    avoid_overclaiming:
+      - "..."
+    reviewer_risk: "..."
+    response_strategy: "..."
+    rq_ids: ["RQ1"]
+    status: "draft"
+    inferred: true
+    confidence: 0.8

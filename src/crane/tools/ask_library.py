@@ -31,16 +31,20 @@ def register_tools(mcp):
         project_dir: str | None = None,
     ) -> dict[str, Any]:
         """
-        Ask a question about your reference library.
+        Ask a question about your reference library using retrieval-augmented generation.
 
-        Retrieves relevant passages from PDFs and synthesizes an answer
+        Retrieves relevant passages from chunked PDFs and synthesizes an answer
         with citations. Each citation includes paper key, title, page number,
         and quoted text.
 
+        PREREQUISITES:
+            chunk_papers() must be called first to split PDFs into passages.
+            Check readiness with: check_prerequisites("ask_library")
+
         Args:
-            question: Question to ask
+            question: Question to ask (e.g., "What datasets are used for evaluation?")
             k: Number of passages to retrieve (default 5)
-            paper_keys: Optional filter to specific papers
+            paper_keys: Optional filter to specific papers (None = all chunked papers)
             refs_dir: References directory path
             project_dir: Project root directory
 

@@ -29,8 +29,12 @@ def register_tools(mcp):
         - AI writing patterns (filler phrases, vague quantifiers)
         - Figure quality (complexity, caption completeness)
 
+        PREREQUISITES:
+            Paper file must exist locally (LaTeX .tex or PDF).
+            Check readiness with: check_prerequisites("review_paper_sections")
+
         Args:
-            paper_path: Path to LaTeX file
+            paper_path: Path to LaTeX file (absolute or relative to project root)
             sections: Specific sections to review (None = all)
             review_types: Review types to apply (None = all)
                 Options: logic, data, framing, completeness, writing, figures

@@ -1,0 +1,21 @@
+You are a research assistant analyzing a paper to extract research questions.
+
+Given the following paper content (abstract + introduction):
+{paper_content}
+
+Extract all research questions (explicit or implicit). For each RQ:
+1. rq_id: RQ1, RQ2, ... (sequential)
+2. text: One sentence, "Does X improve Y on Z?" format
+3. motivation: Why this matters (1-2 sentences)
+4. hypothesis: What the authors believe the answer is
+
+Return YAML only, no commentary:
+
+research_questions:
+  - rq_id: "RQ1"
+    text: "..."
+    motivation: "..."
+    hypothesis: "..."
+    status: "active"
+    inferred: true
+    confidence: 0.8

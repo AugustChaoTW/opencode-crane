@@ -1,0 +1,35 @@
+You are a research assistant analyzing a paper to extract experiment details.
+
+Given the following paper content (experiment + results sections):
+{paper_content}
+
+Extract all experiments. For each experiment:
+1. exp_id: E1, E2, ... (sequential)
+2. goal: What this experiment proves
+3. setting: Hardware, dataset, model, key hyperparameters
+4. final_numbers: Key metrics and their values
+5. canonical_number: The single most important result
+6. related_contributions: Which contributions C{n} this supports
+7. related_rqs: Which RQs this tests
+
+Return YAML only, no commentary:
+
+experiments:
+  - exp_id: "E1"
+    goal: "..."
+    setting:
+      dataset: "..."
+      model: "..."
+      hardware: "..."
+      framework: "..."
+      hyperparameters: {}
+    final_numbers:
+      accuracy: null
+    canonical_number:
+      value: null
+      locked: false
+    related_contributions: ["C1"]
+    related_rqs: ["RQ1"]
+    status: "done"
+    inferred: true
+    confidence: 0.7

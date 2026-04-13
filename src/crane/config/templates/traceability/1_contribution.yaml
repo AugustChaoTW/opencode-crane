@@ -1,0 +1,22 @@
+# Contribution Registry — what this paper claims to contribute
+# RQ/Contribution traceability chain start
+
+paper_title: ""          # full title
+paper_path: ""           # relative path to .tex or .pdf
+paper_stage: "draft"     # draft | revision | camera_ready
+
+core_research_question:
+  rq_id: "RQ1"
+  text: ""               # one sentence: "Does X improve Y on Z?"
+  motivation: ""
+  hypothesis: ""
+
+main_thesis:
+  safe_claim: ""         # the one claim you can 100% defend
+  one_sentence_safe_claim: ""
+
+contributions: []
+
+avoid_overclaiming: []   # global list of phrases to remove from draft
+
+reviewer_risk: ""        # highest-probability rejection reason

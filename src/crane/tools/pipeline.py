@@ -215,6 +215,140 @@ def register_tools(mcp):
     """Register pipeline tools with the MCP server."""
 
     @mcp.tool()
+    def list_workflows() -> list[dict[str, Any]]:
+        """
+        List all available research workflows with steps, parameters, and use cases.
+
+        Call this first to discover what end-to-end pipelines are available before
+        choosing individual tools. Each workflow can be executed via run_pipeline().
+
+        Returns:
+            List of workflow descriptors with name, description, use_case,
+            required_params, optional_params, steps, prerequisites, and estimated_time.
+        """
+        return [
+            {
+                "name": "literature-review",
+                "description": (
+                    "Search papers → add to library → download PDFs → "
+                    "read text → auto-annotate → create task"
+                ),
+                "use_case": "Starting a literature review on a new topic",
+                "required_params": {"topic": "str — research topic or search query"},
+                "optional_params": {
+                    "max_papers": "int = 5 — max papers to process",
+                    "source": "str = 'arxiv' — paper source",
+                    "skip_steps": "list[str] — step names to skip",
+                    "stop_after": "str — stop after this step",
+                    "dry_run": "bool = False — preview without executing",
+                },
+                "steps": LITERATURE_REVIEW_STEPS,
+                "prerequisites": [],
+                "estimated_time": "2–5 minutes",
+            },
+            {
+                "name": "full-setup",
+                "description": (
+                    "Initialize GitHub labels, milestones, directory structure, "
+                    "and issue template for a new research project"
+                ),
+                "use_case": "Starting a brand-new research project from scratch",
+                "required_params": {},
+                "optional_params": {
+                    "project_dir": "str — project root (auto-detected from git if None)",
+                    "refs_dir": "str = 'references' — references directory path",
+                },
+                "steps": FULL_SETUP_STEPS,
+                "prerequisites": [
+                    "GitHub CLI (gh) must be authenticated",
+                    "Must be run inside a git repository",
+                ],
+                "estimated_time": "< 1 minute",
+            },
+            {
+                "name": "lecun-enhanced-review",
+                "description": (
+                    "7-dimension evidence evaluation → enhanced citation check → "
+                    "adversarial section review → revision report + execution plan → "
+                    "outcome simulation → research positioning analysis"
+                ),
+                "use_case": "Comprehensive pre-submission review of a paper",
+                "required_params": {
+                    "paper_path": "str — path to paper LaTeX or PDF file",
+                },
+                "optional_params": {
+                    "include_claim_analysis": "bool = True — include claim-level evidence",
+                    "skip_steps": "list[str] — step names to skip",
+                    "stop_after": "str — stop after this step",
+                    "dry_run": "bool = False — preview without executing",
+                },
+                "steps": LECUN_ENHANCED_REVIEW_STEPS,
+                "prerequisites": [
+                    "Paper file must exist locally (PDF or LaTeX)",
+                    "Call check_prerequisites('evaluate_paper_v2') to verify",
+                ],
+                "estimated_time": "5–15 minutes",
+            },
+            {
+                "name": "submission-check",
+                "description": (
+                    "Literature gap review → experiment results check → "
+                    "framing analysis → paper health check"
+                ),
+                "use_case": "Final checklist review before journal submission",
+                "required_params": {
+                    "paper_path": "str — path to paper file",
+                },
+                "optional_params": {
+                    "skip_steps": "list[str] — step names to skip",
+                    "stop_after": "str — stop after this step",
+                },
+                "steps": SUBMISSION_CHECK_STEPS,
+                "prerequisites": [
+                    "Paper file must exist locally",
+                ],
+                "estimated_time": "3–8 minutes",
+            },
+            {
+                "name": "paper-trace",
+                "description": (
+                    "Trace research lifecycle: infer RQs → contributions → experiments → "
+                    "figures/tables → risks → generate RTM + Mermaid visualization"
+                ),
+                "use_case": (
+                    "Building a complete traceability chain for a paper under active writing. "
+                    "Triggered by: 'trace this paper', 'do paper trace', '整理這篇研究'"
+                ),
+                "required_params": {
+                    "paper_path": "str — path to .tex or .pdf file",
+                },
+                "optional_params": {
+                    "mode": (
+                        "str = 'full' — full | init | infer | update | status | viz. "
+                        "'full' infers all items; 'init' creates blank templates; "
+                        "'status' is read-only; 'viz' returns Mermaid+DOT"
+                    ),
+                    "paper_stage": "str = 'draft' — draft | revision | camera_ready",
+                    "output_dir": "str — custom trace base directory (default: co-located with paper)",
+                    "project_dir": "str — project root hint for path resolution",
+                },
+                "steps": [
+                    "trace_paper(mode='full') — init versioned trace dir + infer all items",
+                    "get_traceability_status() — check chain completeness",
+                    "verify_traceability_chain() — validate RQ→Contribution→Experiment→Fig chain",
+                    "find_orphan_artifacts() — identify unlinked nodes",
+                    "generate_rtm() — produce Requirements Traceability Matrix",
+                    "get_traceability_mermaid() — visualize as Mermaid flowchart",
+                ],
+                "prerequisites": [
+                    "Paper file must exist locally (.tex or .pdf)",
+                    "Trace directory will be created as _paper_trace/v{n}/ co-located with paper",
+                ],
+                "estimated_time": "< 1 minute",
+            },
+        ]
+
+    @mcp.tool()
     def run_pipeline(
         pipeline: str,
         topic: str = "",

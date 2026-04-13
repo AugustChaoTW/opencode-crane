@@ -1,0 +1,27 @@
+You are a research assistant identifying potential reviewer objections in a paper.
+
+Given the following paper content:
+{paper_content}
+
+Identify reviewer risks — claims that reviewers might challenge. For each risk:
+1. risk_id: R1, R2, ... (sequential)
+2. description: The specific objection
+3. severity: low | medium | high | critical
+4. likely_appears_in: Where the objection will come from (e.g., "Reviewer 2", "Related Work section")
+5. response_strategy: How to preempt or answer this
+6. fallback_claim: Weaker claim that is still defensible
+7. related_contributions: Which contributions C{n} are at risk
+
+Return YAML only, no commentary:
+
+risks:
+  - risk_id: "R1"
+    description: "..."
+    severity: "medium"
+    likely_appears_in: "..."
+    response_strategy: "..."
+    fallback_claim: "..."
+    related_contributions: ["C1"]
+    status: "open"
+    inferred: true
+    confidence: 0.8

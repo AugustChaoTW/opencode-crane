@@ -151,10 +151,27 @@ def register_tools(mcp):
         Returns scorecard with 7-dimension scores, gates status,
         readiness assessment, and revision plan.
 
+        PREREQUISITES:
+            Paper file must exist locally (LaTeX .tex or PDF).
+            Check readiness with: check_prerequisites("evaluate_paper_v2")
+
         Args:
-            paper_path: Path to LaTeX file
-            mode: 'hybrid' (default) or 'heuristic'
-            project_dir: Project root directory
+            paper_path: Path to LaTeX file (absolute or relative to project_dir)
+            mode: 'hybrid' (default) uses evidence extraction + heuristic fallback;
+                  'heuristic' uses rule-based scoring only
+            project_dir: Project root directory (auto-detected from git if None)
+
+        Returns:
+            {
+                "paper_path": str,
+                "mode": str,
+                "profile": dict,           # 17-field paper profile
+                "scores": list[dict],      # 7-dimension evidence scores
+                "overall_score": float,    # 0–100
+                "gates_passed": bool,
+                "readiness": str,          # "ready" | "needs_revision" | "major_revision"
+                "revision_plan": dict      # prioritised revision items
+            }
         """
         resolved_paper_path = _resolve_paper_path(paper_path, project_dir)
         evaluation = EvidenceEvaluationService(mode=mode).evaluate(resolved_paper_path)
@@ -179,6 +196,10 @@ def register_tools(mcp):
 
         Returns target/backup/safe recommendations with fit scores
         and desk-reject risk assessment.
+
+        PREREQUISITES:
+            Paper file must exist locally (LaTeX .tex or PDF).
+            Check readiness with: check_prerequisites("match_journal_v2")
         """
         resolved_paper_path = _resolve_paper_path(paper_path, project_dir)
         profile = PaperProfileService().extract_profile(resolved_paper_path)

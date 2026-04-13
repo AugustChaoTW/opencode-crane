@@ -36,7 +36,11 @@ def register_tools(mcp):
         project_dir: str | None = None,
     ) -> dict[str, Any]:
         """
-        Find similar papers by query text.
+        Find similar papers by query text using vector embeddings.
+
+        PREREQUISITES:
+            build_embeddings() must be called first.
+            Check readiness with: check_prerequisites("semantic_search")
 
         Args:
             query: Search query text (e.g., "attention mechanisms")
@@ -48,6 +52,8 @@ def register_tools(mcp):
             Dict with query and list of similar papers:
             {
                 "query": "...",
+                "status": "success" | "no_embeddings" | "embedding_failed",
+                "match_count": int,
                 "matches": [
                     {
                         "key": "paper_id",
@@ -101,7 +107,11 @@ def register_tools(mcp):
         project_dir: str | None = None,
     ) -> dict[str, Any]:
         """
-        Find papers similar to a given reference.
+        Find papers similar to a given reference using vector embeddings.
+
+        PREREQUISITES:
+            build_embeddings() must be called first.
+            Check readiness with: check_prerequisites("semantic_search_by_paper")
 
         Args:
             paper_key: BibTeX citation key of the paper to find similar papers for
