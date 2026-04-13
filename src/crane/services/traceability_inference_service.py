@@ -25,8 +25,8 @@ class TraceabilityInferenceService:
 
     TEMPLATE_DIR = Path(__file__).parent.parent / "config" / "templates" / "llm"
 
-    def __init__(self, paper_path: str) -> None:
-        self.paper_path = Path(paper_path)
+    def __init__(self, paper_path: str = "") -> None:
+        self.paper_path = Path(paper_path) if paper_path else Path()
         self._content_cache: str | None = None
 
     # ------------------------------------------------------------------
