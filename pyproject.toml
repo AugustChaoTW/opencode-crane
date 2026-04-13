@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "opencode-crane"
-version = "0.13.0"
+version = "0.14.0"
 description = "CRANE - Autonomous Research Assistant MCP Server for OpenCode"
 readme = "README.md"
 license = "MIT"

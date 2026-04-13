@@ -8,6 +8,6 @@ An MCP (Model Context Protocol) server that provides tools for:
 - Project lifecycle management
 """
 
-__version__ = "0.12.2"
+__version__ = "0.14.0"
 __project__ = "opencode-crane"
 __codename__ = "crane"

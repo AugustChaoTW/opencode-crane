@@ -102,3 +102,30 @@ src/crane/config/            ← domain packs, journal standards (IEEE TPAMI), L
 |---|---|---|
 | `CRANE_CHECK_VERSION_ON_START` | `"true"` | Emit warning if a newer version is on PyPI |
 | `GH_TOKEN` | — | Required for `gh` CLI calls (issues, PRs) |
+
+## Coding Principles (Karpathy-Inspired)
+
+When developing in this repo, apply these four principles at every step:
+
+### 1. Think Before Coding
+- State assumptions explicitly before writing any code.
+- If a request is ambiguous, present multiple interpretations and ask which is intended — do not silently pick one.
+- Push back when a simpler alternative exists; propose it first.
+- Never hide confusion by running with a guess.
+
+### 2. Simplicity First
+- Write only the minimum code that solves the stated problem.
+- No speculative features, unrequested configurability, or forward-compatibility shims.
+- No error handling for scenarios that cannot happen given the existing invariants.
+- Test: would a senior engineer call this overcomplicated? If yes, simplify.
+
+### 3. Surgical Changes
+- Touch only the lines that must change for the task at hand.
+- Do not reformat, rename, or "improve" adjacent working code.
+- Match the existing style of the file being edited.
+- Remove only the imports / variables that *your* changes orphaned — leave pre-existing dead code alone unless explicitly requested.
+
+### 4. Goal-Driven Execution
+- Before implementing anything non-trivial, write down verifiable success criteria (e.g., "these three tests pass", "tool count stays at 133").
+- Use test loops: write the tests first, then make them pass.
+- For complex tasks, outline a brief plan with checkpoints before touching code.
