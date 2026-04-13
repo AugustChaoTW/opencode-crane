@@ -278,8 +278,16 @@ class TraceabilityInferenceService:
     # Combined inference
     # ------------------------------------------------------------------
 
-    def infer_all(self) -> dict[str, Any]:
-        """Run all inference methods and return structured results."""
+    def infer_all(self, paper_path: str = "") -> dict[str, Any]:
+        """Run all inference methods and return structured results.
+
+        Args:
+            paper_path: Optional override for the paper path set at init.
+                        Clears the content cache when provided.
+        """
+        if paper_path:
+            self.paper_path = Path(paper_path)
+            self._content_cache = None
         return {
             "research_questions": self.infer_research_questions(),
             "contributions": self.infer_contributions(),
