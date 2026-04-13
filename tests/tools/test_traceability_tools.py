@@ -76,20 +76,13 @@ def traceability_tools(mcp_mock):
 
 
 class TestToolRegistration:
-    def test_all_24_tools_registered(self, traceability_tools):
+    def test_all_17_tools_registered(self, traceability_tools):
         expected = {
             "trace_paper",
             "list_active_papers",
             "get_traceability_status",
             "init_traceability",
-            "add_research_question",
-            "add_contribution",
-            "add_experiment",
-            "add_figure_table",
-            "add_trace_reference",
-            "add_reviewer_risk",
-            "add_dataset",
-            "add_baseline",
+            "trace_add",          # unified add_* (replaces 8 individual add_* tools)
             "link_artifacts",
             "log_change",
             "get_change_impact",
@@ -98,12 +91,21 @@ class TestToolRegistration:
             "verify_traceability_chain",
             "find_orphan_artifacts",
             "generate_artifact_index",
-            "get_traceability_mermaid",
-            "get_traceability_dot",
+            "get_traceability_viz",  # replaces get_traceability_mermaid + get_traceability_dot
             "diff_trace_versions",
             "generate_rtm",
+            "check_prerequisites",  # registered from workspace module separately
         }
-        assert expected == set(traceability_tools.keys())
+        # check subset — server also registers workspace tools
+        assert {"trace_add", "get_traceability_viz"} <= set(traceability_tools.keys())
+        # old individual add_* and viz tools must be gone
+        removed = {
+            "add_research_question", "add_contribution", "add_experiment",
+            "add_figure_table", "add_trace_reference", "add_reviewer_risk",
+            "add_dataset", "add_baseline",
+            "get_traceability_mermaid", "get_traceability_dot",
+        }
+        assert removed.isdisjoint(set(traceability_tools.keys()))
 
     def test_tools_are_callable(self, traceability_tools):
         for name, fn in traceability_tools.items():
@@ -208,109 +210,146 @@ class TestTracePaper:
 
 
 class TestAddTools:
+    """Tests for the unified trace_add tool (replaces 8 individual add_* tools)."""
+
     @pytest.fixture(autouse=True)
     def _init(self, tmp_paper, traceability_tools):
         traceability_tools["init_traceability"](str(tmp_paper))
         self.paper_path = str(tmp_paper)
         self.tools = traceability_tools
 
-    def test_add_research_question(self):
-        result = self.tools["add_research_question"](
+    def test_trace_add_rq(self):
+        result = self.tools["trace_add"](
             self.paper_path,
-            rq_id="RQ1",
-            text="Does affect-aware training improve HCI?",
-            motivation="HCI apps need emotion context",
-            hypothesis="Yes, training with affect data improves engagement",
+            item_type="rq",
+            item_id="RQ1",
+            data={
+                "text": "Does affect-aware training improve HCI?",
+                "motivation": "HCI apps need emotion context",
+                "hypothesis": "Yes, training with affect data improves engagement",
+            },
         )
         assert result["status"] == "added"
-        assert result["rq_id"] == "RQ1"
+        assert result["item_id"] == "RQ1"
+        assert result["item_type"] == "rq"
 
-    def test_add_contribution(self):
-        result = self.tools["add_contribution"](
+    def test_trace_add_contribution(self):
+        result = self.tools["trace_add"](
             self.paper_path,
-            contribution_id="C1",
-            claim="Our model achieves 87% accuracy on AffectCorpus",
-            why_it_matters="Sets new benchmark for affect recognition",
-            rq_ids=["RQ1"],
+            item_type="contribution",
+            item_id="C1",
+            data={
+                "claim": "Our model achieves 87% accuracy on AffectCorpus",
+                "why_it_matters": "Sets new benchmark for affect recognition",
+                "rq_ids": ["RQ1"],
+            },
         )
         assert result["status"] == "added"
-        assert result["contribution_id"] == "C1"
+        assert result["item_id"] == "C1"
 
-    def test_add_experiment(self):
-        result = self.tools["add_experiment"](
+    def test_trace_add_experiment(self):
+        result = self.tools["trace_add"](
             self.paper_path,
-            exp_id="E1",
-            goal="Compare affect-aware vs baseline on AffectCorpus",
-            dataset="AffectCorpus",
-            model="AffectNet-v2",
-            related_contributions=["C1"],
-            related_rqs=["RQ1"],
+            item_type="experiment",
+            item_id="E1",
+            data={
+                "goal": "Compare affect-aware vs baseline on AffectCorpus",
+                "dataset": "AffectCorpus",
+                "model": "AffectNet-v2",
+                "related_contributions": ["C1"],
+                "related_rqs": ["RQ1"],
+            },
         )
         assert result["status"] == "added"
-        assert result["exp_id"] == "E1"
+        assert result["item_id"] == "E1"
 
-    def test_add_figure_table(self):
-        result = self.tools["add_figure_table"](
+    def test_trace_add_figure_table(self):
+        result = self.tools["trace_add"](
             self.paper_path,
-            ft_id="Fig:1",
-            ft_type="figure",
-            purpose="Show accuracy comparison across models",
-            source_experiments=["E1"],
-            related_rqs=["RQ1"],
+            item_type="figure_table",
+            item_id="Fig:1",
+            data={
+                "ft_type": "figure",
+                "purpose": "Show accuracy comparison across models",
+                "source_experiments": ["E1"],
+                "related_rqs": ["RQ1"],
+            },
         )
         assert result["status"] == "added"
-        assert result["ft_id"] == "Fig:1"
+        assert result["item_id"] == "Fig:1"
 
-    def test_add_trace_reference(self):
-        result = self.tools["add_trace_reference"](
+    def test_trace_add_reference(self):
+        result = self.tools["trace_add"](
             self.paper_path,
-            ref_key="vaswani2017attention",
-            title="Attention Is All You Need",
-            purpose="Foundation for our self-attention mechanism",
-            role="foundation",
-            should_appear_in=["Related Work", "Methodology"],
+            item_type="reference",
+            item_id="vaswani2017attention",
+            data={
+                "title": "Attention Is All You Need",
+                "purpose": "Foundation for our self-attention mechanism",
+                "role": "foundation",
+                "should_appear_in": ["Related Work", "Methodology"],
+            },
         )
         assert result["status"] == "added"
-        assert result["ref_key"] == "vaswani2017attention"
+        assert result["item_id"] == "vaswani2017attention"
 
-    def test_add_reviewer_risk(self):
-        result = self.tools["add_reviewer_risk"](
+    def test_trace_add_risk(self):
+        result = self.tools["trace_add"](
             self.paper_path,
-            risk_id="R1",
-            description="Reviewer may claim BERT baseline is outdated",
-            severity="high",
-            likely_appears_in="Reviewer 2",
-            response_strategy="Add GPT-4 comparison in rebuttal",
-            related_contributions=["C1"],
+            item_type="risk",
+            item_id="R1",
+            data={
+                "description": "Reviewer may claim BERT baseline is outdated",
+                "severity": "high",
+                "likely_appears_in": "Reviewer 2",
+                "response_strategy": "Add GPT-4 comparison in rebuttal",
+                "related_contributions": ["C1"],
+            },
         )
         assert result["status"] == "added"
-        assert result["risk_id"] == "R1"
+        assert result["item_id"] == "R1"
 
-    def test_add_dataset(self):
-        result = self.tools["add_dataset"](
+    def test_trace_add_dataset(self):
+        result = self.tools["trace_add"](
             self.paper_path,
-            dataset_id="DS1",
-            name="AffectCorpus",
-            description="Multimodal affect dataset with 10K samples",
-            split="80/10/10 train/val/test",
-            metrics=["accuracy", "F1"],
-            used_in_experiments=["E1"],
+            item_type="dataset",
+            item_id="DS1",
+            data={
+                "name": "AffectCorpus",
+                "description": "Multimodal affect dataset with 10K samples",
+                "split": "80/10/10 train/val/test",
+                "metrics": ["accuracy", "F1"],
+                "used_in_experiments": ["E1"],
+            },
         )
         assert result["status"] == "added"
-        assert result["dataset_id"] == "DS1"
+        assert result["item_id"] == "DS1"
 
-    def test_add_baseline(self):
-        result = self.tools["add_baseline"](
+    def test_trace_add_baseline(self):
+        result = self.tools["trace_add"](
             self.paper_path,
-            baseline_id="BL1",
-            name="BERT",
-            full_name="BERT-base-uncased",
-            source_citation="devlin2019bert",
-            implementation_source="official",
-            used_in_experiments=["E1"],
+            item_type="baseline",
+            item_id="BL1",
+            data={
+                "name": "BERT",
+                "full_name": "BERT-base-uncased",
+                "source_citation": "devlin2019bert",
+                "implementation_source": "official",
+                "used_in_experiments": ["E1"],
+            },
         )
         assert result["status"] == "added"
-        assert result["baseline_id"] == "BL1"
+        assert result["item_id"] == "BL1"
+
+    def test_trace_add_unknown_type_returns_error(self):
+        result = self.tools["trace_add"](
+            self.paper_path,
+            item_type="unknown_type",
+            item_id="X1",
+            data={},
+        )
+        assert result["status"] == "error"
+        assert "item_type" in result["error"].lower() or "unknown" in result["error"].lower()
 
     def test_link_artifacts(self):
         result = self.tools["link_artifacts"](
@@ -326,13 +365,10 @@ class TestAddTools:
         assert result["artifact_id"] == "A001"
 
     def test_duplicate_rq_not_added_twice(self):
-        self.tools["add_research_question"](
-            self.paper_path, rq_id="RQ1", text="First add"
-        )
-        self.tools["add_research_question"](
-            self.paper_path, rq_id="RQ1", text="Second add"  # duplicate
-        )
-        # Read YAML directly and count entries
+        self.tools["trace_add"](self.paper_path, item_type="rq", item_id="RQ1",
+                                data={"text": "First add"})
+        self.tools["trace_add"](self.paper_path, item_type="rq", item_id="RQ1",
+                                data={"text": "Second add"})  # duplicate
         from crane.services.traceability_service import TraceabilityService
         svc = TraceabilityService(paper_path=self.paper_path)
         vdir = svc.get_version_dir("status")
@@ -466,31 +502,34 @@ class TestVisualizationTools:
     @pytest.fixture(autouse=True)
     def _init(self, tmp_paper, traceability_tools):
         traceability_tools["init_traceability"](str(tmp_paper))
-        # Add some nodes to visualize
         self.paper_path = str(tmp_paper)
         self.tools = traceability_tools
-        traceability_tools["add_research_question"](
-            str(tmp_paper), rq_id="RQ1", text="Test RQ"
+        traceability_tools["trace_add"](
+            str(tmp_paper), item_type="rq", item_id="RQ1", data={"text": "Test RQ"}
         )
-        traceability_tools["add_contribution"](
-            str(tmp_paper), contribution_id="C1", claim="Test claim",
-            why_it_matters="Test", rq_ids=["RQ1"]
+        traceability_tools["trace_add"](
+            str(tmp_paper), item_type="contribution", item_id="C1",
+            data={"claim": "Test claim", "why_it_matters": "Test", "rq_ids": ["RQ1"]}
         )
 
-    def test_mermaid_output_format(self):
-        result = self.tools["get_traceability_mermaid"](self.paper_path)
+    def test_get_traceability_viz_mermaid(self):
+        result = self.tools["get_traceability_viz"](self.paper_path)
         assert "mermaid" in result
         assert "flowchart" in result["mermaid"]
 
-    def test_dot_output_format(self):
-        result = self.tools["get_traceability_dot"](self.paper_path)
+    def test_get_traceability_viz_dot(self):
+        result = self.tools["get_traceability_viz"](self.paper_path, output_format="dot")
         assert "dot" in result
         assert "digraph" in result["dot"]
 
-    def test_mermaid_contains_node_count(self):
-        result = self.tools["get_traceability_mermaid"](self.paper_path)
+    def test_viz_contains_node_count(self):
+        result = self.tools["get_traceability_viz"](self.paper_path)
         assert "node_count" in result
         assert isinstance(result["node_count"], int)
+
+    def test_viz_output_format_echoed(self):
+        result = self.tools["get_traceability_viz"](self.paper_path, output_format="mermaid")
+        assert result["output_format"] == "mermaid"
 
 
 # ---------------------------------------------------------------------------
@@ -511,8 +550,8 @@ class TestDiffTraceVersions:
 
     def test_diff_two_versions(self, tmp_paper, traceability_tools):
         traceability_tools["init_traceability"](str(tmp_paper))
-        traceability_tools["add_research_question"](
-            str(tmp_paper), rq_id="RQ1", text="Added in v1"
+        traceability_tools["trace_add"](
+            str(tmp_paper), item_type="rq", item_id="RQ1", data={"text": "Added in v1"}
         )
         traceability_tools["init_traceability"](str(tmp_paper))  # creates v2
         result = traceability_tools["diff_trace_versions"](str(tmp_paper))
@@ -542,12 +581,13 @@ class TestGenerateRTM:
 
     def test_rtm_with_items(self, tmp_paper, traceability_tools):
         traceability_tools["init_traceability"](str(tmp_paper))
-        traceability_tools["add_research_question"](
-            str(tmp_paper), rq_id="RQ1", text="Does X work?"
+        traceability_tools["trace_add"](
+            str(tmp_paper), item_type="rq", item_id="RQ1", data={"text": "Does X work?"}
         )
-        traceability_tools["add_reviewer_risk"](
-            str(tmp_paper), risk_id="R1", description="Baseline is outdated",
-            severity="high", likely_appears_in="Reviewer 2", response_strategy="Add GPT-4"
+        traceability_tools["trace_add"](
+            str(tmp_paper), item_type="risk", item_id="R1",
+            data={"description": "Baseline is outdated", "severity": "high",
+                  "likely_appears_in": "Reviewer 2", "response_strategy": "Add GPT-4"}
         )
         result = traceability_tools["generate_rtm"](str(tmp_paper))
         assert result["rq_count"] == 1

@@ -1,4 +1,4 @@
-"""Semantic search tools: find similar papers by query or by reference."""
+"""Semantic search tools: find similar papers by query or by anchor paper."""
 
 import os
 from pathlib import Path
@@ -30,45 +30,61 @@ def register_tools(mcp):
 
     @mcp.tool()
     def semantic_search(
-        query: str,
+        query: str = "",
+        anchor_paper_key: str = "",
         k: int = 5,
         refs_dir: str = "references",
         project_dir: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Find similar papers by query text using vector embeddings.
+        """Find similar papers by query text or by an anchor paper.
+
+        Provide either *query* (free-text) or *anchor_paper_key* (BibTeX key).
+        When both are given, *anchor_paper_key* takes precedence.
 
         PREREQUISITES:
             build_embeddings() must be called first.
             Check readiness with: check_prerequisites("semantic_search")
 
         Args:
-            query: Search query text (e.g., "attention mechanisms")
-            k: Number of similar papers to return (default 5)
-            refs_dir: References directory path
-            project_dir: Project root directory
+            query:            Free-text search (e.g. "attention mechanisms").
+                              Ignored when anchor_paper_key is provided.
+            anchor_paper_key: BibTeX key of a paper already in your library.
+                              Returns papers similar to that paper, excluding itself.
+            k:                Number of similar papers to return (default 5).
+            refs_dir:         References directory path.
+            project_dir:      Project root directory.
 
         Returns:
-            Dict with query and list of similar papers:
-            {
-                "query": "...",
-                "status": "success" | "no_embeddings" | "embedding_failed",
-                "match_count": int,
-                "matches": [
-                    {
-                        "key": "paper_id",
-                        "similarity": 0.85,
-                        "title": "...",
-                        "authors": [...],
-                        "year": 2024,
-                        "abstract": "..."
-                    },
-                    ...
-                ]
-            }
+            Dict with status, matches list, and either query or anchor_paper_key echoed.
+            matches: [{key, similarity, title, authors, year, abstract}, ...]
         """
         service = _get_service(refs_dir, project_dir)
 
+        # ── anchor-paper mode ──────────────────────────────────────────────
+        if anchor_paper_key:
+            if anchor_paper_key not in service.references:
+                return {
+                    "anchor_paper_key": anchor_paper_key,
+                    "status": "not_found",
+                    "message": f"Reference not found: {anchor_paper_key}",
+                    "matches": [],
+                }
+            if not service.embeddings or anchor_paper_key not in service.embeddings:
+                return {
+                    "anchor_paper_key": anchor_paper_key,
+                    "status": "no_embedding",
+                    "message": f"No embedding for {anchor_paper_key}. Run build_embeddings first.",
+                    "matches": [],
+                }
+            matches = service.find_similar_by_paper(paper_key=anchor_paper_key, k=k)
+            return {
+                "anchor_paper_key": anchor_paper_key,
+                "status": "success",
+                "match_count": len(matches),
+                "matches": matches,
+            }
+
+        # ── query-text mode ────────────────────────────────────────────────
         if not service.embeddings:
             return {
                 "query": query,
@@ -91,59 +107,8 @@ def register_tools(mcp):
             query_embedding=query_embedding,
             k=k,
         )
-
         return {
             "query": query,
-            "status": "success",
-            "match_count": len(matches),
-            "matches": matches,
-        }
-
-    @mcp.tool()
-    def semantic_search_by_paper(
-        paper_key: str,
-        k: int = 5,
-        refs_dir: str = "references",
-        project_dir: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Find papers similar to a given reference using vector embeddings.
-
-        PREREQUISITES:
-            build_embeddings() must be called first.
-            Check readiness with: check_prerequisites("semantic_search_by_paper")
-
-        Args:
-            paper_key: BibTeX citation key of the paper to find similar papers for
-            k: Number of similar papers to return (default 5)
-            refs_dir: References directory path
-            project_dir: Project root directory
-
-        Returns:
-            Dict with paper key and list of similar papers
-        """
-        service = _get_service(refs_dir, project_dir)
-
-        if paper_key not in service.references:
-            return {
-                "paper_key": paper_key,
-                "status": "not_found",
-                "message": f"Reference not found: {paper_key}",
-                "matches": [],
-            }
-
-        if not service.embeddings or paper_key not in service.embeddings:
-            return {
-                "paper_key": paper_key,
-                "status": "no_embedding",
-                "message": f"No embedding found for {paper_key}. Run build_embeddings first.",
-                "matches": [],
-            }
-
-        matches = service.find_similar_by_paper(paper_key=paper_key, k=k)
-
-        return {
-            "paper_key": paper_key,
             "status": "success",
             "match_count": len(matches),
             "matches": matches,
@@ -154,16 +119,16 @@ def register_tools(mcp):
         refs_dir: str = "references",
         project_dir: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Build and cache embeddings for all references.
+        """Build and cache embeddings for all references.
+
         Requires OPENAI_API_KEY environment variable.
 
         Args:
-            refs_dir: References directory path
-            project_dir: Project root directory
+            refs_dir:    References directory path.
+            project_dir: Project root directory.
 
         Returns:
-            Dict with embedding status and count
+            Dict with embedding status and count.
         """
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:

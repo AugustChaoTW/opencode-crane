@@ -171,16 +171,16 @@ class TestSemanticSearchTool:
         assert result["matches"] == []
 
 
-class TestSemanticSearchByPaperTool:
-    """Test semantic_search_by_paper MCP tool."""
+class TestSemanticSearchAnchorPaperMode:
+    """Test semantic_search with anchor_paper_key (replaces semantic_search_by_paper)."""
 
-    def test_search_by_paper_returns_matches(self, registered_tools, temp_refs_dir):
-        """Test that semantic_search_by_paper returns matches."""
-        tool = registered_tools["semantic_search_by_paper"]
+    def test_anchor_mode_returns_matches(self, registered_tools, temp_refs_dir):
+        """Test that anchor_paper_key mode returns matches."""
+        tool = registered_tools["semantic_search"]
 
         with patch("os.getenv", return_value="test-key"):
             result = tool(
-                paper_key="paper1",
+                anchor_paper_key="paper1",
                 k=5,
                 refs_dir=str(temp_refs_dir),
                 project_dir=None,
@@ -189,13 +189,13 @@ class TestSemanticSearchByPaperTool:
         assert result["status"] == "success"
         assert "matches" in result
 
-    def test_search_by_paper_excludes_itself(self, registered_tools, temp_refs_dir):
-        """Test that results don't include the query paper."""
-        tool = registered_tools["semantic_search_by_paper"]
+    def test_anchor_mode_excludes_itself(self, registered_tools, temp_refs_dir):
+        """Test that results don't include the anchor paper."""
+        tool = registered_tools["semantic_search"]
 
         with patch("os.getenv", return_value="test-key"):
             result = tool(
-                paper_key="paper1",
+                anchor_paper_key="paper1",
                 k=5,
                 refs_dir=str(temp_refs_dir),
                 project_dir=None,
@@ -204,13 +204,13 @@ class TestSemanticSearchByPaperTool:
         keys = [m["key"] for m in result["matches"]]
         assert "paper1" not in keys
 
-    def test_search_by_paper_not_found(self, registered_tools, temp_refs_dir):
-        """Test search_by_paper with nonexistent paper."""
-        tool = registered_tools["semantic_search_by_paper"]
+    def test_anchor_mode_not_found(self, registered_tools, temp_refs_dir):
+        """Test anchor mode with nonexistent paper."""
+        tool = registered_tools["semantic_search"]
 
         with patch("os.getenv", return_value="test-key"):
             result = tool(
-                paper_key="nonexistent",
+                anchor_paper_key="nonexistent",
                 k=5,
                 refs_dir=str(temp_refs_dir),
                 project_dir=None,
@@ -218,6 +218,26 @@ class TestSemanticSearchByPaperTool:
 
         assert result["status"] == "not_found"
         assert result["matches"] == []
+
+    def test_anchor_key_absent_falls_back_to_query(self, registered_tools, temp_refs_dir):
+        """When no anchor_paper_key, falls back to query-text mode."""
+        tool = registered_tools["semantic_search"]
+
+        with (
+            patch("os.getenv", return_value="test-key"),
+            patch("crane.services.semantic_search_service.requests.post") as mock_post,
+        ):
+            mock_post.return_value.json.return_value = {"data": [{"embedding": [0.1] * 1536}]}
+            result = tool(
+                query="attention mechanism",
+                k=2,
+                refs_dir=str(temp_refs_dir),
+                project_dir=None,
+            )
+
+        # query mode returns "query" key, not "anchor_paper_key"
+        assert "query" in result
+        assert "anchor_paper_key" not in result
 
 
 class TestBuildEmbeddingsTool:

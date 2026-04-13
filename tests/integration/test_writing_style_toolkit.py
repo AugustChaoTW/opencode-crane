@@ -182,11 +182,10 @@ class TestMCPToolsIntegration:
         register_tools(FakeMCP())
         return captured
 
-    def test_all_seven_tools_registered(self, tools: dict[str, Any]):
+    def test_all_six_tools_registered(self, tools: dict[str, Any]):
         expected = {
             "crane_extract_journal_style_guide",
-            "crane_diagnose_section",
-            "crane_diagnose_paper",
+            "crane_diagnose",           # replaces crane_diagnose_paper + crane_diagnose_section
             "crane_get_style_exemplars",
             "crane_suggest_rewrites",
             "crane_compare_sections",
@@ -206,10 +205,11 @@ class TestMCPToolsIntegration:
         assert "error" not in result or result.get("confidence", 0) >= 0
 
     def test_diagnose_section(self, tools: dict[str, Any], sample_tex_file: str):
-        result = tools["crane_diagnose_section"](
+        result = tools["crane_diagnose"](
             paper_path=sample_tex_file,
-            section_name="Introduction",
             journal_name="IEEE TPAMI",
+            scope="section",
+            section_name="Introduction",
         )
         assert "error" not in result
         assert result["section_name"] == "Introduction"
@@ -217,14 +217,24 @@ class TestMCPToolsIntegration:
         assert "deviation_score" in result
 
     def test_diagnose_paper(self, tools: dict[str, Any], sample_tex_file: str):
-        result = tools["crane_diagnose_paper"](
+        result = tools["crane_diagnose"](
             paper_path=sample_tex_file,
             journal_name="IEEE TPAMI",
+            scope="paper",
         )
         assert "error" not in result
         assert result["journal"] == "IEEE TPAMI"
         assert result["sections_analysed"] >= 3
         assert "overall_deviation" in result
+
+    def test_diagnose_section_requires_section_name(self, tools: dict[str, Any], sample_tex_file: str):
+        result = tools["crane_diagnose"](
+            paper_path=sample_tex_file,
+            journal_name="IEEE TPAMI",
+            scope="section",
+            # section_name intentionally omitted
+        )
+        assert "error" in result
 
     def test_get_style_exemplars(self, tools: dict[str, Any]):
         result = tools["crane_get_style_exemplars"](

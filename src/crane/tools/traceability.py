@@ -277,373 +277,151 @@ def register_tools(mcp):  # noqa: C901
     # ------------------------------------------------------------------
 
     @mcp.tool()
-    def add_research_question(
+    def trace_add(
         paper_path: str,
-        rq_id: str,
-        text: str,
-        motivation: str = "",
-        hypothesis: str = "",
+        item_type: str,
+        item_id: str,
+        data: dict,
         output_dir: str = "",
         project_dir: str = "",
     ) -> dict[str, Any]:
-        """Add a research question to the traceability chain.
+        """Add any traceability item to the paper trace chain.
 
-        Updates 6_research_question.yaml in the latest trace version.
+        Unified entry-point replacing the individual add_research_question,
+        add_contribution, add_experiment, add_figure_table, add_trace_reference,
+        add_reviewer_risk, add_dataset, and add_baseline tools.
+
+        item_type     item_id format    required data keys
+        ─────────────────────────────────────────────────────────────────
+        rq            RQ1, RQ2, …       text
+        contribution  C1, C2, …         claim
+        experiment    E1, E2, …         goal
+        figure_table  Fig:1, T:1, …     ft_type, purpose
+        reference     <bib key>          title, purpose
+        risk          R1, R2, …         description
+        dataset       DS1, DS2, …       name
+        baseline      BL1, BL2, …       name
+
+        All other keys in data are optional and map directly to the
+        original add_* parameter names (e.g. motivation, rq_ids, dataset,
+        role, severity, split, full_name, …).
 
         Args:
-            paper_path:  Path to .tex or .pdf file
-            rq_id:       ID in format RQ1, RQ2, ...
-            text:        One sentence: "Does X improve Y on Z?"
-            motivation:  Why this question matters
-            hypothesis:  What the authors believe the answer is
-            output_dir:  Custom trace base directory
-            project_dir: Project root hint
+            paper_path:  Path to .tex or .pdf file.
+            item_type:   One of the types listed above.
+            item_id:     Unique ID for this item (e.g. "RQ1", "C2", "E1").
+            data:        Dict of type-specific fields.
+            output_dir:  Custom trace base directory (optional).
+            project_dir: Project root hint (optional).
 
         Returns:
-            Confirmation with rq_id and version_dir.
+            {"status": "added", "item_type": ..., "item_id": ..., "version_dir": ...}
         """
         svc = _make_service(paper_path, output_dir, project_dir)
         vdir = _version_dir(svc, "update")
-        svc.add_research_question(vdir, rq_id=rq_id, text=text,
-                                   motivation=motivation, hypothesis=hypothesis)
-        return {"status": "added", "rq_id": rq_id, "version_dir": str(vdir)}
+        d = data or {}
 
-    # ------------------------------------------------------------------
-    # 6. add_contribution
-    # ------------------------------------------------------------------
+        if item_type == "rq":
+            svc.add_research_question(
+                vdir,
+                rq_id=item_id,
+                text=d.get("text", ""),
+                motivation=d.get("motivation", ""),
+                hypothesis=d.get("hypothesis", ""),
+            )
+        elif item_type == "contribution":
+            svc.add_contribution(
+                vdir,
+                contribution_id=item_id,
+                claim=d.get("claim", ""),
+                why_it_matters=d.get("why_it_matters", ""),
+                strongest_defensible_wording=d.get("strongest_defensible_wording", ""),
+                reviewer_risk=d.get("reviewer_risk", ""),
+                response_strategy=d.get("response_strategy", ""),
+                rq_ids=d.get("rq_ids") or [],
+            )
+        elif item_type == "experiment":
+            svc.add_experiment(
+                vdir,
+                exp_id=item_id,
+                goal=d.get("goal", ""),
+                dataset=d.get("dataset", ""),
+                model=d.get("model", ""),
+                hardware=d.get("hardware", ""),
+                framework=d.get("framework", ""),
+                related_contributions=d.get("related_contributions") or [],
+                related_rqs=d.get("related_rqs") or [],
+                notes=d.get("notes", ""),
+            )
+        elif item_type == "figure_table":
+            svc.add_figure_table(
+                vdir,
+                ft_id=item_id,
+                ft_type=d.get("ft_type", "figure"),
+                purpose=d.get("purpose", ""),
+                claim_supported=d.get("claim_supported", ""),
+                source_experiments=d.get("source_experiments") or [],
+                related_rqs=d.get("related_rqs") or [],
+                caption_draft=d.get("caption_draft", ""),
+            )
+        elif item_type == "reference":
+            svc.add_reference(
+                vdir,
+                ref_key=item_id,
+                title=d.get("title", ""),
+                purpose=d.get("purpose", ""),
+                role=d.get("role", "comparison"),
+                should_appear_in=d.get("should_appear_in") or [],
+                should_not_appear_in=d.get("should_not_appear_in") or [],
+                supports_contributions=d.get("supports_contributions") or [],
+            )
+        elif item_type == "risk":
+            svc.add_reviewer_risk(
+                vdir,
+                risk_id=item_id,
+                description=d.get("description", ""),
+                severity=d.get("severity", "medium"),
+                likely_appears_in=d.get("likely_appears_in", ""),
+                response_strategy=d.get("response_strategy", ""),
+                fallback_claim=d.get("fallback_claim", ""),
+                related_contributions=d.get("related_contributions") or [],
+            )
+        elif item_type == "dataset":
+            svc.add_dataset(
+                vdir,
+                dataset_id=item_id,
+                name=d.get("name", ""),
+                description=d.get("description", ""),
+                split=d.get("split", ""),
+                metrics=d.get("metrics") or [],
+                used_in_experiments=d.get("used_in_experiments") or [],
+                download_url=d.get("download_url", ""),
+            )
+        elif item_type == "baseline":
+            svc.add_baseline(
+                vdir,
+                baseline_id=item_id,
+                name=d.get("name", ""),
+                full_name=d.get("full_name", ""),
+                source_citation=d.get("source_citation", ""),
+                implementation_source=d.get("implementation_source", "official"),
+                implementation_url=d.get("implementation_url", ""),
+                used_in_experiments=d.get("used_in_experiments") or [],
+            )
+        else:
+            return {
+                "status": "error",
+                "error": f"Unknown item_type '{item_type}'. "
+                "Use: rq | contribution | experiment | figure_table | "
+                "reference | risk | dataset | baseline",
+            }
 
-    @mcp.tool()
-    def add_contribution(
-        paper_path: str,
-        contribution_id: str,
-        claim: str,
-        why_it_matters: str = "",
-        strongest_defensible_wording: str = "",
-        reviewer_risk: str = "",
-        response_strategy: str = "",
-        rq_ids: list[str] | None = None,
-        output_dir: str = "",
-        project_dir: str = "",
-    ) -> dict[str, Any]:
-        """Add a claimed contribution to the traceability chain.
-
-        Updates 1_contribution.yaml in the latest trace version.
-
-        Args:
-            paper_path:                   Path to .tex or .pdf file
-            contribution_id:              ID in format C1, C2, ...
-            claim:                        Specific, falsifiable statement
-            why_it_matters:               Impact statement
-            strongest_defensible_wording: Most defensible phrasing
-            reviewer_risk:                Most likely reviewer objection
-            response_strategy:            How to handle the objection
-            rq_ids:                       Related research question IDs
-            output_dir:                   Custom trace base directory
-            project_dir:                  Project root hint
-        """
-        svc = _make_service(paper_path, output_dir, project_dir)
-        vdir = _version_dir(svc, "update")
-        svc.add_contribution(
-            vdir,
-            contribution_id=contribution_id,
-            claim=claim,
-            why_it_matters=why_it_matters,
-            strongest_defensible_wording=strongest_defensible_wording,
-            reviewer_risk=reviewer_risk,
-            response_strategy=response_strategy,
-            rq_ids=rq_ids or [],
-        )
-        return {"status": "added", "contribution_id": contribution_id, "version_dir": str(vdir)}
-
-    # ------------------------------------------------------------------
-    # 7. add_experiment
-    # ------------------------------------------------------------------
-
-    @mcp.tool()
-    def add_experiment(
-        paper_path: str,
-        exp_id: str,
-        goal: str,
-        dataset: str = "",
-        model: str = "",
-        hardware: str = "",
-        framework: str = "",
-        related_contributions: list[str] | None = None,
-        related_rqs: list[str] | None = None,
-        notes: str = "",
-        output_dir: str = "",
-        project_dir: str = "",
-    ) -> dict[str, Any]:
-        """Add an experiment to the traceability chain.
-
-        Updates 2_experiment.yaml in the latest trace version.
-
-        Args:
-            paper_path:              Path to .tex or .pdf file
-            exp_id:                  ID in format E1, E2, ...
-            goal:                    What this experiment proves
-            dataset:                 Dataset name
-            model:                   Model/method name
-            hardware:                Hardware description
-            framework:               Software framework
-            related_contributions:   C{n} IDs this experiment supports
-            related_rqs:             RQ{n} IDs this experiment tests
-            notes:                   Free-form notes
-            output_dir:              Custom trace base directory
-            project_dir:             Project root hint
-        """
-        svc = _make_service(paper_path, output_dir, project_dir)
-        vdir = _version_dir(svc, "update")
-        svc.add_experiment(
-            vdir,
-            exp_id=exp_id,
-            goal=goal,
-            dataset=dataset,
-            model=model,
-            hardware=hardware,
-            framework=framework,
-            related_contributions=related_contributions or [],
-            related_rqs=related_rqs or [],
-            notes=notes,
-        )
-        return {"status": "added", "exp_id": exp_id, "version_dir": str(vdir)}
-
-    # ------------------------------------------------------------------
-    # 8. add_figure_table
-    # ------------------------------------------------------------------
-
-    @mcp.tool()
-    def add_figure_table(
-        paper_path: str,
-        ft_id: str,
-        ft_type: str,
-        purpose: str,
-        claim_supported: str = "",
-        source_experiments: list[str] | None = None,
-        related_rqs: list[str] | None = None,
-        caption_draft: str = "",
-        output_dir: str = "",
-        project_dir: str = "",
-    ) -> dict[str, Any]:
-        """Add a figure or table to the traceability chain.
-
-        Updates 5_figure_table_map.yaml in the latest trace version.
-
-        Args:
-            paper_path:          Path to .tex or .pdf file
-            ft_id:               ID in format Fig:1, T:1, Fig:2, ...
-            ft_type:             "figure" or "table"
-            purpose:             What this figure/table demonstrates
-            claim_supported:     Which contribution claim it supports
-            source_experiments:  E{n} IDs that produced this
-            related_rqs:         RQ{n} IDs this addresses
-            caption_draft:       Initial caption text
-            output_dir:          Custom trace base directory
-            project_dir:         Project root hint
-        """
-        svc = _make_service(paper_path, output_dir, project_dir)
-        vdir = _version_dir(svc, "update")
-        svc.add_figure_table(
-            vdir,
-            ft_id=ft_id,
-            ft_type=ft_type,
-            purpose=purpose,
-            claim_supported=claim_supported,
-            source_experiments=source_experiments or [],
-            related_rqs=related_rqs or [],
-            caption_draft=caption_draft,
-        )
-        return {"status": "added", "ft_id": ft_id, "version_dir": str(vdir)}
-
-    # ------------------------------------------------------------------
-    # 9. add_trace_reference
-    # ------------------------------------------------------------------
-
-    @mcp.tool()
-    def add_trace_reference(
-        paper_path: str,
-        ref_key: str,
-        title: str,
-        purpose: str,
-        role: str = "comparison",
-        should_appear_in: list[str] | None = None,
-        should_not_appear_in: list[str] | None = None,
-        supports_contributions: list[str] | None = None,
-        output_dir: str = "",
-        project_dir: str = "",
-    ) -> dict[str, Any]:
-        """Add a reference with placement rules to the traceability citation map.
-
-        Updates 4_citation_map.yaml in the latest trace version.
-        Tracks WHERE each reference must (and must not) appear, and which
-        contributions it supports.
-
-        Args:
-            paper_path:              Path to .tex or .pdf file
-            ref_key:                 BibTeX citation key
-            title:                   Paper title
-            purpose:                 Why this is cited
-            role:                    baseline | comparison | foundation | method | dataset | tool
-            should_appear_in:        Section names where it must appear
-            should_not_appear_in:    Section names where it must NOT appear
-            supports_contributions:  C{n} IDs this reference supports
-            output_dir:              Custom trace base directory
-            project_dir:             Project root hint
-        """
-        svc = _make_service(paper_path, output_dir, project_dir)
-        vdir = _version_dir(svc, "update")
-        svc.add_reference(
-            vdir,
-            ref_key=ref_key,
-            title=title,
-            purpose=purpose,
-            role=role,
-            should_appear_in=should_appear_in or [],
-            should_not_appear_in=should_not_appear_in or [],
-            supports_contributions=supports_contributions or [],
-        )
-        return {"status": "added", "ref_key": ref_key, "version_dir": str(vdir)}
-
-    # ------------------------------------------------------------------
-    # 10. add_reviewer_risk
-    # ------------------------------------------------------------------
-
-    @mcp.tool()
-    def add_reviewer_risk(
-        paper_path: str,
-        risk_id: str,
-        description: str,
-        severity: str = "medium",
-        likely_appears_in: str = "",
-        response_strategy: str = "",
-        fallback_claim: str = "",
-        related_contributions: list[str] | None = None,
-        output_dir: str = "",
-        project_dir: str = "",
-    ) -> dict[str, Any]:
-        """Add a reviewer risk to the risk register.
-
-        Updates 8_limitation_reviewer_risk.yaml in the latest trace version.
-
-        Args:
-            paper_path:              Path to .tex or .pdf file
-            risk_id:                 ID in format R1, R2, ...
-            description:             Specific reviewer objection
-            severity:                low | medium | high | critical
-            likely_appears_in:       Where objection will come from
-            response_strategy:       How to handle the objection
-            fallback_claim:          Weaker but still defensible claim
-            related_contributions:   C{n} IDs at risk
-            output_dir:              Custom trace base directory
-            project_dir:             Project root hint
-        """
-        svc = _make_service(paper_path, output_dir, project_dir)
-        vdir = _version_dir(svc, "update")
-        svc.add_reviewer_risk(
-            vdir,
-            risk_id=risk_id,
-            description=description,
-            severity=severity,
-            likely_appears_in=likely_appears_in,
-            response_strategy=response_strategy,
-            fallback_claim=fallback_claim,
-            related_contributions=related_contributions or [],
-        )
-        return {"status": "added", "risk_id": risk_id, "version_dir": str(vdir)}
-
-    # ------------------------------------------------------------------
-    # 11. add_dataset
-    # ------------------------------------------------------------------
-
-    @mcp.tool()
-    def add_dataset(
-        paper_path: str,
-        dataset_id: str,
-        name: str,
-        description: str = "",
-        split: str = "",
-        metrics: list[str] | None = None,
-        used_in_experiments: list[str] | None = None,
-        download_url: str = "",
-        output_dir: str = "",
-        project_dir: str = "",
-    ) -> dict[str, Any]:
-        """Add a dataset to the dataset/baseline protocol.
-
-        Updates 9_dataset_baseline_protocol.yaml in the latest trace version.
-
-        Args:
-            paper_path:           Path to .tex or .pdf file
-            dataset_id:           ID in format DS1, DS2, ...
-            name:                 Dataset name
-            description:          Brief description
-            split:                Train/val/test split description
-            metrics:              Evaluation metrics used
-            used_in_experiments:  E{n} IDs that use this dataset
-            download_url:         URL to download the dataset
-            output_dir:           Custom trace base directory
-            project_dir:          Project root hint
-        """
-        svc = _make_service(paper_path, output_dir, project_dir)
-        vdir = _version_dir(svc, "update")
-        svc.add_dataset(
-            vdir,
-            dataset_id=dataset_id,
-            name=name,
-            description=description,
-            split=split,
-            metrics=metrics or [],
-            used_in_experiments=used_in_experiments or [],
-            download_url=download_url,
-        )
-        return {"status": "added", "dataset_id": dataset_id, "version_dir": str(vdir)}
-
-    # ------------------------------------------------------------------
-    # 12. add_baseline
-    # ------------------------------------------------------------------
-
-    @mcp.tool()
-    def add_baseline(
-        paper_path: str,
-        baseline_id: str,
-        name: str,
-        full_name: str = "",
-        source_citation: str = "",
-        implementation_source: str = "official",
-        implementation_url: str = "",
-        used_in_experiments: list[str] | None = None,
-        output_dir: str = "",
-        project_dir: str = "",
-    ) -> dict[str, Any]:
-        """Add a baseline method to the dataset/baseline protocol.
-
-        Updates 9_dataset_baseline_protocol.yaml in the latest trace version.
-
-        Args:
-            paper_path:             Path to .tex or .pdf file
-            baseline_id:            ID in format BL1, BL2, ...
-            name:                   Short name (e.g., "BERT")
-            full_name:              Full method name
-            source_citation:        BibTeX key of the source paper
-            implementation_source:  official | reproduced | third_party
-            implementation_url:     URL to implementation
-            used_in_experiments:    E{n} IDs that use this baseline
-            output_dir:             Custom trace base directory
-            project_dir:            Project root hint
-        """
-        svc = _make_service(paper_path, output_dir, project_dir)
-        vdir = _version_dir(svc, "update")
-        svc.add_baseline(
-            vdir,
-            baseline_id=baseline_id,
-            name=name,
-            full_name=full_name,
-            source_citation=source_citation,
-            implementation_source=implementation_source,
-            implementation_url=implementation_url,
-            used_in_experiments=used_in_experiments or [],
-        )
-        return {"status": "added", "baseline_id": baseline_id, "version_dir": str(vdir)}
+        return {
+            "status": "added",
+            "item_type": item_type,
+            "item_id": item_id,
+            "version_dir": str(vdir),
+        }
 
     # ------------------------------------------------------------------
     # 13. link_artifacts
@@ -954,12 +732,15 @@ def register_tools(mcp):  # noqa: C901
     # ------------------------------------------------------------------
 
     @mcp.tool()
-    def get_traceability_mermaid(
+    def get_traceability_viz(
         paper_path: str,
+        output_format: str = "mermaid",
         output_dir: str = "",
         project_dir: str = "",
     ) -> dict[str, Any]:
-        """Generate a Mermaid flowchart of the traceability graph.
+        """Generate a visualization of the traceability graph.
+
+        Consolidates get_traceability_mermaid and get_traceability_dot.
 
         Node color coding:
           RQ → blue, Contribution → orange, Experiment → purple,
@@ -967,12 +748,14 @@ def register_tools(mcp):  # noqa: C901
           Reference → teal, Artifact → brown, Change → yellow
 
         Args:
-            paper_path:  Path to .tex or .pdf file
-            output_dir:  Custom trace base directory
-            project_dir: Project root hint
+            paper_path:    Path to .tex or .pdf file.
+            output_format: "mermaid" — Mermaid flowchart (default, embed in Markdown).
+                           "dot"     — Graphviz DOT format (render with graphviz).
+            output_dir:    Custom trace base directory.
+            project_dir:   Project root hint.
 
         Returns:
-            Dict with mermaid string ready to embed in Markdown.
+            Dict with node_count and either mermaid or dot string.
         """
         from crane.services.traceability_viz_service import TraceabilityVizService
 
@@ -980,48 +763,17 @@ def register_tools(mcp):  # noqa: C901
         vdir = _version_dir(svc, "viz")
         graph = svc.build_graph(vdir)
         viz = TraceabilityVizService()
-        return {
+        result: dict[str, Any] = {
             "paper_path": paper_path,
             "version_dir": str(vdir),
+            "output_format": output_format,
             "node_count": len(graph.get_all_nodes()),
-            "mermaid": viz.get_mermaid(graph),
         }
-
-    # ------------------------------------------------------------------
-    # 22. get_traceability_dot
-    # ------------------------------------------------------------------
-
-    @mcp.tool()
-    def get_traceability_dot(
-        paper_path: str,
-        output_dir: str = "",
-        project_dir: str = "",
-    ) -> dict[str, Any]:
-        """Generate a Graphviz DOT diagram of the traceability graph.
-
-        Risk nodes use diamond shape. All other nodes use filled boxes
-        with type-specific colors matching Mermaid output.
-
-        Args:
-            paper_path:  Path to .tex or .pdf file
-            output_dir:  Custom trace base directory
-            project_dir: Project root hint
-
-        Returns:
-            Dict with dot string suitable for rendering with graphviz.
-        """
-        from crane.services.traceability_viz_service import TraceabilityVizService
-
-        svc = _make_service(paper_path, output_dir, project_dir)
-        vdir = _version_dir(svc, "viz")
-        graph = svc.build_graph(vdir)
-        viz = TraceabilityVizService()
-        return {
-            "paper_path": paper_path,
-            "version_dir": str(vdir),
-            "node_count": len(graph.get_all_nodes()),
-            "dot": viz.get_dot(graph),
-        }
+        if output_format == "dot":
+            result["dot"] = viz.get_dot(graph)
+        else:
+            result["mermaid"] = viz.get_mermaid(graph)
+        return result
 
     # ------------------------------------------------------------------
     # 23. diff_trace_versions

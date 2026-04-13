@@ -11,8 +11,8 @@ from crane.workspace import resolve_workspace
 # Maps tool name → list of capability checks required
 _TOOL_PREREQUISITES: dict[str, list[str]] = {
     "semantic_search": ["embeddings"],
-    "semantic_search_by_paper": ["embeddings"],
     "get_research_clusters": ["embeddings"],
+    "visualize_citations": ["embeddings"],
     "ask_library": ["chunks"],
     "evaluate_paper_v2": ["paper_file"],
     "review_paper_sections": ["paper_file"],

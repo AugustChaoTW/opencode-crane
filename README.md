@@ -6,7 +6,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![MCP](https://img.shields.io/badge/MCP-Server-orange.svg)](https://modelcontextprotocol.io/)
 
-CRANE 提供 **138 個 MCP 工具**，涵蓋完整研究生命週期，對標 Nature 論文《The AI Scientist》的 6 個核心研究階段。CRANE provides **138 MCP Tools** across the full research lifecycle.
+CRANE 提供 **121 個 MCP 工具**，涵蓋完整研究生命週期，對標 Nature 論文《The AI Scientist》的 6 個核心研究階段。CRANE provides **121 MCP Tools** across the full research lifecycle.
 
 ---
 
@@ -449,7 +449,7 @@ uv run pytest tests/ -m "not integration" -q
 
 | 特性 | CRANE | Zotero | Mendeley | Obsidian |
 |------|-------|--------|----------|----------|
-| **AI 自主性** | 138 個 MCP 工具 | 第三方插件 | 有限 | 手動設置 |
+| **AI 自主性** | 121 個 MCP 工具 | 第三方插件 | 有限 | 手動設置 |
 | **實驗生成** | ✅ 代碼合成、超參優化 | ✗ | ✗ | ✗ |
 | **想法生成** | ✅ Map Elites、Pareto | ✗ | ✗ | ✗ |
 | **自動評審** | ✅ 5 評審員集合 | ✗ | ✗ | ✗ |
@@ -622,7 +622,7 @@ diff_trace_versions(paper_path="JLE/main.tex", version_a=1, version_b=3)
   title   = {CRANE: Autonomous Research Assistant System},
   year    = {2026},
   url     = {https://github.com/AugustChaoTW/opencode-crane},
-  note    = {138 MCP tools for end-to-end research automation, aligned with Nature's The AI Scientist}
+  note    = {121 MCP tools for end-to-end research automation, aligned with Nature's The AI Scientist}
 }
 ```
 

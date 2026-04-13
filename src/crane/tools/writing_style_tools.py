@@ -99,61 +99,67 @@ def register_tools(mcp):
             return {"error": str(exc), "journal": journal_name}
 
     @mcp.tool()
-    def crane_diagnose_section(
+    def crane_diagnose(
         paper_path: str,
-        section_name: str,
         journal_name: str,
+        scope: str = "paper",
+        section_name: str = "",
         project_dir: str | None = None,
     ) -> dict[str, Any]:
-        """Analyse one section against journal style targets.
+        """Diagnose writing style deviation against a journal's targets.
 
-        Computes current metrics, deviation score, issues, and suggestions
-        for the specified section (Introduction, Methods, Results, etc.).
+        Consolidates crane_diagnose_paper (scope="paper") and
+        crane_diagnose_section (scope="section") into a single tool.
+
+        Args:
+            paper_path:   Path to .tex file.
+            journal_name: Target journal name.
+            scope:        "paper"   — diagnose all sections (default).
+                          "section" — diagnose one section only.
+            section_name: Section name when scope="section"
+                          (e.g. "Introduction", "Methods", "Results").
+            project_dir:  Project root directory.
+
+        Returns:
+            scope="paper":   {paper, journal, sections, overall_deviation,
+                              sections_analysed, total_issues, total_suggestions}
+            scope="section": {section, journal, deviation_score, issues,
+                              suggestions, current_metrics}
         """
         try:
             resolved = _resolve_paper_path(paper_path, project_dir)
             service = WritingStyleService(journal_name)
-            sections = service.section_chunker.chunk_latex_paper(resolved)
 
-            target_section = None
-            for sec in sections:
-                if (
-                    sec.canonical_name.lower() == section_name.lower()
-                    or sec.name.lower() == section_name.lower()
-                ):
-                    target_section = sec
-                    break
+            if scope == "section":
+                if not section_name:
+                    return {
+                        "error": "section_name is required when scope='section'",
+                        "journal": journal_name,
+                    }
+                sections = service.section_chunker.chunk_latex_paper(resolved)
+                target_section = None
+                for sec in sections:
+                    if (
+                        sec.canonical_name.lower() == section_name.lower()
+                        or sec.name.lower() == section_name.lower()
+                    ):
+                        target_section = sec
+                        break
 
-            if target_section is None:
-                return {
-                    "error": f"Section '{section_name}' not found in {paper_path}",
-                    "section": section_name,
-                    "journal": journal_name,
-                }
+                if target_section is None:
+                    return {
+                        "error": f"Section '{section_name}' not found in {paper_path}",
+                        "section": section_name,
+                        "journal": journal_name,
+                    }
 
-            diagnosis = service.diagnose_section(target_section)
-            result = _diagnosis_to_dict(diagnosis)
-            result["journal"] = journal_name
-            return result
-        except (ValueError, FileNotFoundError) as exc:
-            return {"error": str(exc), "section": section_name, "journal": journal_name}
+                diagnosis = service.diagnose_section(target_section)
+                result = _diagnosis_to_dict(diagnosis)
+                result["journal"] = journal_name
+                return result
 
-    @mcp.tool()
-    def crane_diagnose_paper(
-        paper_path: str,
-        journal_name: str,
-        project_dir: str | None = None,
-    ) -> dict[str, Any]:
-        """Full paper diagnosis across all sections.
-
-        Returns per-section deviation scores, issues, suggestions,
-        and an overall deviation average.
-        """
-        try:
-            resolved = _resolve_paper_path(paper_path, project_dir)
-            service = WritingStyleService(journal_name)
+            # scope == "paper"
             diagnoses = service.diagnose_full_paper(resolved)
-
             sections_result: dict[str, Any] = {}
             deviation_scores: list[float] = []
             for name, diag in diagnoses.items():
@@ -161,7 +167,6 @@ def register_tools(mcp):
                 deviation_scores.append(diag.deviation_score)
 
             overall = sum(deviation_scores) / len(deviation_scores) if deviation_scores else 0.0
-
             return {
                 "paper": paper_path,
                 "journal": journal_name,

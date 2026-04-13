@@ -134,10 +134,10 @@ class TestCheckPrerequisitesEmbeddings:
         assert result["ready"] is True
         assert result["missing"] == []
 
-    def test_semantic_search_by_paper_same_check(self, workspace_tools, sample_workspace):
+    def test_visualize_citations_same_check(self, workspace_tools, sample_workspace):
         result = _with_workspace(
             sample_workspace,
-            lambda: workspace_tools["check_prerequisites"]("semantic_search_by_paper"),
+            lambda: workspace_tools["check_prerequisites"]("visualize_citations"),
         )
         assert result["ready"] is False
         assert any(m["name"] == "embeddings" for m in result["missing"])

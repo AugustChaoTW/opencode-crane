@@ -61,18 +61,51 @@ def _get_bridge_service(project_dir: str | None) -> Any:
 
 def register_tools(mcp):
     @mcp.tool()
-    def start_sse_server(
+    def transport_control(
+        transport: str,
+        action: str,
         host: str = "127.0.0.1",
-        port: int = 8765,
+        port: int | None = None,
+        jwt_secret: str = "",
         project_dir: str | None = None,
     ) -> dict[str, Any]:
-        service = _get_sse_service(project_dir)
-        return service.start_server(host=host, port=port)
+        """Start, stop, or query the status of a transport server.
 
-    @mcp.tool()
-    def stop_sse_server(project_dir: str | None = None) -> dict[str, Any]:
-        service = _get_sse_service(project_dir)
-        return service.stop_server()
+        Consolidates start/stop/status for both SSE and Remote Bridge
+        into a single tool.
+
+        Args:
+            transport:   "sse"    — Server-Sent Events server (default port 8765).
+                         "bridge" — Remote Bridge server    (default port 8766).
+            action:      "start"  — Start the server.
+                         "stop"   — Stop the server.
+                         "status" — Query current server status.
+            host:        Bind host (start action only, default 127.0.0.1).
+            port:        Bind port (start action only).
+                         Defaults: sse=8765, bridge=8766.
+            jwt_secret:  JWT signing secret (bridge start only).
+            project_dir: Project root directory.
+
+        Returns:
+            Transport-specific status dict.
+        """
+        if transport == "sse":
+            svc = _get_sse_service(project_dir)
+            if action == "start":
+                return svc.start_server(host=host, port=port or 8765)
+            if action == "stop":
+                return svc.stop_server()
+            return svc.get_server_status()
+
+        if transport == "bridge":
+            svc = _get_bridge_service(project_dir)
+            if action == "start":
+                return svc.start_bridge(host=host, port=port or 8766, jwt_secret=jwt_secret)
+            if action == "stop":
+                return svc.stop_bridge()
+            return svc.get_bridge_status()
+
+        return {"error": f"Unknown transport '{transport}'. Use 'sse' or 'bridge'."}
 
     @mcp.tool()
     def broadcast_sse_event(
@@ -80,13 +113,9 @@ def register_tools(mcp):
         data: dict,
         project_dir: str | None = None,
     ) -> dict[str, Any]:
+        """Broadcast an event to all connected SSE clients."""
         service = _get_sse_service(project_dir)
         return service.broadcast_event(event_type=event_type, data=data)
-
-    @mcp.tool()
-    def get_sse_status(project_dir: str | None = None) -> dict[str, Any]:
-        service = _get_sse_service(project_dir)
-        return service.get_server_status()
 
     @mcp.tool()
     def create_session(
@@ -94,6 +123,7 @@ def register_tools(mcp):
         context: dict | None = None,
         project_dir: str | None = None,
     ) -> dict[str, Any]:
+        """Create a new named session for context persistence."""
         service = _get_session_service(project_dir)
         session_id = service.create_session(name=name, context=context)
         return {"session_id": session_id}
@@ -104,38 +134,27 @@ def register_tools(mcp):
         messages: list[dict],
         project_dir: str | None = None,
     ) -> dict[str, Any]:
+        """Save messages to an existing session."""
         service = _get_session_service(project_dir)
         return service.save_session(session_id=session_id, messages=messages)
 
     @mcp.tool()
     def load_session(session_id: str, project_dir: str | None = None) -> dict[str, Any]:
+        """Load a session by ID."""
         service = _get_session_service(project_dir)
         return service.load_session(session_id=session_id)
 
     @mcp.tool()
     def list_sessions(limit: int = 20, project_dir: str | None = None) -> list[dict[str, Any]]:
+        """List recent sessions."""
         service = _get_session_service(project_dir)
         return service.list_sessions(limit=limit)
 
     @mcp.tool()
     def delete_session(session_id: str, project_dir: str | None = None) -> dict[str, Any]:
+        """Delete a session by ID."""
         service = _get_session_service(project_dir)
         return service.delete_session(session_id=session_id)
-
-    @mcp.tool()
-    def start_remote_bridge(
-        host: str = "127.0.0.1",
-        port: int = 8766,
-        jwt_secret: str = "",
-        project_dir: str | None = None,
-    ) -> dict[str, Any]:
-        service = _get_bridge_service(project_dir)
-        return service.start_bridge(host=host, port=port, jwt_secret=jwt_secret)
-
-    @mcp.tool()
-    def stop_remote_bridge(project_dir: str | None = None) -> dict[str, Any]:
-        service = _get_bridge_service(project_dir)
-        return service.stop_bridge()
 
     @mcp.tool()
     def generate_bridge_jwt(
@@ -144,6 +163,7 @@ def register_tools(mcp):
         expiry_hours: int = 24,
         project_dir: str | None = None,
     ) -> dict[str, Any]:
+        """Generate a JWT token for authenticating Remote Bridge calls."""
         service = _get_bridge_service(project_dir)
         token = service.generate_jwt(
             session_id=session_id,
@@ -151,8 +171,3 @@ def register_tools(mcp):
             expiry_hours=expiry_hours,
         )
         return {"token": token}
-
-    @mcp.tool()
-    def get_bridge_status(project_dir: str | None = None) -> dict[str, Any]:
-        service = _get_bridge_service(project_dir)
-        return service.get_bridge_status()
