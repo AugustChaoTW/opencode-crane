@@ -56,6 +56,7 @@ from .tools.writing_style_tools import (
 from .tools.writing_style_tools import register_tools as register_writing_style_tools
 from .tools.traceability import register_tools as register_traceability_tools
 from .tools.karpathy_review import register_tools as register_karpathy_review_tools
+from .tools.paper_index import register_tools as register_paper_index_tools
 
 register_transport_tools = import_module("crane.tools.transport_tools").register_tools
 
@@ -93,6 +94,7 @@ register_writing_style_phase_d_tools(mcp)
 register_transport_tools(mcp)
 register_traceability_tools(mcp)
 register_karpathy_review_tools(mcp)
+register_paper_index_tools(mcp)
 
 
 def _check_version_on_startup():

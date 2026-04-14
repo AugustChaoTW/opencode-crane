@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 
 
@@ -32,8 +33,9 @@ TITLE_PATTERN = re.compile(r"\\title\{([^}]+)\}")
 APPENDIX_PATTERN = re.compile(r"\\appendix")
 
 
-def parse_latex_sections(tex_path: str | Path) -> PaperStructure:
-    """Parse LaTeX file into structured sections."""
+@lru_cache(maxsize=8)
+def _parse_latex_cached(tex_path: str) -> PaperStructure:
+    """Cached implementation — called via parse_latex_sections()."""
     path = Path(tex_path)
     if not path.exists():
         raise FileNotFoundError(f"LaTeX file not found: {tex_path}")
@@ -89,6 +91,15 @@ def parse_latex_sections(tex_path: str | Path) -> PaperStructure:
         appendices=appendices,
         raw_text=content,
     )
+
+
+def parse_latex_sections(tex_path: str | Path) -> PaperStructure:
+    """Parse LaTeX file into structured sections.
+
+    Results are cached by string path (lru_cache, maxsize=8) so repeated
+    calls within the same process pay the I/O cost only once.
+    """
+    return _parse_latex_cached(str(tex_path))
 
 
 def _build_hierarchy(flat_sections: list[SectionLocation]) -> list[SectionLocation]:

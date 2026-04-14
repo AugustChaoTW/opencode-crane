@@ -162,11 +162,23 @@ class SubmissionPipelineService:
             "data_sources": collation.total_files,
         }
 
-    def generate_framing_analysis(self, paper_path: str, submission_dir: Path) -> dict[str, Any]:
-        """生成 FRAMING 分析建議"""
-        review_svc = SectionReviewService()
+    def generate_framing_analysis(
+        self,
+        paper_path: str,
+        submission_dir: Path,
+        precomputed_review=None,
+    ) -> dict[str, Any]:
+        """生成 FRAMING 分析建議
 
-        review = review_svc.review_paper(paper_path, review_types=[ReviewType.FRAMING])
+        Args:
+            precomputed_review: Already-computed full PaperReview (avoids a second
+                                parse when called from run_full_check).
+        """
+        if precomputed_review is not None:
+            review = precomputed_review
+        else:
+            review_svc = SectionReviewService()
+            review = review_svc.review_paper(paper_path, review_types=[ReviewType.FRAMING])
 
         md = "# Framing 分析與建議\n\n"
         md += f"**分析時間**：{datetime.now().isoformat()}\n"
@@ -219,12 +231,24 @@ class SubmissionPipelineService:
             "high": high_count,
         }
 
-    def generate_paper_health_check(self, paper_path: str, submission_dir: Path) -> dict[str, Any]:
-        """執行完整的論文健康檢查"""
-        review_svc = SectionReviewService()
-        q1_svc = Q1EvaluationService()
+    def generate_paper_health_check(
+        self,
+        paper_path: str,
+        submission_dir: Path,
+        precomputed_review=None,
+    ) -> dict[str, Any]:
+        """執行完整的論文健康檢查
 
-        section_review = review_svc.review_paper(paper_path)
+        Args:
+            precomputed_review: Already-computed full PaperReview (avoids a second
+                                parse when called from run_full_check).
+        """
+        q1_svc = Q1EvaluationService()
+        if precomputed_review is not None:
+            section_review = precomputed_review
+        else:
+            review_svc = SectionReviewService()
+            section_review = review_svc.review_paper(paper_path)
         q1_eval = q1_svc.evaluate(paper_path)
 
         md = "# 投稿前健康檢查報告\n\n"
@@ -280,7 +304,7 @@ class SubmissionPipelineService:
         }
 
     def run_full_check(self, paper_path: str) -> SubmissionCheckResult:
-        """執行完整的投稿前檢查"""
+        """執行完整的投稿前檢查（單次 SectionReview pass）"""
         submission_dir, version = self.create_submission_workspace()
         checkpoints = []
         reports = {}
@@ -292,11 +316,18 @@ class SubmissionPipelineService:
             checkpoints.append("experiment_results")
             reports["experiments"] = self.generate_experiment_results(submission_dir)
 
+            # Single full review — reused by both framing_analysis and paper_health_check
+            full_review = SectionReviewService().review_paper(paper_path)
+
             checkpoints.append("framing_analysis")
-            reports["framing"] = self.generate_framing_analysis(paper_path, submission_dir)
+            reports["framing"] = self.generate_framing_analysis(
+                paper_path, submission_dir, precomputed_review=full_review
+            )
 
             checkpoints.append("paper_health_check")
-            reports["health"] = self.generate_paper_health_check(paper_path, submission_dir)
+            reports["health"] = self.generate_paper_health_check(
+                paper_path, submission_dir, precomputed_review=full_review
+            )
 
             return SubmissionCheckResult(
                 status="completed",

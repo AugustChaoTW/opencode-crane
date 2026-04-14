@@ -5,9 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![MCP Server](https://img.shields.io/badge/MCP-Server-orange.svg)](https://modelcontextprotocol.io/)
-[![Version](https://img.shields.io/badge/version-0.14.1-green.svg)](https://github.com/AugustChaoTW/opencode-crane/releases)
+[![Version](https://img.shields.io/badge/version-0.14.2-green.svg)](https://github.com/AugustChaoTW/opencode-crane/releases)
 
-**121 個 MCP 工具**，涵蓋從文獻回顧到期刊投稿的 7 個研究階段。  
+**123 個 MCP 工具**，涵蓋從文獻回顧到期刊投稿的 7 個研究階段。  
+CRANE provides **123 MCP Tools** for end-to-end academic research automation.  
 基於 Nature《The AI Scientist》的研究架構，並整合 Karpathy 4 原則作為 AI 寫程式的品質守門。
 
 ---
@@ -462,7 +463,7 @@ check_prerequisites("semantic_search")
 
 ---
 
-## 工具總覽（121 個）
+## 工具總覽（123 個）
 
 ### 文獻管理
 `search_papers` · `search_references` · `download_paper` · `add_reference` · `get_reference` · `list_references` · `remove_reference` · `annotate_reference` · `verify_reference` · `check_citations` · `check_all_references` · `read_paper` · `parse_paper_structure`
@@ -557,6 +558,7 @@ check_prerequisites("semantic_search")
 
 | 版本 | 工具數 | 主要功能 |
 |------|--------|---------|
+| **v0.14.2** | 123 | Paper Review 加速：build_paper_index、run_review_pipeline、lru_cache 解析快取、投稿流程單次 review pass |
 | **v0.14.1** | 121 | 工具整合重構（-17 工具）：trace_add、crane_diagnose、transport_control、visualize_citations、get_traceability_viz |
 | **v0.14.0** | 138 | Karpathy 4 原則工具：plan_experiment_implementation、check_code_simplicity、review_code_changes、define_experiment_success_criteria、karpathy_review |
 | **v0.13.0** | 133 | 論文可追溯性系統（Paper Traceability）：24 工具、10 YAML 模板、版次管理 |
