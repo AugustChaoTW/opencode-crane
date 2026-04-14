@@ -187,6 +187,19 @@ _INTENT_MAP: list[tuple[list[str], dict[str, Any]]] = [
         },
     ),
     (
+        ["build embeddings", "ollama embeddings", "local embeddings",
+         "nomic embed", "embed papers", "embedding model"],
+        {
+            "tool": "build_embeddings",
+            "description": "Build vector embeddings. Supports OpenAI and local Ollama (no API key).",
+            "call": 'build_embeddings()',
+            "ollama_call": 'build_embeddings(provider="ollama")  # uses nomic-embed-text locally',
+            "ollama_custom": 'build_embeddings(provider="ollama", model="mxbai-embed-large")',
+            "tip": "Ollama must be running: `ollama serve` + `ollama pull nomic-embed-text`",
+            "see_also": ["semantic_search", "check_prerequisites"],
+        },
+    ),
+    (
         ["ask library", "ask papers", "rag", "question answering",
          "what does paper say", "查詢文獻庫"],
         {

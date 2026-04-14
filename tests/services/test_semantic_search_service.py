@@ -6,7 +6,6 @@ All OpenAI API calls are mocked.
 
 from __future__ import annotations
 
-import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -526,6 +525,9 @@ class TestVectorStorage:
         assert data["metadata"]["model"] == "text-embedding-3-small"
         assert data["metadata"]["embedding_count"] == 3
         assert "last_updated" in data["metadata"]
+        # v0.14.4: provider and embedding_dim are also stored
+        assert "provider" in data["metadata"]
+        assert "embedding_dim" in data["metadata"]
 
     def test_save_vector_dimensions(self, service_with_embeddings):
         service_with_embeddings._save_embeddings(service_with_embeddings.embeddings)
@@ -546,23 +548,22 @@ class TestVectorStorage:
         with open(service.embeddings_file, "w", encoding="utf-8") as f:
             yaml.dump(cache_data, f, sort_keys=False)
 
-        loaded = service._load_embeddings()
-        assert loaded is not None
-        assert len(loaded) == 3
+        service._load_embeddings()
+        assert len(service.embeddings) == 3
 
-    def test_load_returns_none_if_missing(self, service):
-        loaded = service._load_embeddings()
-        assert loaded is None
+    def test_load_leaves_empty_if_missing(self, service):
+        service._load_embeddings()
+        assert service.embeddings == {}
 
-    def test_load_returns_none_if_corrupt(self, service):
+    def test_load_leaves_empty_if_corrupt(self, service):
         service.embeddings_file.write_text("not: valid: yaml: [[[", encoding="utf-8")
-        loaded = service._load_embeddings()
-        assert loaded is None
+        service._load_embeddings()
+        assert service.embeddings == {}
 
-    def test_load_returns_none_if_no_embeddings_key(self, service):
+    def test_load_leaves_empty_if_no_embeddings_key(self, service):
         service.embeddings_file.write_text("metadata: {}", encoding="utf-8")
-        loaded = service._load_embeddings()
-        assert loaded is None
+        service._load_embeddings()
+        assert service.embeddings == {}
 
     def test_save_load_roundtrip(self, service_with_embeddings):
         original = dict(service_with_embeddings.embeddings)
@@ -600,6 +601,218 @@ class TestVectorStorage:
     def test_cache_invalid_when_no_metadata(self, service):
         service.embeddings_file.write_text("embeddings: {}", encoding="utf-8")
         assert service._is_embeddings_cache_valid() is False
+
+
+# ===========================================================================
+# Ollama support (v0.14.4)
+# ===========================================================================
+
+
+def _ollama_embed_response(dim: int = 768) -> MagicMock:
+    """Fake Ollama /api/embeddings response."""
+    mock = MagicMock()
+    mock.raise_for_status = MagicMock()
+    mock.json.return_value = {"embedding": [0.1] * dim}
+    return mock
+
+
+class TestEmbedTextOllama:
+    def test_calls_ollama_endpoint(self, service):
+        with patch("crane.services.semantic_search_service.requests.post") as mock_post:
+            mock_post.return_value = _ollama_embed_response()
+            result = service._embed_text_ollama("test text", model="nomic-embed-text")
+
+        url = mock_post.call_args.args[0]
+        assert "11434" in url
+        assert "embeddings" in url
+        assert result is not None
+        assert len(result) == 768
+
+    def test_sends_correct_json(self, service):
+        with patch("crane.services.semantic_search_service.requests.post") as mock_post:
+            mock_post.return_value = _ollama_embed_response()
+            service._embed_text_ollama("hello world", model="nomic-embed-text")
+
+        body = mock_post.call_args.kwargs["json"]
+        assert body["model"] == "nomic-embed-text"
+        assert body["prompt"] == "hello world"
+
+    def test_custom_base_url(self, service):
+        with patch("crane.services.semantic_search_service.requests.post") as mock_post:
+            mock_post.return_value = _ollama_embed_response()
+            service._embed_text_ollama("text", model="nomic-embed-text", base_url="http://myserver:11434")
+
+        url = mock_post.call_args.args[0]
+        assert "myserver:11434" in url
+
+    def test_caches_result(self, service):
+        with patch("crane.services.semantic_search_service.requests.post") as mock_post:
+            mock_post.return_value = _ollama_embed_response()
+            r1 = service._embed_text_ollama("same", model="nomic-embed-text")
+            r2 = service._embed_text_ollama("same", model="nomic-embed-text")
+
+        assert mock_post.call_count == 1
+        assert r1 == r2
+
+    def test_different_models_not_confused(self, service):
+        responses = iter([_ollama_embed_response(768), _ollama_embed_response(1024)])
+        with patch("crane.services.semantic_search_service.requests.post", side_effect=responses):
+            r1 = service._embed_text_ollama("same", model="nomic-embed-text")
+            r2 = service._embed_text_ollama("same", model="mxbai-embed-large")
+
+        assert len(r1) == 768
+        assert len(r2) == 1024
+
+    def test_raises_on_http_error(self, service):
+        with patch("crane.services.semantic_search_service.requests.post") as mock_post:
+            mock_post.return_value.raise_for_status.side_effect = Exception("connection refused")
+            with pytest.raises(Exception, match="connection refused"):
+                service._embed_text_ollama("text", model="nomic-embed-text")
+
+
+class TestBuildEmbeddingsOllama:
+    def test_ollama_provider_sets_provider_attr(self, service):
+        with patch.object(service, "_embed_text_ollama", return_value=[0.1] * 768):
+            service.build_embeddings(provider="ollama")
+
+        assert service.embedding_provider == "ollama"
+
+    def test_ollama_provider_sets_model(self, service):
+        with patch.object(service, "_embed_text_ollama", return_value=[0.1] * 768):
+            service.build_embeddings(provider="ollama", model="mxbai-embed-large")
+
+        assert service.embedding_model == "mxbai-embed-large"
+
+    def test_ollama_default_model_is_nomic(self, service):
+        with patch.object(service, "_embed_text_ollama", return_value=[0.1] * 768) as mock_embed:
+            service.build_embeddings(provider="ollama")
+
+        # First call uses nomic-embed-text
+        model_used = mock_embed.call_args_list[0].args[1]
+        assert model_used == "nomic-embed-text"
+
+    def test_ollama_embeds_all_papers(self, service):
+        call_count = 0
+
+        def fake_ollama(text, model, base_url="http://localhost:11434"):
+            nonlocal call_count
+            call_count += 1
+            return [0.1] * 768
+
+        with patch.object(service, "_embed_text_ollama", side_effect=fake_ollama):
+            result = service.build_embeddings(provider="ollama")
+
+        assert call_count == 3
+        assert len(result) == 3
+
+    def test_ollama_saves_provider_in_cache(self, service):
+        with patch.object(service, "_embed_text_ollama", return_value=[0.1] * 768):
+            service.build_embeddings(provider="ollama")
+
+        with open(service.embeddings_file, encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+
+        assert data["metadata"]["provider"] == "ollama"
+        assert data["metadata"]["model"] == "nomic-embed-text"
+        assert data["metadata"]["embedding_dim"] == 768
+
+    def test_ollama_embedding_dim_inferred_from_vector(self, service):
+        with patch.object(service, "_embed_text_ollama", return_value=[0.1] * 1024):
+            service.build_embeddings(provider="ollama", model="mxbai-embed-large")
+
+        assert service.embedding_dim == 1024
+
+    def test_ollama_skip_failed_papers(self, service):
+        """Papers that fail to embed are skipped; others succeed."""
+        call_count = 0
+
+        def selective_fail(text, model, base_url="http://localhost:11434"):
+            nonlocal call_count
+            call_count += 1
+            if call_count == 2:
+                raise Exception("timeout")
+            return [0.1] * 768
+
+        with patch.object(service, "_embed_text_ollama", side_effect=selective_fail):
+            result = service.build_embeddings(provider="ollama")
+
+        # 2 out of 3 succeeded
+        assert len(result) == 2
+
+
+class TestEmbedQueryRouting:
+    def test_openai_routes_to_embed_text(self, service):
+        service.embedding_provider = "openai"
+        with patch.object(service, "_embed_text", return_value=[0.1] * 1536) as mock_ot:
+            result = service._embed_query("test")
+
+        mock_ot.assert_called_once_with("test")
+        assert result == [0.1] * 1536
+
+    def test_ollama_routes_to_embed_text_ollama(self, service):
+        service.embedding_provider = "ollama"
+        service.embedding_model = "nomic-embed-text"
+        with patch.object(service, "_embed_text_ollama", return_value=[0.1] * 768) as mock_ot:
+            result = service._embed_query("test")
+
+        mock_ot.assert_called_once()
+        assert result == [0.1] * 768
+
+    def test_ollama_exception_returns_none(self, service):
+        service.embedding_provider = "ollama"
+        with patch.object(service, "_embed_text_ollama", side_effect=Exception("down")):
+            result = service._embed_query("test")
+
+        assert result is None
+
+    def test_openai_no_key_returns_none(self, service):
+        service.embedding_provider = "openai"
+        service.embedding_api_key = None
+        with patch.dict("os.environ", {}, clear=True):
+            import os
+            os.environ.pop("OPENAI_API_KEY", None)
+            result = service._embed_query("test")
+
+        assert result is None
+
+
+class TestMetadataRoundtrip:
+    def test_ollama_provider_restored_from_cache(self, service, fake_vectors):
+        """Provider loaded from embeddings.yaml so query uses same backend."""
+        cache_data = {
+            "metadata": {
+                "provider": "ollama",
+                "model": "nomic-embed-text",
+                "embedding_dim": 768,
+                "embedding_count": 3,
+                "last_updated": "2026-04-01T00:00:00Z",
+            },
+            "embeddings": {k: [0.1] * 768 for k in fake_vectors},
+        }
+        with open(service.embeddings_file, "w", encoding="utf-8") as f:
+            yaml.dump(cache_data, f, sort_keys=False)
+
+        svc2 = SemanticSearchService(refs_dir=service.refs_path)
+        assert svc2.embedding_provider == "ollama"
+        assert svc2.embedding_model == "nomic-embed-text"
+        assert svc2.embedding_dim == 768
+
+    def test_legacy_cache_without_provider_defaults_openai(self, service, fake_vectors):
+        """Old embeddings.yaml (no provider field) keeps openai as default."""
+        cache_data = {
+            "metadata": {
+                "model": "text-embedding-3-small",
+                "embedding_count": 3,
+                "last_updated": "2026-04-01T00:00:00Z",
+            },
+            "embeddings": fake_vectors,
+        }
+        with open(service.embeddings_file, "w", encoding="utf-8") as f:
+            yaml.dump(cache_data, f, sort_keys=False)
+
+        svc2 = SemanticSearchService(refs_dir=service.refs_path)
+        # No provider in old cache → stays at default "openai"
+        assert svc2.embedding_provider == "openai"
 
 
 class TestResolveApiKey:

@@ -93,7 +93,7 @@ def register_tools(mcp):
                 "matches": [],
             }
 
-        query_embedding = service._embed_text(query, api_key=service.embedding_api_key)
+        query_embedding = service._embed_query(query)
         if not query_embedding:
             return {
                 "query": query,
@@ -118,32 +118,80 @@ def register_tools(mcp):
     def build_embeddings(
         refs_dir: str = "references",
         project_dir: str | None = None,
+        provider: str = "openai",
+        model: str = "",
+        ollama_url: str = "http://localhost:11434",
     ) -> dict[str, Any]:
         """Build and cache embeddings for all references.
 
-        Requires OPENAI_API_KEY environment variable.
+        Supports OpenAI (default) and local Ollama.
 
         Args:
             refs_dir:    References directory path.
             project_dir: Project root directory.
+            provider:    ``"openai"`` (default) or ``"ollama"``.
+                         Use ``"ollama"`` to embed with a local model — no API
+                         key needed, but Ollama must be running.
+            model:       Model name override.
+                         OpenAI default: ``text-embedding-3-small``
+                         Ollama default: ``nomic-embed-text``
+            ollama_url:  Ollama server URL (default ``http://localhost:11434``).
+                         Only used when provider is ``"ollama"``.
 
         Returns:
-            Dict with embedding status and count.
+            Dict with embedding status, count, provider, and model used.
+
+        Examples:
+            build_embeddings()
+                # OpenAI, reads OPENAI_API_KEY from env
+
+            build_embeddings(provider="ollama")
+                # Local nomic-embed-text via Ollama (no API key needed)
+
+            build_embeddings(provider="ollama", model="mxbai-embed-large")
+                # Local mxbai-embed-large (1024 dims)
         """
+        if provider == "ollama":
+            service = _get_service(refs_dir, project_dir)
+            effective_model = model or "nomic-embed-text"
+            embeddings = service.build_embeddings(
+                provider="ollama",
+                model=effective_model,
+                ollama_url=ollama_url,
+            )
+            return {
+                "status": "success",
+                "provider": "ollama",
+                "model": effective_model,
+                "ollama_url": ollama_url,
+                "embedding_count": len(embeddings),
+                "embedding_dim": service.embedding_dim,
+                "cache_file": str(service.embeddings_file),
+            }
+
+        # OpenAI path
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             return {
                 "status": "error",
-                "message": "OPENAI_API_KEY environment variable not set",
+                "provider": "openai",
+                "message": (
+                    "OPENAI_API_KEY environment variable not set. "
+                    "To use a local model instead, call: "
+                    'build_embeddings(provider="ollama")'
+                ),
                 "embedding_count": 0,
             }
 
         service = _get_service(refs_dir, project_dir)
-        embeddings = service.build_embeddings(api_key=api_key)
+        effective_model = model or None  # service uses its default
+        embeddings = service.build_embeddings(api_key=api_key, model=effective_model)
 
         return {
             "status": "success",
-            "embedding_count": len(embeddings),
-            "cache_file": str(service.embeddings_file),
+            "provider": "openai",
             "model": service.embedding_model,
+            "embedding_count": len(embeddings),
+            "embedding_dim": service.embedding_dim,
+            "cache_file": str(service.embeddings_file),
         }
