@@ -559,7 +559,7 @@ check_prerequisites("semantic_search")
 | 版本 | 工具數 | 主要功能 |
 |------|--------|---------|
 | **v0.14.3** | 124 | crane_help 工具 + SKILL.md 全面改寫：觸發語意對應、Paper Trace 完整流程文件 |
-| **v0.14.2** | 123 | Paper Review 加速：build_paper_index、run_review_pipeline、lru_cache 解析快取、投稿流程單次 review pass |
+| **v0.14.2** | 123 | Paper Review 結構性修正：build_paper_index、run_review_pipeline；lru_cache 快取、review_paper() 呼叫 2→1（理論加速，真實論文基準測試待補）|
 | **v0.14.1** | 121 | 工具整合重構（-17 工具）：trace_add、crane_diagnose、transport_control、visualize_citations、get_traceability_viz |
 | **v0.14.0** | 138 | Karpathy 4 原則工具：plan_experiment_implementation、check_code_simplicity、review_code_changes、define_experiment_success_criteria、karpathy_review |
 | **v0.13.0** | 133 | 論文可追溯性系統（Paper Traceability）：24 工具、10 YAML 模板、版次管理 |

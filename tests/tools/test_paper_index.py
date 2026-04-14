@@ -521,15 +521,23 @@ class TestSubmissionPipelineSinglePass:
 
 
 class TestSpeedMetrics:
-    """Wall-clock regression guards.  Skip in CI if too noisy."""
+    """Wall-clock regression guards against the small SAMPLE_TEX fixture (~40 lines).
+
+    NOTE: These limits apply to the synthetic fixture only and are NOT
+    equivalent to benchmarks on real papers (5 000+ lines).
+    Do not cite these numbers as production performance data.
+    Real-paper cold/warm benchmarks are tracked separately.
+    """
 
     def test_build_index_under_one_second(self, svc, tex_file):
+        # Small fixture (<50 lines) — real papers will be slower.
         t0 = time.perf_counter()
         svc.build(tex_file, force=True)
         elapsed = time.perf_counter() - t0
-        assert elapsed < 1.0, f"build_paper_index took {elapsed:.2f}s (limit 1.0s)"
+        assert elapsed < 1.0, f"build_paper_index took {elapsed:.2f}s (limit 1.0s, fixture only)"
 
     def test_cached_load_under_50ms(self, svc, tex_file):
+        # Cache read — independent of paper size.
         svc.build(tex_file)
         t0 = time.perf_counter()
         svc.load(tex_file)
