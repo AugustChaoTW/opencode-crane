@@ -1,626 +1,631 @@
-# CRANE: 自主科學研究助理系統
+# CRANE：自主科學研究助理系統
 
-**AI 驅動的完整研究自動化系統——從文獻搜索到論文發表的 6 個研究階段。**
+> AI 驅動的端到端研究自動化——從第一篇文獻到論文投稿的完整工作流程。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![MCP](https://img.shields.io/badge/MCP-Server-orange.svg)](https://modelcontextprotocol.io/)
+[![MCP Server](https://img.shields.io/badge/MCP-Server-orange.svg)](https://modelcontextprotocol.io/)
+[![Version](https://img.shields.io/badge/version-0.14.1-green.svg)](https://github.com/AugustChaoTW/opencode-crane/releases)
 
-CRANE 提供 **121 個 MCP 工具**，涵蓋完整研究生命週期，對標 Nature 論文《The AI Scientist》的 6 個核心研究階段。CRANE provides **121 MCP Tools** across the full research lifecycle.
-
----
-
-## 30 秒了解 CRANE
-
-CRANE 是為 [OpenCode](https://github.com/anomalyco/opencode) 構建的**自主科學研究 MCP 伺服器**，實現 Nature 《The AI Scientist》論文提出的完整自動化研究流程。它不僅是一個「論文摘要器」，而是**端到端的科學研究自動化系統**：
-
-- **第 1 階段**：文獻搜索與回顧（多源資料庫、引用圖分析）
-- **第 2 階段**：論文寫作與架構規劃（證據優先評估、層級分析）
-- **第 3 階段**：實驗設計與執行（超參數優化、樹搜索、消融實驗）
-- **第 4 階段**：想法生成與多元性探索（Map Elites、Pareto 前沿）
-- **第 5 階段**：自動評審與驗證（5 評審員集合、元評審、校準）
-- **第 6 階段**：期刊匹配、因果推理、多輪優化（動態排名、因果圖、迴圈協調）
-- **🆕 第 7 階段**：論文可追溯性系統（RQ→貢獻→實驗→圖表→引用→變更影響）
-
-CRANE 確保您的研究結構清晰、可驗證、發表就緒。
+**121 個 MCP 工具**，涵蓋從文獻回顧到期刊投稿的 7 個研究階段。  
+基於 Nature《The AI Scientist》的研究架構，並整合 Karpathy 4 原則作為 AI 寫程式的品質守門。
 
 ---
 
-## 核心優勢
+## CRANE 是什麼？
 
-### 🔬 完整的 Nature AI Scientist 實現
+CRANE 是一個跑在 [OpenCode](https://github.com/anomalyco/opencode) 上的 **MCP 伺服器**。你在聊天框中說話，CRANE 在背後呼叫工具、讀寫你的研究資料夾、回傳結果。
 
-CRANE 完整實現了 Nature 論文《The AI Scientist: Towards Fully Autonomous Research in Materials Discovery》提出的 6 個研究階段：
-
-| 階段 | 核心功能 | 服務 |
-|------|---------|------|
-| **第 1 階段** | 文獻搜索、引用圖、PICOS 篩選 | 多源資料庫適配器 |
-| **第 2 階段** | 論文評估（7 維度）、層級分析、位置校準 | EvidenceEvaluationService |
-| **第 3 階段** | 實驗生成、代碼合成、超參數優化 | ExperimentGenerationService (570 行) |
-| **第 4 階段** | 想法生成、多元性探索、Pareto 優化 | IdeationService (385 行) |
-| **第 5 階段** | 自動評審、5 評審員集合、校準 | AutomatedReviewerV2 |
-| **第 6 階段** | 期刊匹配、因果推理、多輪優化 | DynamicJournalMatchingService + CausalReasoningEngine |
-| **🆕 第 7 階段** | 論文可追溯性、變更影響分析 | TraceabilityService + ImpactGraphService |
-
-### 🗂️ v0.13.0 新功能：論文可追溯性系統（Paper Traceability System）
-
-**核心問題**：論文寫作過程中，研究問題、貢獻聲明、實驗數據、圖表數字彼此分散——數字改了圖沒更新、聲明不一致、reviewer 問題無法快速回應。
-
-**解決方案**：10 個 YAML 文件構成完整研究控制鏈，並自動從 .tex/.pdf 推斷結構：
+**不是摘要器，是研究夥伴。** 它記得你的文獻、追蹤你的實驗、在投稿前幫你做自動評審。
 
 ```
-RQ → 貢獻 → 實驗 → 圖表/表格 → 引用 → 變更影響 → 風險 → 資料集 → 產物
+你 → OpenCode → CRANE MCP → 你的 references/ 資料夾
+                           → GitHub Issues（任務追蹤）
+                           → _paper_trace/（論文追溯）
+                           → 期刊標準資料庫（55 本 Q1）
 ```
-
-**自然語言觸發**（直接在 OpenCode 中輸入）：
-
-```
-trace this paper
-do paper trace
-整理這篇研究
-```
-
-**10 個追溯文件**（自動存入 `_paper_trace/v{n}/`）：
-
-| 文件 | 內容 |
-|------|------|
-| `1_contribution.yaml` | 貢獻聲明 + 最強可辯護措辭 + 防過度聲明 |
-| `2_experiment.yaml` | 實驗設置 + 正規化數字（鎖定） |
-| `3_section_outline.yaml` | 各章節必寫/禁寫事項 + 引用需求 |
-| `4_citation_map.yaml` | 引用放置規則（必出現/禁出現 的章節） |
-| `5_figure_table_map.yaml` | 圖表精確數字 + 可視化規格 + 更新觸發條件 |
-| `6_research_question.yaml` | 研究問題上游錨點（全鏈起點） |
-| `7_change_log_impact.yaml` | 變更記錄 + 下游必更新項目（CH001…） |
-| `8_limitation_reviewer_risk.yaml` | 評審風險 + 回應策略 + fallback 聲明 |
-| `9_dataset_baseline_protocol.yaml` | 資料集 + baseline 協議 + 可重現規則 |
-| `10_artifact_index.yaml` | 所有追蹤文件（腳本、檢查點、圖表） |
-
-**版次管理**：每次 trace 產生新版次 `v1/`、`v2/`…，`_paper_trace/README.md` 自動記錄版次歷史。
-
-**跳過廢棄論文**：目錄名稱含 `reject`、`nogo`、`no-go`、`withdrawn`、`abandon`、`cancel` 等字眼的論文自動跳過。
-
-```
-00_Paper/
-  JLE/          ← 活躍論文 ✓ (掃描)
-  TNNLS-nogo/   ← 廢棄論文 ✗ (跳過)
-  ESWA/         ← 活躍論文 ✓ (掃描)
-```
-
-### 📊 證據優先的 Q1 評估
-
-- **7 維度混合評分**：寫作(12%) + 方法論(18%) + 新穎性(18%) + 評估(20%) + 呈現(8%) + 局限(10%) + 可重現(14%)
-- **閾值機制**：方法論/新穎性/評估任一 < 60 則阻止 Q1 認證
-- **自動分類**：實驗/系統/理論/綜述檔案
-
-### 🎯 動態期刊匹配與趨勢監控
-
-- **55 本 Q1 期刊**：即時影響因子、接受率、排名變化
-- **5 維度加權評分**：範圍(35%) + 貢獻風格(20%) + 評估風格(20%) + 引用(15%) + 運營(10%)
-- **趨勢追蹤**：期刊指標歷史分析、異常預警、個性化推薦
-
-### 🧠 因果推理框架
-
-統一整合 8 個 LeCun 因果推理框架：
-
-1. 世界模型推理（因果圖、反事實）
-2. 研究層級分析（5 層次定位）
-3. 策略決策（Pareto 優化）
-4. 第一性原則解構（假設質疑）
-5. 實驗設計因果性（干預、內部效度）
-6. 期刊決策預測（評審模擬）
-7. 論文修改優先化（ROI 估算）
-8. 多輪優化協調（收斂檢測）
-
-### 🔄 多輪互動式優化
-
-- **自動循環**：evaluate → plan → rewrite → learn → evaluate
-- **收斂檢測**：評分增益 < 1% 時自動終止
-- **多會話管理**：同一論文的並行改寫會話
-- **進度追蹤**：跨輪次評分趨勢與偏好演化
 
 ---
 
-## 6 個研究階段的完整工作流
+## 七個研究階段與使用情境
 
-### 📚 **第 1 階段：文獻回顧與任務規劃**
+### 第 1 階段：文獻搜索與回顧
 
-**目標**：系統搜索、組織、評估相關文獻
+**你在做什麼**：從零開始建立文獻庫，或補充現有研究的相關文獻。
 
-| 功能 | 工具 | 說明 |
-|------|------|------|
-| **初始化專案** | `init_research` | 設置 GitHub 里程碑、標籤、資料夾 |
-| **多源搜索** | `search_papers` | arXiv、OpenAlex、alphaXiv 同時搜索 |
-| **添加文獻** | `add_reference` | 自動生成 BibTeX、YAML 元數據 |
-| **讀取論文** | `read_paper` | 自動下載 PDF、提取全文 |
-| **系統篩選** | `screen_papers_by_picos` | PICOS 框架自動篩選 |
-| **語義搜索** | `semantic_search` | 向量相似度搜索 |
-| **引用圖分析** | `build_citation_graph` | 論文間引用關係、網絡可視化 |
-| **識別空白** | `find_citation_gaps` | 檢測遺漏的重要論文 |
-| **任務管理** | `create_task` | GitHub Issues 進度追蹤 |
+**典型對話**：
 
-**建議流程**：
-```bash
-1. init_research(field="AI/ML", type="literature-review")
-2. search_papers(query="...", sources=["arxiv", "openalex"])
-3. screen_papers_by_picos(...)
-4. add_reference(paper_key="vaswani2017", ...)
-5. build_citation_graph(seed_papers=["vaswani2017"])
+```
+# 搜尋 arXiv 新論文
+search_papers("affect recognition transformer 2024")
+
+# 搜尋本地文獻庫
+search_references("emotion detection multimodal")
+
+# 下載 PDF 並自動解析後設資料
+download_paper("https://arxiv.org/abs/2401.xxxxx")
+
+# 語意搜尋——找跟某篇論文最相近的其他論文
+semantic_search(anchor_paper_key="vaswani2017attention", k=10)
+
+# 建立引用關係圖，找出你遺漏的重要論文
+build_citation_graph()
+find_citation_gaps()
+
+# 用 PICOS 框架系統化篩選論文
+screen_papers_by_picos(
+    population="HCI users",
+    intervention="affect-aware interface",
+    comparison="traditional interface",
+    outcome="engagement",
+    study_type="experiment"
+)
 ```
 
-### ✍️ **第 2 階段：論文寫作與架構規劃**
-
-**目標**：構建論文結構，整合文獻，評估寫作品質
-
-| 功能 | 工具 | 說明 |
-|------|------|------|
-| **評估論文** | `evaluate_paper_v2` | 7 維度混合評分 |
-| **期刊匹配** | `match_journal_v2` | Q1 期刊推薦 + APC 評估 |
-| **段落評審** | `review_paper_sections` | 邏輯、數據、框架問題檢測 |
-| **Feynman 問答** | `generate_feynman_session` | 產生刁鑽問題迫使思考 |
-| **引用核查** | `check_citation_coverage` | 每段引用完整性 |
-| **🆕 追溯分析** | `trace_paper` | 建立 RQ→貢獻→實驗完整鏈 |
-
-### 🔬 **第 3 階段：實驗設計與自動執行**
-
-**目標**：自動化實驗設計、代碼生成、超參數優化
-
-| 功能 | 工具 | 說明 |
-|------|------|------|
-| **實驗生成** | `generate_experiments` | 從論文方法提取實驗框架 |
-| **代碼合成** | `generate_experiment_code` | PyTorch/TensorFlow 代碼生成 |
-| **超參優化** | `optimize_hyperparameters` | 貝葉斯/網格/隨機搜索 |
-| **消融設計** | `design_ablation_study` | 自動生成消融實驗方案 |
-| **🆕 實驗追溯** | `add_experiment` | 記錄實驗到追溯鏈 + 鎖定正規化數字 |
-
-### 💡 **第 4 階段：想法生成與多元性探索**
-
-**目標**：突破研究盲點，探索創新方向
-
-| 功能 | 工具 | 說明 |
-|------|------|------|
-| **想法生成** | `generate_research_ideas` | 基於知識圖的創意生成 |
-| **Pareto 前沿** | `explore_pareto_frontier` | 多目標優化探索 |
-| **Map Elites** | `run_map_elites` | 行為空間多樣性探索 |
-| **第一性原則** | `apply_first_principles` | 分解研究假設 |
-
-### 📋 **第 5 階段：自動評審與驗證**
-
-**目標**：模擬 5 個評審員，識別論文弱點
-
-| 功能 | 工具 | 說明 |
-|------|------|------|
-| **集合評審** | `run_automated_review` | 5 評審員 + 元評審 |
-| **Feynman 探問** | `generate_feynman_session` | 薄弱點識別 + 問題生成 |
-| **修改報告** | `generate_revision_report` | 3 層修改計畫 |
-| **🆕 風險追溯** | `add_reviewer_risk` | 評審風險記錄 + 回應策略 |
-
-### 🎯 **第 6 階段：期刊匹配、因果推理、多輪優化**
-
-| 功能 | 工具 | 說明 |
-|------|------|------|
-| **動態期刊匹配** | `match_journal_v2` | Target/Backup/Safe 三級推薦 |
-| **APC 分析** | `analyze_apc` | 費用評估 + 預算適配 |
-| **因果推理** | `apply_causal_reasoning` | 8 LeCun 框架統一 API |
-| **多輪優化** | `run_iterative_optimization` | 自動收斂協調 |
-| **投稿模擬** | `simulate_submission_outcome` | 接受概率預測 |
+**產出**：
+- `references/papers/` — 每篇論文的 YAML 後設資料
+- `references/pdfs/` — PDF 原文
+- `references/bibliography.bib` — 隨時可用的 BibTeX
 
 ---
 
-## 🆕 第 7 階段：論文可追溯性系統（v0.13.0）
+### 第 2 階段：論文評估與位置校準
 
-**核心理念**：論文寫作是一個動態過程。數字會修改、聲明會調整、圖表會更新——每一次變更都可能在論文其他地方留下不一致的痕跡。CRANE v0.13.0 引入完整的追溯鏈，確保每個數字都有出處、每個聲明都有支撐。
+**你在做什麼**：決定哪些論文值得精讀，你的研究在學術地景中的定位。
 
-### 快速開始
-
-在 OpenCode 中對任何 .tex 或 .pdf 檔案說：
+**典型對話**：
 
 ```
-trace this paper          # 英文觸發
-do paper trace            # 英文觸發
-整理這篇研究               # 中文觸發
-```
+# 7 維度深度評估單篇論文（方法論、新穎性、可重現性…）
+evaluate_paper_v2(paper_key="zhang2023affect")
 
-等同執行：
+# 評估是否符合 Q1 期刊標準
+evaluate_q1_standards(paper_key="zhang2023affect", journal="IEEE TPAMI")
 
-```python
-trace_paper(paper_path="JLE/JLE-main.tex", mode="full")
-```
-
-這會自動：
-1. 建立 `_paper_trace/v1/` 目錄
-2. 從論文內容推斷 RQ、貢獻聲明、實驗、評審風險
-3. 生成 10 個 YAML 追溯文件
-4. 在 `_paper_trace/README.md` 記錄版次
-
-### 完整工作流範例
-
-```python
-# 1. 初始化追溯（首次）
-trace_paper("00_Paper/JLE/JLE-main.tex", mode="full")
-# → 建立 _paper_trace/v1/ + 推斷結構
-
-# 2. 手動補充細節
-add_research_question(
-    paper_path="...",
-    rq_id="RQ1",
-    text="Does affect-aware training improve HCI engagement?",
-    hypothesis="Yes — emotion context reduces cognitive load"
+# 分析你的研究在學術地景的位置
+analyze_research_positioning(
+    your_contribution="affect-aware training with sparse labels",
+    domain="HCI"
 )
 
-add_contribution(
-    paper_path="...",
-    contribution_id="C1",
-    claim="Our model achieves 87.3% accuracy on AffectCorpus",
-    strongest_defensible_wording="...under the specified train/val/test split...",
-    rq_ids=["RQ1"]
+# 產生 Feynman 教學摘要——用最簡單的話解釋核心概念
+generate_feynman_session(paper_key="vaswani2017attention")
+
+# 語意分群——看文獻庫的主題分布
+get_research_clusters(k_clusters=5)
+visualize_citations(mode="clusters", output_format="mermaid")
+```
+
+**產出**：
+- 7 維度評分報告（寫作 12%、方法論 18%、新穎性 18%、評估 20%、呈現 8%、局限 10%、可重現 14%）
+- 競爭對手地圖
+- 引用關係視覺化（Mermaid / 圖檔）
+
+---
+
+### 第 3 階段：實驗設計與執行管理
+
+**你在做什麼**：設計實驗、追蹤執行狀態、確保結果可重現。
+
+**典型對話**：
+
+```
+# 在開始寫程式之前，先讓 CRANE 幫你想清楚
+plan_experiment_implementation(
+    "實作 affect-aware loss function，加入稀疏標籤的正則化"
 )
 
-# 3. 記錄實驗
-add_experiment(
-    paper_path="...",
-    exp_id="E1",
-    goal="Compare affect-aware vs baseline",
-    dataset="AffectCorpus",
-    model="AffectNet-v2",
-    related_contributions=["C1"],
-    related_rqs=["RQ1"]
+# 定義可驗證的成功標準（不要模糊說「改善準確率」）
+define_experiment_success_criteria(
+    goal="在 AffectCorpus 上比 BERT baseline 高 3% F1",
+    domain="experiment"
 )
 
-# 4. 記錄變更影響
+# 把實驗加進論文追溯系統
+trace_add(
+    paper_path="papers/JLE/main.tex",
+    item_type="experiment",
+    item_id="E1",
+    data={
+        "goal": "比較 affect-aware 與 baseline 在 AffectCorpus 的 F1",
+        "dataset": "AffectCorpus",
+        "model": "AffectNet-v2",
+        "hardware": "RTX 4090 × 2",
+        "related_contributions": ["C1"],
+        "related_rqs": ["RQ1"]
+    }
+)
+
+# 實驗跑完，記錄變更並追蹤下游影響
 log_change(
-    paper_path="...",
-    change="Accuracy updated from 0.85 to 0.87 after fixing seed",
+    paper_path="papers/JLE/main.tex",
+    change="E1 重新跑，F1 從 0.847 改為 0.863（修正 seed）",
+    why="seed 設定錯誤導致不可重現",
     changed_artifact="E1",
     impact_severity="high",
     must_update=[
-        {"artifact": "Fig:3", "artifact_type": "figure", "reason": "Bar chart values changed"},
-        {"artifact": "Table:2", "artifact_type": "table", "reason": "Main results table"},
-        {"artifact": "Sec:4", "artifact_type": "section", "reason": "Inline text: '85%'"},
+        {"artifact": "Fig:1", "reason": "圖中數字需更新"},
+        {"artifact": "T:1", "reason": "表格數字需更新"}
     ]
 )
-
-# 5. 查看待辦更新
-get_pending_changes(paper_path="...")
-# → [{change_id: "CH001", artifact: "Fig:3", status: "pending"}, ...]
-
-# 6. 確認完成
-mark_change_resolved(paper_path="...", change_id="CH001", artifact="Fig:3")
-
-# 7. 生成 Mermaid 可視化
-get_traceability_mermaid(paper_path="...")
-# → flowchart LR
-#     RQ1["RQ1: Does affect..."]:::rq
-#     C1["C1: 87.3% accuracy"]:::contribution
-#     E1["E1: AffectNet vs baseline"]:::experiment
-#     RQ1 --> C1 --> E1
-
-# 8. 生成需求追溯矩陣（投稿用）
-generate_rtm(paper_path="...", output_path="rtm.md")
 ```
 
-### 掃描工作區所有論文
-
-```python
-list_active_papers(search_root="00_Paper/")
-# →
-# JLE/         ← has_trace: true,  trace_version: 3
-# ESWA/        ← has_trace: false  (尚未追溯)
-# TKDE/        ← has_trace: true,  trace_version: 1
-# TNNLS-nogo/  ← 自動跳過（含 nogo 關鍵字）
-```
-
-### 版本比對
-
-```python
-diff_trace_versions(paper_path="...", version_a=1, version_b=3)
-# → delta: {rq_count: +0, contribution_count: +1, experiment_count: +2,
-#           chain_coverage: +0.35, pending_changes: -3}
-```
-
-### 24 個追溯工具
-
-| 工具 | 功能 |
-|------|------|
-| `trace_paper` | 主入口：init + infer + status + viz 四種模式 |
-| `list_active_papers` | 掃描工作區，跳過廢棄論文 |
-| `init_traceability` | 建立空白版次（不推斷） |
-| `get_traceability_status` | 查看鏈完整性（唯讀） |
-| `add_research_question` | 新增 RQ 到 6_research_question.yaml |
-| `add_contribution` | 新增貢獻到 1_contribution.yaml |
-| `add_experiment` | 新增實驗到 2_experiment.yaml |
-| `add_figure_table` | 新增圖表到 5_figure_table_map.yaml |
-| `add_trace_reference` | 新增引用放置規則到 4_citation_map.yaml |
-| `add_reviewer_risk` | 新增評審風險到 8_limitation_reviewer_risk.yaml |
-| `add_dataset` | 新增資料集到 9_dataset_baseline_protocol.yaml |
-| `add_baseline` | 新增 baseline 到 9_dataset_baseline_protocol.yaml |
-| `link_artifacts` | 新增產物到 10_artifact_index.yaml |
-| `log_change` | 記錄變更 + 自動生成 CH{n} ID |
-| `get_change_impact` | 查看特定變更的影響範圍 |
-| `get_pending_changes` | 列出所有待完成的更新項目 |
-| `mark_change_resolved` | 標記項目已完成 |
-| `verify_traceability_chain` | 驗證 RQ→貢獻→實驗→圖表完整性 |
-| `find_orphan_artifacts` | 找出沒有連接的孤立節點 |
-| `generate_artifact_index` | 生成追溯摘要索引 |
-| `get_traceability_mermaid` | 生成 Mermaid 流程圖（顏色編碼） |
-| `get_traceability_dot` | 生成 Graphviz DOT 圖 |
-| `diff_trace_versions` | 比較兩個版次的差異 |
-| `generate_rtm` | 生成需求追溯矩陣（Markdown） |
+**產出**：
+- 可驗證的實驗計劃（假設、成功標準、反向目標）
+- `_paper_trace/v{n}/2_experiment.yaml` — 正規化實驗記錄
+- `_paper_trace/v{n}/7_change_log_impact.yaml` — 變更影響鏈
 
 ---
 
-## 核心特性版本總覽
+### 第 4 階段：想法生成與研究貢獻定義
 
-### 🏆 v0.13.0（本版）：論文可追溯性系統
+**你在做什麼**：找出研究缺口，強化貢獻聲明，應對 reviewer 挑戰。
 
-| 特性 | 實現 | 代碼量 | 測試 |
-|------|------|--------|------|
-| **模型層** | TraceabilityIndex + 18 個 dataclass | 410 行 | ✅ 73 個 |
-| **圖引擎** | ImpactGraphService（鄰接表，無外部依賴） | ~175 行 | ✅ |
-| **核心服務** | TraceabilityService（5 層路徑回退、版次管理） | ~430 行 | ✅ |
-| **可視化** | TraceabilityVizService（Mermaid + DOT） | ~160 行 | ✅ |
-| **推斷引擎** | TraceabilityInferenceService（正則啟發式提取） | ~220 行 | ✅ |
-| **MCP 工具** | 24 個工具 in traceability.py | ~600 行 | ✅ 50 個 |
-| **YAML 模板** | 10 個追溯模板 | — | — |
-| **LLM 模板** | 4 個推斷提示模板 | — | — |
+**典型對話**：
 
-**v0.13.0 總計**：~2,000 行新增代碼 + 123 個新測試（100% 通過）
+```
+# 解構領域常識——找出「大家都這樣說但沒人驗證」的假設
+deconstruct_conventional_wisdom(
+    claim="Transformer 在情感識別上優於 CNN",
+    domain="affect recognition"
+)
 
-### 🔥 v0.12.2：Feynman 整合（Issues #71-#72）
+# 把貢獻聲明寫得更精確、更可辯護
+trace_add(
+    paper_path="papers/JLE/main.tex",
+    item_type="contribution",
+    item_id="C1",
+    data={
+        "claim": "本研究提出 AffectNet-v2，在 AffectCorpus 達到 86.3% F1，比最強 baseline（BERT-base）高 3.2%",
+        "why_it_matters": "稀疏標籤場景下的情感識別性能瓶頸",
+        "strongest_defensible_wording": "在 AffectCorpus 測試集，條件 X 下，F1=0.863",
+        "reviewer_risk": "Reviewer 可能質疑 baseline 選擇",
+        "response_strategy": "Table 2 已包含 GPT-4 比較；見 Appendix B"
+    }
+)
 
-| 特性 | 實現 | 代碼量 | 測試 |
-|------|------|--------|------|
-| **證據導向編排器** | EvidenceOrchestrator | 330 行 | ✅ 15 個 |
-| **多來源證據收集器** | MultiSourceEvidenceCollector | 365 行 | ✅ 22 個 |
+# 加入 reviewer 風險管理
+trace_add(
+    paper_path="papers/JLE/main.tex",
+    item_type="risk",
+    item_id="R1",
+    data={
+        "description": "Reviewer 2 可能說 AffectCorpus 太小（10K 樣本）",
+        "severity": "high",
+        "likely_appears_in": "Reviewer 2",
+        "response_strategy": "引用 Li et al. (2023) 的 12K 樣本研究；說明標籤稀疏性是特色",
+        "fallback_claim": "本研究聚焦稀疏標籤場景，不比較全監督"
+    }
+)
+```
 
-**v0.12.2 總計**：695 行 + 37 個測試
+**產出**：
+- 強化後的貢獻聲明（最強可辯護措辭）
+- Reviewer 風險清單 + 回應策略
+- `_paper_trace/v{n}/1_contribution.yaml`
+- `_paper_trace/v{n}/8_limitation_reviewer_risk.yaml`
 
-### 🚀 v0.12.0：4 個研究缺口解決方案（Issues #59-#62）
+---
 
-| 特性 | 實現 | 代碼量 | 測試 |
-|------|------|--------|------|
-| **論文-程式碼對齊驗證** | PaperCodeAlignmentService | 641 行 | ✅ 13 個 |
-| **研究管道基準評估** | ResearchPipelineBenchmarkService | 522 行 | ✅ 16 個 |
-| **AI 輔助信任校準** | TrustCalibrationService | 521 行 | ✅ 18 個 |
-| **MCP 工具編排** | MCPToolOrchestrationService | 704 行 | ✅ 19 個 |
+### 第 5 階段：論文寫作與風格校準
 
-**v0.12.0 總計**：2,388 行 + 66 個測試
+**你在做什麼**：按目標期刊的風格寫作，診斷各章節偏差，生成改寫建議。
 
-### 🏆 v0.11.0：6 個研究階段完整實現
+**典型對話**：
 
-| 特性 | 實現 | 代碼量 | 測試 |
-|------|------|--------|------|
-| **實驗生成** | ExperimentGenerationService | 570 行 | ✅ |
-| **想法生成** | IdeationService | 385 行 | ✅ |
-| **自動評審** | AutomatedReviewerV2 | 328 行 | ✅ 29 個 |
-| **期刊匹配** | DynamicJournalMatchingService | 343 行 | ✅ 18 個 |
-| **因果推理** | CausalReasoningEngine | 444 行 | ✅ 27 個 |
-| **多輪優化** | IterativePaperOptimizationOrchestrator | 388 行 | ✅ 30 個 |
+```
+# 診斷整篇論文（所有章節）的風格偏差
+crane_diagnose(
+    paper_path="papers/JLE/main.tex",
+    journal_name="IEEE TPAMI",
+    scope="paper"
+)
+
+# 只診斷 Introduction 章節
+crane_diagnose(
+    paper_path="papers/JLE/main.tex",
+    journal_name="IEEE TPAMI",
+    scope="section",
+    section_name="Introduction"
+)
+
+# 產生具體改寫建議
+crane_suggest_rewrites(
+    paper_path="papers/JLE/main.tex",
+    section_name="Introduction",
+    journal_name="IEEE TPAMI",
+    count=5
+)
+
+# 比較兩個期刊的風格差異（決定改投哪裡）
+crane_compare_sections(
+    paper_path="papers/JLE/main.tex",
+    section_name="Methods",
+    journal1="IEEE TPAMI",
+    journal2="ACM TOSEM"
+)
+
+# 查看章節結構是否符合追溯鏈要求
+review_paper_sections(paper_path="papers/JLE/main.tex")
+```
+
+**產出**：
+- 各章節偏差分數（越低越接近目標期刊風格）
+- 逐句改寫建議（支援互動選擇）
+- 章節完整性報告（引用是否在對的位置）
+
+---
+
+### 第 6 階段：自動評審與期刊匹配
+
+**你在做什麼**：投稿前的最終品質把關，找最適合的期刊。
+
+**典型對話**：
+
+```
+# 5 位虛擬 reviewer 集合評審（含元評審）
+evaluate_paper_v2(paper_path="papers/JLE/main.tex")
+
+# 從 55 本 Q1 期刊中找最佳匹配
+match_journal_v2(paper_path="papers/JLE/main.tex")
+
+# 深入分析某本期刊的適配度
+analyze_paper_for_journal(
+    paper_path="papers/JLE/main.tex",
+    journal_name="IEEE TPAMI"
+)
+
+# APC 費用分析（開放取用費用）
+analyze_apc(journal_name="IEEE TPAMI")
+
+# 產生投稿 cover letter
+crane_generate_cover_letter(
+    paper_path="papers/JLE/main.tex",
+    journal_name="IEEE TPAMI"
+)
+
+# 模擬投稿結果（接受/修改/拒稿機率）
+simulate_submission_outcome(
+    paper_path="papers/JLE/main.tex",
+    journal_name="IEEE TPAMI"
+)
+
+# 完整投稿流程自動化
+crane_journal_workflow_auto(
+    paper_path="papers/JLE/main.tex",
+    journal_name="IEEE TPAMI"
+)
+```
+
+**產出**：
+- 5 評審員報告 + 元評審結論
+- 期刊排名（5 維度加權：範圍 35%、貢獻風格 20%、評估風格 20%、引用 15%、運營 10%）
+- Cover letter 草稿
+- 投稿風險評估（accept / major revision / reject 各機率）
+
+---
+
+### 第 7 階段：論文可追溯性系統
+
+**你在做什麼**：確保整篇論文的聲明、數字、圖表、引用都一致，有任何變更立刻知道影響範圍。
+
+**典型對話**：
+
+```
+# 第一次使用：一鍵初始化追溯系統（自動從論文推斷結構）
+trace_paper(
+    paper_path="papers/JLE/main.tex",
+    mode="full"
+)
+# 或直接說：trace this paper / 整理這篇研究
+
+# 查看追溯鏈完整性
+get_traceability_status(paper_path="papers/JLE/main.tex")
+
+# 確認所有鏈結都完整（RQ → 貢獻 → 實驗 → 圖表）
+verify_traceability_chain(paper_path="papers/JLE/main.tex")
+
+# 找出沒有上下游連接的孤立節點
+find_orphan_artifacts(paper_path="papers/JLE/main.tex")
+
+# 某個實驗數字改了，看影響哪些地方
+get_change_impact(
+    paper_path="papers/JLE/main.tex",
+    artifact_id="E1"
+)
+
+# 查看還有哪些東西需要更新
+get_pending_changes(paper_path="papers/JLE/main.tex")
+
+# 產生 Requirements Traceability Matrix（RTM）給 journal editor
+generate_rtm(paper_path="papers/JLE/main.tex")
+
+# 視覺化整個追溯圖（Mermaid 格式，可貼到 GitHub）
+get_traceability_viz(
+    paper_path="papers/JLE/main.tex",
+    output_format="mermaid"
+)
+
+# 比較兩個版本的差異
+diff_trace_versions(
+    paper_path="papers/JLE/main.tex",
+    version_a=1,
+    version_b=2
+)
+```
+
+**追溯文件結構**（自動建立於 `_paper_trace/v{n}/`）：
+
+| 文件 | 記錄內容 |
+|------|---------|
+| `1_contribution.yaml` | 貢獻聲明 + 最強可辯護措辭 |
+| `2_experiment.yaml` | 實驗設置 + 正規化結果數字 |
+| `3_section_outline.yaml` | 各章節必寫／禁寫事項 |
+| `4_citation_map.yaml` | 引用出現規則（哪個引用必須在哪章） |
+| `5_figure_table_map.yaml` | 圖表數字 + 更新觸發條件 |
+| `6_research_question.yaml` | 研究問題（全鏈起點） |
+| `7_change_log_impact.yaml` | 變更記錄 + 下游影響清單 |
+| `8_limitation_reviewer_risk.yaml` | 評審風險 + 回應策略 |
+| `9_dataset_baseline_protocol.yaml` | 資料集 + baseline 可重現規則 |
+| `10_artifact_index.yaml` | 所有追蹤文件（腳本、模型、圖表） |
+
+---
+
+### Karpathy 4 原則工具（v0.14.0 新增）
+
+**你在做什麼**：在 AI 幫你生成程式碼或實驗計劃之前，先做品質把關。
+
+```
+# 原則 1：先想清楚再寫——產生實作計劃
+plan_experiment_implementation(
+    "在訓練迴圈中加入 affect-aware loss，使用稀疏標籤正則化"
+)
+
+# 原則 2：檢查是否過度複雜
+check_code_simplicity(code=open("train.py").read())
+
+# 原則 3：確認修改是否精準（沒有動到不相關的程式碼）
+review_code_changes(
+    original=old_code,
+    modified=new_code,
+    stated_goal="修正 seed 設定"
+)
+
+# 原則 4：把模糊目標轉成可驗證的成功標準
+define_experiment_success_criteria(
+    goal="改善 AffectCorpus 準確率",
+    domain="experiment"
+)
+
+# 全部 4 原則一次跑
+karpathy_review(
+    code=generated_code,
+    original_code=original,
+    stated_goal="implement affect loss",
+    domain="experiment"
+)
+```
 
 ---
 
 ## 快速開始
 
-### 一行安裝
+### 安裝
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/AugustChaoTW/opencode-crane/main/scripts/install.sh | bash
+# 從 PyPI 安裝（推薦）
+pip install opencode-crane
+
+# 或從原始碼安裝
+git clone https://github.com/AugustChaoTW/opencode-crane
+cd opencode-crane
+uv sync
 ```
 
-安裝腳本會自動完成：git clone、uv sync、bun plugin 安裝、OpenCode 設定、SKILL.md 部署。
+### 設定 OpenCode
 
-### 手動安裝
+在 `~/.opencode/mcp.json` 加入：
 
-```bash
-git clone https://github.com/AugustChaoTW/opencode-crane.git ~/.opencode-crane
-cd ~/.opencode-crane && uv sync
-
-# 設定 OpenCode
-mkdir -p ~/.config/opencode
-cat > ~/.config/opencode/opencode.json << 'EOF'
+```json
 {
-  "$schema": "https://opencode.ai/config.json",
-  "mcp": {
+  "servers": {
     "crane": {
-      "type": "local",
-      "command": ["sh", "-c", "cd ~/.opencode-crane && uv run crane"],
-      "enabled": true
+      "command": "crane",
+      "env": {
+        "GH_TOKEN": "your_github_token"
+      }
     }
   }
 }
-EOF
 ```
 
-### 前置需求
-
-- **Python**: 3.10+
-- **uv**: [安裝指引](https://astral.sh/uv/install.sh)
-- **作業系統**：Linux (Ubuntu 20.04+) 或 macOS
-
-### 驗證安裝
+### 初始化研究工作區
 
 ```bash
-uv run pytest tests/ -m "not integration" -q
-# 應看到：2100+ passed
+# 建立標準資料夾結構
+init_research(project_name="my-research")
+
+# 確認工作區狀態
+workspace_status()
+
+# 檢查某個工具的前置條件
+check_prerequisites("semantic_search")
 ```
+
+### 環境變數
+
+| 變數 | 必要 | 用途 |
+|------|------|------|
+| `GH_TOKEN` | 必要 | GitHub Issues 任務追蹤 |
+| `OPENAI_API_KEY` | 選用 | 語意搜尋 embedding |
+| `CRANE_CHECK_VERSION_ON_START` | 選用（預設 true） | 啟動時檢查更新 |
 
 ---
 
-## 功能對比
+## 工具總覽（121 個）
 
-| 特性 | CRANE | Zotero | Mendeley | Obsidian |
-|------|-------|--------|----------|----------|
-| **AI 自主性** | 121 個 MCP 工具 | 第三方插件 | 有限 | 手動設置 |
-| **實驗生成** | ✅ 代碼合成、超參優化 | ✗ | ✗ | ✗ |
-| **想法生成** | ✅ Map Elites、Pareto | ✗ | ✗ | ✗ |
-| **自動評審** | ✅ 5 評審員集合 | ✗ | ✗ | ✗ |
-| **期刊趨勢** | ✅ 實時排名、動態推薦 | ✗ | ✗ | ✗ |
-| **因果推理** | ✅ 8 框架統一 API | ✗ | ✗ | ✗ |
-| **多輪優化** | ✅ 自動循環協調 | ✗ | ✗ | ✗ |
-| **🆕 論文追溯** | ✅ 10 文件完整控制鏈 | ✗ | ✗ | ✗ |
-| **🆕 變更影響** | ✅ 自動 CH{n} 追蹤 | ✗ | ✗ | ✗ |
-| **開發者友善** | CLI/MCP/YAML | GUI 重 | GUI 重 | 筆記重 |
+### 文獻管理
+`search_papers` · `search_references` · `download_paper` · `add_reference` · `get_reference` · `list_references` · `remove_reference` · `annotate_reference` · `verify_reference` · `check_citations` · `check_all_references` · `read_paper` · `parse_paper_structure`
+
+### 語意搜尋
+`semantic_search` · `build_embeddings` · `chunk_papers` · `ask_library` · `get_chunk_stats`
+
+### 引用圖分析
+`build_citation_graph` · `find_citation_gaps` · `get_research_clusters` · `visualize_citations`
+
+### 論文篩選
+`screen_papers_by_picos` · `screen_reference` · `list_screened_references` · `compare_papers`
+
+### 論文評估
+`evaluate_paper_v2` · `evaluate_q1_standards` · `review_paper_sections` · `analyze_paper_for_journal` · `match_journal_v2` · `generate_feynman_session` · `deconstruct_conventional_wisdom` · `analyze_research_positioning`
+
+### 論文可追溯性（第 7 階段）
+`trace_paper` · `init_traceability` · `trace_add` · `link_artifacts` · `log_change` · `get_change_impact` · `get_pending_changes` · `mark_change_resolved` · `verify_traceability_chain` · `find_orphan_artifacts` · `get_traceability_status` · `get_traceability_viz` · `diff_trace_versions` · `generate_rtm` · `generate_artifact_index` · `list_active_papers`
+
+### 期刊投稿
+`crane_journal_setup` · `crane_journal_questionnaire` · `crane_assess_risk` · `crane_generate_cover_letter` · `crane_get_journal_workflow_status` · `crane_journal_workflow_auto` · `run_submission_check` · `simulate_submission_outcome` · `generate_submission_checklist` · `analyze_apc` · `find_similar_papers_in_journal`
+
+### 寫作風格
+`crane_diagnose` · `crane_suggest_rewrites` · `crane_compare_sections` · `crane_start_rewrite_session` · `crane_submit_rewrite_choice` · `crane_get_rewrite_session` · `crane_list_rewrite_sessions` · `crane_coach_chapter` · `crane_export_style_report` · `crane_extract_journal_style_guide` · `crane_get_style_exemplars` · `crane_get_user_preferences` · `crane_reset_user_preferences` · `crane_review_full`
+
+### Karpathy 4 原則（v0.14.0）
+`plan_experiment_implementation` · `check_code_simplicity` · `review_code_changes` · `define_experiment_success_criteria` · `karpathy_review`
+
+### 實驗設計
+`generate_figure` · `generate_comparison` · `generate_revision_report` · `benchmark_research_pipeline`
+
+### 任務追蹤
+`create_task` · `update_task` · `close_task` · `view_task` · `list_tasks` · `report_progress` · `get_milestone_progress`
+
+### 系統與工作區
+`init_research` · `workspace_status` · `check_prerequisites` · `list_workflows` · `run_pipeline` · `get_project_info` · `check_crane_version` · `upgrade_crane` · `rollback_crane` · `orchestrate_research_tools`
+
+### Transport / Session
+`transport_control` · `broadcast_sse_event` · `create_session` · `save_session` · `load_session` · `list_sessions` · `delete_session` · `generate_bridge_jwt`
+
+### Agent 管理
+`get_agent` · `list_agents` · `add_agent_memory` · `get_agent_memory` · `clear_agent_memory`
+
+### 權限與信任
+`add_permission_rule` · `remove_permission_rule` · `list_permission_rules` · `evaluate_permission_action` · `show_effective_rules` · `critique_permission_rules` · `calibrate_trust`
+
+---
+
+## 常見工作流程
+
+### 「我剛開始做一個新研究」
+
+```
+1. init_research("my-project")
+2. search_papers("your topic 2024")
+3. build_embeddings()
+4. get_research_clusters()
+5. trace_paper(paper_path="paper.tex", mode="full")
+```
+
+### 「我要投稿了，確認論文品質」
+
+```
+1. verify_traceability_chain(paper_path)   ← 確認邏輯鏈完整
+2. get_pending_changes(paper_path)         ← 確認沒有未更新項目
+3. evaluate_paper_v2(paper_path)           ← 5 評審員評估
+4. match_journal_v2(paper_path)            ← 找最佳期刊
+5. crane_journal_workflow_auto(paper_path) ← 完整投稿流程
+```
+
+### 「實驗數字改了，影響哪些地方？」
+
+```
+1. log_change(paper_path, change="E1 F1 改成 0.863", ...)
+2. get_pending_changes(paper_path)
+3. get_change_impact(paper_path, artifact_id="E1")
+4. verify_traceability_chain(paper_path)
+```
+
+### 「AI 幫我寫了程式碼，先做品質檢查」
+
+```
+1. plan_experiment_implementation(task)
+2. check_code_simplicity(code)
+3. review_code_changes(original, modified, stated_goal)
+4. define_experiment_success_criteria(goal)
+```
 
 ---
 
 ## 版本歷史
 
-| 版本 | 發佈日期 | 重點 |
-|------|----------|-------|
-| **v0.13.0** | 2026-04-14 | 論文可追溯性系統：24 個工具、4 個服務、10 YAML 模板、123 個測試。自然語言觸發「trace this paper」/ 「整理這篇研究」。 |
-| **v0.12.2** | 2026-04-10 | Feynman 整合（Issues #71-#72）：EvidenceOrchestrator + MultiSourceEvidenceCollector。695 行 + 37 個測試 |
-| **v0.12.1** | 2026-04-07 | 版本同步與文件增強 |
-| **v0.12.0** | 2026-04-07 | 4 個研究缺口：論文-程式碼對齊（#59）、管道基準（#60）、信任校準（#61）、MCP 工具編排（#62）。2,388 行 + 66 個測試 |
-| v0.11.0 | 2026-04-06 | 6 個研究階段完整實現：實驗生成、想法生成、自動評審、期刊匹配、因果推理、多輪優化 |
-| v0.10.1 | 2026-04-06 | 期刊感知寫作風格工具包：55 本期刊、8 項量化指標 |
-| v0.10.0 | 2026-04-06 | ACM TOSEM 投稿工具鏈 |
-| v0.9.x | 2026-04-04 | LeCun 框架、代理管理、紙碼一致性 |
+| 版本 | 工具數 | 主要功能 |
+|------|--------|---------|
+| **v0.14.1** | 121 | 工具整合重構（-17 工具）：trace_add、crane_diagnose、transport_control、visualize_citations、get_traceability_viz |
+| **v0.14.0** | 138 | Karpathy 4 原則工具：plan_experiment_implementation、check_code_simplicity、review_code_changes、define_experiment_success_criteria、karpathy_review |
+| **v0.13.0** | 133 | 論文可追溯性系統（Paper Traceability）：24 工具、10 YAML 模板、版次管理 |
+| **v0.12.2** | 109 | Feynman 整合：EvidenceOrchestrator + MultiSourceEvidenceCollector |
+| **v0.12.1** | 109 | 版本同步與文件強化 |
+| **v0.12.0** | 109 | 寫作風格工具包（Phase C + D）：55 本期刊風格資料庫 |
+| **v0.11.0** | 95  | 動態期刊匹配、趨勢監控、APC 分析 |
+| **v0.10.0** | 80  | AutomatedReviewerV2：5 評審員集合 + 元評審 |
 
 ---
 
-## 開發與測試
+## 架構
 
-### 環境設置
+```
+MCP Client（OpenCode）
+    │
+    ▼
+src/crane/server.py          ← FastMCP over stdio
+    │
+    ▼
+src/crane/tools/             ← 工具模組（各自 export register_tools）
+    │
+    ▼
+src/crane/services/          ← 商業邏輯（52+ 服務類別）
+    │
+    ├── TraceabilityService         第 7 階段核心
+    ├── AutomatedReviewerV2         5 評審員集合（~11K 行）
+    ├── KarpathyReviewService       4 原則品質守門
+    ├── WritingStyleService         風格診斷與改寫
+    ├── DynamicJournalMatchingService  55 本期刊動態排名
+    ├── ExperimentGenerationService    實驗合成（~570 行）
+    └── CausalReasoningEngine          8 個 LeCun 因果框架
+    │
+    ▼
+src/crane/providers/         ← 文獻來源適配器（arXiv、OpenAlex、Semantic Scholar…）
+src/crane/models/            ← 資料結構（Paper、TraceabilityNode、CanonicalNumber…）
+src/crane/config/            ← 期刊標準、領域規範、LLM prompt 模板
+```
+
+---
+
+## 開發
 
 ```bash
-cd ~/.opencode-crane
+# 安裝開發依賴
 uv sync --dev
-```
 
-### 運行測試
+# 執行單元測試
+uv run pytest -m "not integration" -q
 
-```bash
-# 單元測試（推薦）
-uv run pytest tests/ -m "not integration" -q
+# 執行整合測試
+uv run pytest -m "integration"
 
-# 含覆蓋率
-uv run pytest tests/ --cov=crane --cov-report=term-missing
+# Lint
+uv run ruff check src/ tests/
 
-# 特定模組
-uv run pytest tests/tools/test_traceability_tools.py -v
-uv run pytest tests/models/test_traceability.py -v
-```
-
-### 新增工具
-
-1. 在 `src/crane/services/` 建立服務
-2. 在 `src/crane/tools/` 建立工具模組，匯出 `register_tools(mcp)`
-3. 在 `src/crane/server.py` 匯入並呼叫
-4. 更新 `scripts/install.sh` 的 `EXPECTED_TOOLS`
-
-### 專案結構
-
-```
-src/crane/
-  server.py                  # FastMCP 入口；匯入並註冊所有工具
-  tools/                     # 工具模組（每個匯出 register_tools）
-    traceability.py          # 🆕 v0.13.0：24 個追溯工具
-    evaluation_v2.py         # 評估工具（5 個）
-    pipeline.py              # 工作流管道（含 paper-trace）
-    workspace.py             # 工作區工具（含追溯能力偵測）
-    [其他 26 個工具模組]
-  services/                  # 業務邏輯服務
-    traceability_service.py       # 🆕 核心追溯服務（版次管理）
-    impact_graph_service.py       # 🆕 鄰接表圖引擎
-    traceability_viz_service.py   # 🆕 Mermaid + DOT 可視化
-    traceability_inference_service.py  # 🆕 正則啟發式推斷
-    evidence_orchestrator_service.py   # v0.12.2
-    experiment_generation_service.py   # v0.11.0
-    [其他 50+ 個服務]
-  models/
-    traceability.py          # 🆕 18 個 dataclass（RQ、貢獻、實驗等）
-    paper_profile.py
-    [其他模型]
-  config/
-    templates/
-      traceability/          # 🆕 10 個 YAML 模板（空白初始結構）
-    journal_standards/       # 55 本 Q1 期刊設定
-  templates/
-    llm/                     # LLM 提示模板
-      traceability_extract_rq.txt          # 🆕
-      traceability_extract_contribution.txt # 🆕
-      traceability_extract_experiment.txt   # 🆕
-      traceability_extract_risk.txt         # 🆕
-
-tests/
-  models/
-    test_traceability.py     # 🆕 73 個模型測試
-  tools/
-    test_traceability_tools.py  # 🆕 50 個工具測試
-    test_claude_usability.py    # 工作流發現測試
-  services/                  # 200+ 服務單元測試
-  integration/               # 整合測試
-```
-
----
-
-## 實際應用案例
-
-### 1️⃣ 新論文：從想法到追溯鏈
-
-```bash
-# 建立專案並開始追溯
-init_research(field="HCI", type="full-research")
-trace_paper("00_Paper/JLE/JLE-main.tex", mode="full")
-# → _paper_trace/v1/ 自動建立，RQ/貢獻/實驗/風險 自動推斷
-```
-
-### 2️⃣ 修改實驗數字後的影響追蹤
-
-```python
-# 實驗結果更新
-log_change(
-    paper_path="JLE/JLE-main.tex",
-    change="Accuracy 0.85 → 0.87 (fixed random seed)",
-    changed_artifact="E1",
-    impact_severity="high",
-    must_update=[
-        {"artifact": "Fig:3", "artifact_type": "figure", "reason": "Bar chart"},
-        {"artifact": "Table:2", "artifact_type": "table", "reason": "Main results"},
-        {"artifact": "Sec:5", "artifact_type": "section", "reason": "Inline claim '85%'"},
-    ]
-)
-
-# 查看待更新項目
-get_pending_changes(paper_path="JLE/JLE-main.tex")
-```
-
-### 3️⃣ 投稿前完整性檢查
-
-```python
-# 驗證完整追溯鏈
-verify_traceability_chain(paper_path="...")
-# → {rq_coverage: 1.0, contribution_coverage: 0.8, orphans: ["E3"]}
-
-# 生成需求追溯矩陣
-generate_rtm(paper_path="...", output_path="submission/rtm.md")
-
-# 7 維度品質評估
-evaluate_paper_v2(paper_path="main.tex")
-match_journal_v2(paper_path="main.tex", budget_usd=3000)
-```
-
-### 4️⃣ 多論文工作區管理
-
-```python
-list_active_papers(search_root="00_Paper/")
-# → JLE/ (v3), ESWA/ (未追溯), TKDE/ (v1)
-# → TNNLS-nogo/ 自動跳過
-
-diff_trace_versions(paper_path="JLE/main.tex", version_a=1, version_b=3)
-# → chain_coverage: 0.40 → 0.95 (+0.55)
+# 啟動伺服器（測試用）
+crane
 ```
 
 ---
 
 ## 引用
 
-如果 CRANE 對您的研究有幫助，請引用：
-
 ```bibtex
-@software{crane2026,
-  author  = {Chao, August and contributors},
-  title   = {CRANE: Autonomous Research Assistant System},
-  year    = {2026},
+@software{crane2025,
+  title   = {CRANE: Autonomous Research Assistant MCP Server},
+  author  = {AugChao},
+  year    = {2025},
   url     = {https://github.com/AugustChaoTW/opencode-crane},
   note    = {121 MCP tools for end-to-end research automation, aligned with Nature's The AI Scientist}
 }
@@ -628,18 +633,6 @@ diff_trace_versions(paper_path="JLE/main.tex", version_a=1, version_b=3)
 
 ---
 
-## 授權
+## License
 
-MIT 授權 — 詳見 [LICENSE](LICENSE) 檔案
-
----
-
-## 支援與反饋
-
-- **GitHub Issues**: [報告問題](https://github.com/AugustChaoTW/opencode-crane/issues)
-- **Discussions**: [功能建議與討論](https://github.com/AugustChaoTW/opencode-crane/discussions)
-- **Community**: [OpenCode 社群](https://github.com/anomalyco/opencode)
-
----
-
-**立即開始**：執行安裝腳本，然後對任一論文說 `trace this paper`！
+MIT © AugChao
