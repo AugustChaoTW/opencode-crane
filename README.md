@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![MCP Server](https://img.shields.io/badge/MCP-Server-orange.svg)](https://modelcontextprotocol.io/)
-[![Version](https://img.shields.io/badge/version-0.14.3-green.svg)](https://github.com/AugustChaoTW/opencode-crane/releases)
+[![Version](https://img.shields.io/badge/version-0.14.4-green.svg)](https://github.com/AugustChaoTW/opencode-crane/releases)
 
 **124 個 MCP 工具**，涵蓋從文獻回顧到期刊投稿的 7 個研究階段。  
 CRANE provides **124 MCP Tools** for end-to-end academic research automation.  
@@ -45,6 +45,10 @@ search_references("emotion detection multimodal")
 
 # 下載 PDF 並自動解析後設資料
 download_paper("https://arxiv.org/abs/2401.xxxxx")
+
+# 建立 embedding（OpenAI 或本機 Ollama）
+build_embeddings()                             # OpenAI text-embedding-3-small
+build_embeddings(provider="ollama")            # 本機 nomic-embed-text，免 API key
 
 # 語意搜尋——找跟某篇論文最相近的其他論文
 semantic_search(anchor_paper_key="vaswani2017attention", k=10)
@@ -458,8 +462,18 @@ check_prerequisites("semantic_search")
 | 變數 | 必要 | 用途 |
 |------|------|------|
 | `GH_TOKEN` | 必要 | GitHub Issues 任務追蹤 |
-| `OPENAI_API_KEY` | 選用 | 語意搜尋 embedding |
+| `OPENAI_API_KEY` | 選用 | 語意搜尋 embedding（OpenAI 路徑） |
 | `CRANE_CHECK_VERSION_ON_START` | 選用（預設 true） | 啟動時檢查更新 |
+
+> **不想用 OpenAI？** v0.14.4 支援本機 Ollama embedding，完全不需要 API key：
+>
+> ```bash
+> ollama pull nomic-embed-text        # 274 MB，768 維向量
+> ```
+> ```
+> build_embeddings(provider="ollama")                          # 預設 nomic-embed-text
+> build_embeddings(provider="ollama", model="mxbai-embed-large")  # 1024 維
+> ```
 
 ---
 
@@ -519,7 +533,8 @@ check_prerequisites("semantic_search")
 ```
 1. init_research("my-project")
 2. search_papers("your topic 2024")
-3. build_embeddings()
+3. build_embeddings()                             # OpenAI（需 API key）
+   # 或：build_embeddings(provider="ollama")      # 本機 Ollama，免費
 4. get_research_clusters()
 5. trace_paper(paper_path="paper.tex", mode="full")
 ```
@@ -558,6 +573,7 @@ check_prerequisites("semantic_search")
 
 | 版本 | 工具數 | 主要功能 |
 |------|--------|---------|
+| **v0.14.4** | 124 | Ollama Embedding 支援：build_embeddings(provider="ollama")，本機語意搜尋不需 API key；nomic-embed-text (768d) / mxbai-embed-large (1024d)；embeddings.yaml 記錄 provider+dim，重新載入自動路由 |
 | **v0.14.3** | 124 | crane_help 工具 + SKILL.md 全面改寫：觸發語意對應、Paper Trace 完整流程文件 |
 | **v0.14.2** | 123 | Paper Review 結構性修正：build_paper_index、run_review_pipeline；lru_cache 快取、review_paper() 呼叫 2→1（理論加速，真實論文基準測試待補）|
 | **v0.14.1** | 121 | 工具整合重構（-17 工具）：trace_add、crane_diagnose、transport_control、visualize_citations、get_traceability_viz |
