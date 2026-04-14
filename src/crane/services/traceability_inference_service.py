@@ -5,8 +5,6 @@ import re
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from crane.models.traceability import (
     ContributionItem,
     ExperimentEntry,
@@ -24,6 +22,14 @@ class TraceabilityInferenceService:
     """
 
     TEMPLATE_DIR = Path(__file__).parent.parent / "config" / "templates" / "llm"
+
+    # Patterns for figure/table detection (plain-text and LaTeX)
+    _FIGURE_PATTERNS = [
+        r"(?:Figure|Fig\.?)\s*(\d+[a-zA-Z]?)",
+        r"Table\s*(\d+[a-zA-Z]?)",
+        r"\\(?:ref|autoref)\{((?:fig|tab)[^}]+)\}",
+        r"\\(?:figure|table)\{([^}]+)\}",
+    ]
 
     def __init__(self, paper_path: str = "") -> None:
         self.paper_path = Path(paper_path) if paper_path else Path()
@@ -219,6 +225,49 @@ class TraceabilityInferenceService:
 
         return experiments
 
+    def infer_figure_tables(self) -> list[dict[str, Any]]:
+        """Detect figure and table references from paper content.
+
+        Scans for ``Figure N``, ``Fig. N``, ``Table N``, and LaTeX ``\\ref{fig…}``
+        patterns within the first 8000 characters.
+
+        Returns:
+            List of dicts with ``fig_id``, ``label`` (``"figure"``/``"table"``),
+            and a short ``context`` snippet around each match.
+        """
+        # Use full content for figure detection (they appear throughout the paper)
+        path = self.paper_path
+        if not path.exists():
+            return []
+        content = path.read_text(encoding="utf-8", errors="ignore")[:8000]
+
+        seen: set[str] = set()
+        results: list[dict[str, Any]] = []
+
+        for pattern in self._FIGURE_PATTERNS:
+            for m in re.finditer(pattern, content, re.IGNORECASE):
+                raw = m.group(0).lower()
+                is_figure = "fig" in raw
+                label = "figure" if is_figure else "table"
+                # Extract number/id from capture group or whole match
+                num = m.group(1) if m.lastindex and m.lastindex >= 1 else str(len(results) + 1)
+                prefix = "Fig" if is_figure else "Tab"
+                fig_id = f"{prefix}:{num}"
+
+                if fig_id not in seen:
+                    seen.add(fig_id)
+                    ctx_start = max(0, m.start() - 40)
+                    ctx_end = min(len(content), m.end() + 40)
+                    results.append(
+                        {
+                            "fig_id": fig_id,
+                            "label": label,
+                            "context": content[ctx_start:ctx_end].strip(),
+                        }
+                    )
+
+        return results
+
     def infer_risks(self) -> list[ReviewerRisk]:
         """Extract reviewer risks using signal-word heuristics."""
         content = self._read_paper_content()
@@ -293,6 +342,7 @@ class TraceabilityInferenceService:
             "contributions": self.infer_contributions(),
             "experiments": self.infer_experiments(),
             "risks": self.infer_risks(),
+            "figure_tables": self.infer_figure_tables(),
         }
 
     # ------------------------------------------------------------------

@@ -268,6 +268,20 @@ _INTENT_MAP: list[tuple[list[str], dict[str, Any]]] = [
         },
     ),
     (
+        ["chain coverage", "coverage report", "trace coverage", "chain completeness",
+         "isolated nodes", "fix chain", "鏈條覆蓋率", "孤立節點修復"],
+        {
+            "tool": "get_chain_coverage",
+            "description": (
+                "Compute RQ→Experiment + Contribution→Evidence + Experiment→Figure "
+                "coverage (0–1). Returns per-node breakdown and ready-to-run fix actions."
+            ),
+            "call": 'get_chain_coverage(paper_path="<path>")',
+            "output": "chain_coverage, breakdown, isolated_nodes, suggested_actions",
+            "see_also": ["verify_traceability_chain", "find_orphan_artifacts", "trace_add"],
+        },
+    ),
+    (
         ["check prerequisites", "prerequisites", "ready to use",
          "is tool ready", "前置條件"],
         {

@@ -12,23 +12,10 @@ import yaml
 
 from crane.models.traceability import (
     TRACE_DIR_NAME,
-    ArtifactEntry,
-    BaselineSpec,
-    ChangeLogEntry,
-    ContributionItem,
-    DatasetSpec,
-    ExperimentEntry,
-    FigureTableEntry,
-    MustUpdateItem,
-    ReferenceMapEntry,
-    ResearchQuestion,
-    ReviewerRisk,
-    SectionEntry,
     TraceabilityIndex,
     is_active_paper_dir,
 )
 from crane.services.impact_graph_service import ImpactGraphService
-
 
 # ---------------------------------------------------------------------------
 # YAML helpers
@@ -755,6 +742,89 @@ class TraceabilityService:
                 "contributions_with_evidence": f"{contrib_ok}/{len(contributions)}",
                 "experiments_with_figures": f"{exp_ok}/{len(experiments)}",
             },
+        }
+
+    def compute_chain_coverage(self, version_dir: Path) -> dict[str, Any]:
+        """Compute chain coverage with per-node breakdown and actionable fix commands.
+
+        Wraps :meth:`verify_chain` and enriches the result with:
+
+        - ``breakdown`` — per-category counts of covered vs. isolated nodes
+        - ``isolated_nodes`` — flat list of all un-linked node IDs
+        - ``suggested_actions`` — ready-to-execute ``trace_add`` / ``link_artifacts``
+          call templates for each isolated node
+
+        Formula::
+
+            coverage = (RQ_with_exp + Contrib_with_evidence + Exp_with_figure)
+                       / (total_RQs + total_Contribs + total_Exps)
+
+        Args:
+            version_dir: Path to a ``_paper_trace/v{n}/`` directory.
+
+        Returns:
+            Dict with ``chain_coverage`` (0.0–1.0), ``covered_nodes``,
+            ``total_nodes``, ``breakdown``, ``isolated_nodes``, and
+            ``suggested_actions``.
+        """
+        verify = self.verify_chain(version_dir)
+
+        rq_checks = verify["rq_checks"]
+        contrib_checks = verify["contribution_checks"]
+        exp_checks = verify["experiment_checks"]
+
+        rqs_isolated = [r["rq_id"] for r in rq_checks if not r["has_experiment"]]
+        contribs_isolated = [c["contribution_id"] for c in contrib_checks if not c["has_evidence"]]
+        exps_isolated = [e["exp_id"] for e in exp_checks if not e["has_figure_table"]]
+
+        isolated_nodes = rqs_isolated + contribs_isolated + exps_isolated
+
+        suggested_actions: list[str] = []
+        for rq_id in rqs_isolated:
+            suggested_actions.append(
+                f'trace_add(item_type="experiment", '
+                f'data={{"related_rqs": ["{rq_id}"], "goal": "Experiment for {rq_id}"}})'
+            )
+        for c_id in contribs_isolated:
+            suggested_actions.append(
+                f'trace_add(item_type="experiment", '
+                f'data={{"related_contributions": ["{c_id}"], "goal": "Evidence for {c_id}"}})'
+            )
+        for e_id in exps_isolated:
+            suggested_actions.append(
+                f'link_artifacts(paper_path="<path>", exp_id="{e_id}", artifact_path="<fig_path>")'
+            )
+
+        covered_nodes = (
+            sum(1 for r in rq_checks if r["has_experiment"])
+            + sum(1 for c in contrib_checks if c["has_evidence"])
+            + sum(1 for e in exp_checks if e["has_figure_table"])
+        )
+        total_nodes = len(rq_checks) + len(contrib_checks) + len(exp_checks)
+
+        return {
+            "chain_coverage": verify["chain_coverage"],
+            "covered_nodes": covered_nodes,
+            "total_nodes": total_nodes,
+            "breakdown": {
+                "rqs": {
+                    "total": len(rq_checks),
+                    "covered": sum(1 for r in rq_checks if r["has_experiment"]),
+                    "isolated": rqs_isolated,
+                },
+                "contributions": {
+                    "total": len(contrib_checks),
+                    "covered": sum(1 for c in contrib_checks if c["has_evidence"]),
+                    "isolated": contribs_isolated,
+                },
+                "experiments": {
+                    "total": len(exp_checks),
+                    "covered": sum(1 for e in exp_checks if e["has_figure_table"]),
+                    "isolated": exps_isolated,
+                },
+            },
+            "isolated_nodes": isolated_nodes,
+            "suggested_actions": suggested_actions,
         }
 
     def find_orphans(self, version_dir: Path) -> dict:

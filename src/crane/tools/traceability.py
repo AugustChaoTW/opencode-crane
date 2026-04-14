@@ -651,6 +651,62 @@ def register_tools(mcp):  # noqa: C901
         }
 
     # ------------------------------------------------------------------
+    # 18b. get_chain_coverage
+    # ------------------------------------------------------------------
+
+    @mcp.tool()
+    def get_chain_coverage(
+        paper_path: str,
+        output_dir: str = "",
+        project_dir: str = "",
+    ) -> dict[str, Any]:
+        """Show chain coverage score with per-node breakdown and fix actions.
+
+        More actionable than verify_traceability_chain: for each isolated
+        node it generates a ready-to-execute trace_add or link_artifacts call.
+
+        Formula::
+
+            coverage = (RQ→Exp + Contribution→Evidence + Experiment→Figure)
+                       / (total_RQs + total_Contributions + total_Experiments)
+
+        Args:
+            paper_path:  Path to .tex or .pdf file.
+            output_dir:  Custom trace base directory.
+            project_dir: Project root hint.
+
+        Returns:
+            Dict with chain_coverage (0.0–1.0), covered_nodes, total_nodes,
+            breakdown per category, isolated_nodes list, and suggested_actions.
+
+        Example output::
+
+            {
+              "chain_coverage": 0.0,
+              "covered_nodes": 0,
+              "total_nodes": 3,
+              "breakdown": {
+                "rqs":           {"total": 1, "covered": 0, "isolated": ["RQ1"]},
+                "contributions": {"total": 1, "covered": 0, "isolated": ["C1"]},
+                "experiments":   {"total": 1, "covered": 0, "isolated": ["E1"]},
+              },
+              "isolated_nodes": ["RQ1", "C1", "E1"],
+              "suggested_actions": [
+                'trace_add(item_type="experiment", data={"related_rqs": ["RQ1"], ...})',
+                'link_artifacts(paper_path="<path>", exp_id="E1", artifact_path="<fig>")',
+              ]
+            }
+        """
+        svc = _make_service(paper_path, output_dir, project_dir)
+        vdir = _version_dir(svc, "status")
+        coverage = svc.compute_chain_coverage(vdir)
+        return {
+            "paper_path": paper_path,
+            "version_dir": str(vdir),
+            **coverage,
+        }
+
+    # ------------------------------------------------------------------
     # 19. find_orphan_artifacts
     # ------------------------------------------------------------------
 
