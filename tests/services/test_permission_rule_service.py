@@ -264,3 +264,27 @@ def test_critique_rules_openrouter_handles_error(monkeypatch, tmp_path):
 
     assert "LLM critique failed" in result["critique"]
     assert result["overall_score"] == 0
+
+
+def test_critique_rules_openrouter_empty_response_handles_gracefully(monkeypatch, tmp_path):
+    service = _make_service(tmp_path, monkeypatch)
+    service.add_rule("allow", "search arxiv")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-or-test")
+
+    class _EmptyResponse:
+        def __init__(self):
+            self.status_code = 200
+
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"choices": [{"message": {"content": None}}]}
+
+    with monkeypatch.context() as m:
+        m.setattr("requests.post", lambda *args, **kwargs: _EmptyResponse())
+        result = service.critique_rules(model="openrouter/elephant-alpha")
+
+    assert "rate limit" in result["critique"].lower() or "empty" in result["critique"].lower()
+    assert result["overall_score"] == 0
+    assert result["has_custom_rules"] is True

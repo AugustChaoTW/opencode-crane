@@ -285,7 +285,8 @@ class PermissionRuleService:
                 )
                 content = response.choices[0].message.content or "{}"
             # 空内容处理（Elephant-Alpha 速率限制时可能返回空）
-            if not content:
+            is_empty = not content or content == "{}"
+            if is_empty:
                 return {
                     "critique": "LLM returned empty response (possible rate limit), please retry later.",
                     "issues_found": [],
