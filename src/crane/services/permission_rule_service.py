@@ -7,9 +7,14 @@ import re
 from pathlib import Path
 from typing import Any
 
+import requests
 import yaml
 
 from crane.workspace import resolve_workspace
+
+_OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
+_OPENROUTER_REFERER = "https://github.com/anomalyco/opencode"
+_OPENROUTER_TITLE = "CRANE"
 
 DEFAULT_PERMISSION_RULES = {
     "allow": [
@@ -164,25 +169,38 @@ class PermissionRuleService:
                 "has_custom_rules": False,
             }
 
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            return {
-                "critique": "Skipped LLM critique: OPENAI_API_KEY is not set.",
-                "issues_found": [],
-                "overall_score": 0,
-                "has_custom_rules": True,
-            }
+        is_openrouter = model.startswith("openrouter/")
+        resolved_model = model.replace("openrouter/", "") if is_openrouter else model
 
-        try:
-            openai_module = importlib.import_module("openai")
-            OpenAI = getattr(openai_module, "OpenAI")
-        except Exception:
-            return {
-                "critique": "Skipped LLM critique: openai package is unavailable.",
-                "issues_found": [],
-                "overall_score": 0,
-                "has_custom_rules": True,
-            }
+        if is_openrouter:
+            api_key = os.getenv("OPENROUTER_API_KEY")
+            if not api_key:
+                return {
+                    "critique": "Skipped LLM critique: OPENROUTER_API_KEY is not set.",
+                    "issues_found": [],
+                    "overall_score": 0,
+                    "has_custom_rules": True,
+                }
+        else:
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                return {
+                    "critique": "Skipped LLM critique: OPENAI_API_KEY is not set.",
+                    "issues_found": [],
+                    "overall_score": 0,
+                    "has_custom_rules": True,
+                }
+
+            try:
+                openai_module = importlib.import_module("openai")
+                OpenAI = getattr(openai_module, "OpenAI")
+            except Exception:
+                return {
+                    "critique": "Skipped LLM critique: openai package is unavailable.",
+                    "issues_found": [],
+                    "overall_score": 0,
+                    "has_custom_rules": True,
+                }
 
         response_format = {
             "type": "json_schema",
@@ -232,17 +250,40 @@ class PermissionRuleService:
         )
 
         try:
-            client = OpenAI(api_key=api_key)
-            response = client.chat.completions.create(
-                model=model,
-                temperature=0.2,
-                messages=[
-                    {"role": "system", "content": CRITIQUE_SYSTEM_PROMPT},
-                    {"role": "user", "content": user_prompt},
-                ],
-                response_format=response_format,
-            )
-            content = response.choices[0].message.content or "{}"
+            if is_openrouter:
+                response = requests.post(
+                    _OPENROUTER_API_URL,
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json",
+                        "HTTP-Referer": _OPENROUTER_REFERER,
+                        "X-Title": _OPENROUTER_TITLE,
+                    },
+                    json={
+                        "model": resolved_model,
+                        "temperature": 0.2,
+                        "messages": [
+                            {"role": "system", "content": CRITIQUE_SYSTEM_PROMPT},
+                            {"role": "user", "content": user_prompt},
+                        ],
+                        "response_format": response_format,
+                    },
+                    timeout=60,
+                )
+                response.raise_for_status()
+                content = response.json()["choices"][0]["message"]["content"] or "{}"
+            else:
+                client = OpenAI(api_key=api_key)
+                response = client.chat.completions.create(
+                    model=model,
+                    temperature=0.2,
+                    messages=[
+                        {"role": "system", "content": CRITIQUE_SYSTEM_PROMPT},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    response_format=response_format,
+                )
+                content = response.choices[0].message.content or "{}"
             parsed = json.loads(content)
         except Exception as exc:
             return {

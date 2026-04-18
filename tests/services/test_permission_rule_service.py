@@ -208,3 +208,59 @@ def test_resolve_workspace_failure_falls_back_to_project_dir(tmp_path, monkeypat
     )
     service = PermissionRuleService(project_dir=str(tmp_path))
     assert service.project_root == str(tmp_path.resolve())
+
+
+def test_critique_rules_with_openrouter_api_key_skips_without_key(tmp_path, monkeypatch):
+    service = _make_service(tmp_path, monkeypatch)
+    service.add_rule("allow", "Read files in the project directory")
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
+    result = service.critique_rules(model="openrouter/elephant-alpha")
+    assert "OPENROUTER_API_KEY" in result["critique"]
+    assert result["overall_score"] == 0
+
+
+def test_critique_rules_calls_openrouter_endpoint(monkeypatch, tmp_path):
+    service = _make_service(tmp_path, monkeypatch)
+    service.add_rule("allow", "Read files in the project directory")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-or-test")
+
+    payload = {
+        "critique": "Rules are clear.",
+        "issues_found": [],
+        "overall_score": 9,
+    }
+
+    class _Response:
+        def __init__(self):
+            self.status_code = 200
+
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"choices": [{"message": {"content": json.dumps(payload)}}]}
+
+    with monkeypatch.context() as m:
+        m.setattr("requests.post", lambda *args, **kwargs: _Response())
+        result = service.critique_rules(model="openrouter/elephant-alpha")
+
+    assert result["overall_score"] == 9
+    assert result["has_custom_rules"] is True
+
+
+def test_critique_rules_openrouter_handles_error(monkeypatch, tmp_path):
+    service = _make_service(tmp_path, monkeypatch)
+    service.add_rule("allow", "Read files in the project directory")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-or-test")
+
+    with monkeypatch.context() as m:
+        m.setattr(
+            "requests.post",
+            lambda *args, **kwargs: (_ for _ in ()).throw(Exception("APIError")),
+        )
+        result = service.critique_rules(model="openrouter/elephant-alpha")
+
+    assert "LLM critique failed" in result["critique"]
+    assert result["overall_score"] == 0
