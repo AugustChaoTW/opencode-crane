@@ -245,8 +245,9 @@ class PermissionRuleService:
         }
 
         user_prompt = (
-            "Review the following custom permission rules and return JSON only.\n\n"
+            "Review the following custom permission rules.\n\n"
             f"Rules:\n{json.dumps(normalized_rules, ensure_ascii=False, indent=2)}"
+            + "\n\nScore 1-10. Return JSON with keys: critique, issues_found (array), overall_score (integer 1-10)."
         )
 
         try:
@@ -266,7 +267,6 @@ class PermissionRuleService:
                             {"role": "system", "content": CRITIQUE_SYSTEM_PROMPT},
                             {"role": "user", "content": user_prompt},
                         ],
-                        "response_format": response_format,
                     },
                     timeout=60,
                 )
@@ -284,7 +284,24 @@ class PermissionRuleService:
                     response_format=response_format,
                 )
                 content = response.choices[0].message.content or "{}"
-            parsed = json.loads(content)
+            # 空内容处理（Elephant-Alpha 速率限制时可能返回空）
+            if not content:
+                return {
+                    "critique": "LLM returned empty response (possible rate limit), please retry later.",
+                    "issues_found": [],
+                    "overall_score": 0,
+                    "has_custom_rules": True,
+                }
+            try:
+                parsed = json.loads(content)
+            except json.JSONDecodeError:
+                # 尝试提取 JSON 部分
+                import re
+                match = re.search(r'\{[\s\S]*\}', content or "{}")
+                try:
+                    parsed = json.loads(match.group()) if match else {"critique": content, "issues_found": [], "overall_score": 0}
+                except:
+                    parsed = {"critique": content, "issues_found": [], "overall_score": 0}
         except Exception as exc:
             return {
                 "critique": f"LLM critique failed: {exc}",
