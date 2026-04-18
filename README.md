@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![MCP Server](https://img.shields.io/badge/MCP-Server-orange.svg)](https://modelcontextprotocol.io/)
-[![Version](https://img.shields.io/badge/version-0.14.4-green.svg)](https://github.com/AugustChaoTW/opencode-crane/releases)
+[![Version](https://img.shields.io/badge/version-0.14.5-green.svg)](https://github.com/AugustChaoTW/opencode-crane/releases)
 
 **124 個 MCP 工具**，涵蓋從文獻回顧到期刊投稿的 7 個研究階段。  
 CRANE provides **124 MCP Tools** for end-to-end academic research automation.  
@@ -475,6 +475,14 @@ check_prerequisites("semantic_search")
 > build_embeddings(provider="ollama", model="mxbai-embed-large")  # 1024 維
 > ```
 
+> **想用 OpenRouter？** v0.14.5 支援 OpenRouter 許可規則分析：
+> ```bash
+> export OPENROUTER_API_KEY="sk-or-v1-..."
+> ```
+> ```
+> critique_permission_rules(model="openrouter/elephant-alpha")
+> ```
+
 ---
 
 ## 工具總覽（124 個）
@@ -573,6 +581,7 @@ check_prerequisites("semantic_search")
 
 | 版本 | 工具數 | 主要功能 |
 |------|--------|---------|
+| **v0.14.5** | 124 | OpenRouter 支援：critique_permission_rules(model="openrouter/elephant-alpha")，Elephant-Alpha 分析許可規則；空回應處理與 error handling；prompt 優化 |
 | **v0.14.4** | 124 | Ollama Embedding 支援：build_embeddings(provider="ollama")，本機語意搜尋不需 API key；nomic-embed-text (768d) / mxbai-embed-large (1024d)；embeddings.yaml 記錄 provider+dim，重新載入自動路由 |
 | **v0.14.3** | 124 | crane_help 工具 + SKILL.md 全面改寫：觸發語意對應、Paper Trace 完整流程文件 |
 | **v0.14.2** | 123 | Paper Review 結構性修正：build_paper_index、run_review_pipeline；lru_cache 快取、review_paper() 呼叫 2→1（理論加速，真實論文基準測試待補）|
