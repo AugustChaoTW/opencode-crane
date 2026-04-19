@@ -1,0 +1,56 @@
+name: Feature Request
+description: Request a new feature or enhancement
+title: "[{VERSION}] "
+labels: ["enhancement", "priority:P2", "type:feature"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: v0.14.x
+      value: v0.14.x
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      placeholder: Brief description of the feature...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0: Critical - Immediate attention
+        - P1: High - Important, fix soon
+        - P2: Medium - Planned for this version
+        - P3: Low - Future consideration
+      default: P2: Medium
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - feature: New feature request
+        - enhancement: Improvement to existing
+        - implementation: Code implementation
+        - bug: Bug fix
+        - research: Research/exploration
+    validations:
+      required: true
+
+  - type: textarea
+    id: integration
+    attributes:
+      label: Integration with existing features
+      placeholder: Which existing features does this integrate with?
+      description: Required for all feature requests
+    validations:
+      required: true

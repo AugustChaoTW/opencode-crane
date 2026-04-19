@@ -581,7 +581,18 @@ check_prerequisites("semantic_search")
 
 | 版本 | 工具數 | 主要功能 |
 |------|--------|---------|
+| **v0.14.6** | ~130 | 3LLM 論文閱讀流程（Scanner → Extractor → Reviewer）；LLM Judge Reliability Inspector；Generalization Benchmark；RAG Test Enhancement；Label 規範與 Issue Template | 
 | **v0.14.5** | 124 | OpenRouter 支援：critique_permission_rules(model="openrouter/elephant-alpha")，Elephant-Alpha 分析許可規則；空回應處理與 error handling；prompt 優化 |
+
+---
+
+## 已發表論文
+
+| 標題 | 作者 | 期刊 | 狀態 |
+|------|------|------|------|
+| **Logic-posedness Score: A Diagnostic Framework for Identifying Adaptive Computation Failure in Spatio-Temporal Traffic Forecasting Models** | August Chao, Cheng-Yu Lai | Transportation Research Part C | Submitted (2026-04-19) |
+
+> 本專案研究成果應用於交通預測模型的診斷框架，相關程式碼與工具有興趣可聯繫作者。 |
 | **v0.14.4** | 124 | Ollama Embedding 支援：build_embeddings(provider="ollama")，本機語意搜尋不需 API key；nomic-embed-text (768d) / mxbai-embed-large (1024d)；embeddings.yaml 記錄 provider+dim，重新載入自動路由 |
 | **v0.14.3** | 124 | crane_help 工具 + SKILL.md 全面改寫：觸發語意對應、Paper Trace 完整流程文件 |
 | **v0.14.2** | 123 | Paper Review 結構性修正：build_paper_index、run_review_pipeline；lru_cache 快取、review_paper() 呼叫 2→1（理論加速，真實論文基準測試待補）|
