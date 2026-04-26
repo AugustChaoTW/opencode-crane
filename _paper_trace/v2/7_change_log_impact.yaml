@@ -1,0 +1,24 @@
+changes:
+- change: 強化 Feynman 與 GitHub Issues 的自動化操作（v0.14.7）：預加載 issue 內容、批量呼叫 generate_feynman_session、依量化規則決定
+    REOPEN/COMMENT、結果寫回 issues，並整合進 CI/CD 與錯誤處理
+  change_id: CH001
+  changed_artifact: ''
+  date: '2026-04-22'
+  impact_severity: medium
+  must_update:
+  - artifact: scripts/orchestrator.py
+    artifact_type: script
+    reason: 改用預加載 issue 內容，批量分組，並寫回結果
+    resolved_at: ''
+    status: pending
+  - artifact: scripts/run_review.py
+    artifact_type: script
+    reason: 呼叫 generate_feynman_session，根據量化規則決定 PASS/REOPEN，並透過 gh 寫回 comment/reopen
+    resolved_at: ''
+    status: pending
+  - artifact: prompts/agent_review_prompt.txt
+    artifact_type: prompt
+    reason: 加入預加載與寫回範本，確保 agent 流程完整
+    resolved_at: ''
+    status: pending
+  why: 為了將本工作完整落地到 opencode-crane，並與 gh CLI、generate_feynman_session 工具鏈平滑整合，需要一個穩健且可觸發的自動流程；此次更強化內容預載、批量處理、量化決策與寫回機制，確保流程可靠、可觀測、易維護。
