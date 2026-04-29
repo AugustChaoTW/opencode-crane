@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+from datetime import datetime
+from typing import Any
 
 from crane.models.paper_profile import DimensionScore
 
@@ -34,6 +37,64 @@ class FeynmanSession:
 
     def by_difficulty(self, diff: str) -> list[FeynmanQuestion]:
         return [q for q in self.questions if q.difficulty == diff]
+
+
+@dataclass
+class FeynmanInteractiveSession:
+    session_id: str
+    paper_path: str
+    questions: list[FeynmanQuestion]
+    current_index: int
+    answers: list[str]
+    scores: list[float]
+    completed: bool
+
+    def current_question(self) -> FeynmanQuestion | None:
+        if self.current_index < len(self.questions):
+            return self.questions[self.current_index]
+        return None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "session_id": self.session_id,
+            "paper_path": self.paper_path,
+            "questions": [
+                {
+                    "dimension": q.dimension,
+                    "question": q.question,
+                    "section": q.section,
+                    "difficulty": q.difficulty,
+                    "expected_insight": q.expected_insight,
+                }
+                for q in self.questions
+            ],
+            "current_index": self.current_index,
+            "answers": self.answers,
+            "scores": self.scores,
+            "completed": self.completed,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> FeynmanInteractiveSession:
+        questions = [
+            FeynmanQuestion(
+                dimension=q["dimension"],
+                question=q["question"],
+                section=q["section"],
+                difficulty=q["difficulty"],
+                expected_insight=q["expected_insight"],
+            )
+            for q in data.get("questions", [])
+        ]
+        return cls(
+            session_id=data["session_id"],
+            paper_path=data["paper_path"],
+            questions=questions,
+            current_index=data["current_index"],
+            answers=data["answers"],
+            scores=data["scores"],
+            completed=data["completed"],
+        )
 
 
 class FeynmanSessionService:
@@ -457,3 +518,117 @@ class FeynmanSessionService:
                 if part.replace(".", "", 1).isdigit():
                     return part
         return "5"
+
+    # ------------------------------------------------------------------
+    # Interactive session API
+    # ------------------------------------------------------------------
+
+    def start_interactive(
+        self,
+        dimension_scores: list[DimensionScore],
+        paper_path: str = "",
+        num_questions: int = 5,
+    ) -> FeynmanInteractiveSession:
+        """Build an interactive session and return the first question."""
+        base_session = self.generate_session(dimension_scores, num_questions=num_questions)
+        session_id = f"feynman_{int(datetime.now().timestamp())}"
+        return FeynmanInteractiveSession(
+            session_id=session_id,
+            paper_path=paper_path,
+            questions=base_session.questions,
+            current_index=0,
+            answers=[],
+            scores=[],
+            completed=False,
+        )
+
+    def evaluate_answer(
+        self,
+        session: FeynmanInteractiveSession,
+        answer: str,
+        confidence: int | None = None,
+    ) -> dict[str, Any]:
+        """Evaluate an answer and advance the session state."""
+        question = session.current_question()
+        if question is None:
+            return {"result": "completed", "summary": self._build_summary(session)}
+
+        score, jargon_detected, unclear_concept = self._score_answer(question, answer)
+
+        session.answers.append(answer)
+        session.scores.append(score)
+
+        passes = score >= 0.6 and (confidence is None or confidence >= 3)
+
+        if passes:
+            session.current_index += 1
+            if session.current_index >= len(session.questions):
+                session.completed = True
+                return {"result": "completed", "summary": self._build_summary(session)}
+            return {
+                "result": "pass",
+                "score": score,
+                "feedback": f"清楚展現了「{question.expected_insight}」",
+                "next_question": self._question_to_dict(session.current_question()),
+            }
+        else:
+            hint = self._build_retry_hint(question, jargon_detected, unclear_concept)
+            return {
+                "result": "retry",
+                "score": score,
+                "retry_hint": hint,
+                "question": self._question_to_dict(question),
+            }
+
+    def _score_answer(
+        self, question: FeynmanQuestion, answer: str
+    ) -> tuple[float, bool, str]:
+        """Return (score, jargon_detected, unclear_concept)."""
+        words = answer.split()
+        score = 0.3 if len(words) < 10 else 0.6
+
+        expected_keywords = set(question.expected_insight.lower().split())
+        answer_words = set(answer.lower().split())
+        overlap = expected_keywords & answer_words
+        if len(overlap) >= 2:
+            score = min(score + 0.2, 1.0)
+
+        acronyms = re.findall(r"\b[A-Z]{2,}\b", answer)
+        jargon = len(acronyms) > 2
+        unclear = acronyms[0] if acronyms else ""
+
+        return score, jargon, unclear
+
+    def _build_retry_hint(
+        self, question: FeynmanQuestion, jargon: bool, unclear: str
+    ) -> str:
+        if jargon and unclear:
+            return f"你用了「{unclear}」這個縮寫。試著不用這個詞解釋同樣的概念。"
+        return f"你的回答還沒有展現「{question.expected_insight}」。試著更具體地說明。"
+
+    def _build_summary(self, session: FeynmanInteractiveSession) -> dict[str, Any]:
+        avg = sum(session.scores) / max(len(session.scores), 1)
+        scores_by_dim: dict[str, float] = {}
+        for q, s in zip(session.questions, session.scores):
+            scores_by_dim[q.dimension] = s
+        weakest = min(scores_by_dim, key=scores_by_dim.get) if scores_by_dim else ""
+        strongest = max(scores_by_dim, key=scores_by_dim.get) if scores_by_dim else ""
+        return {
+            "average_score": round(avg, 2),
+            "weakest_dimension": weakest,
+            "strongest_dimension": strongest,
+            "total_questions": len(session.questions),
+            "answers_given": len(session.answers),
+        }
+
+    @staticmethod
+    def _question_to_dict(question: FeynmanQuestion | None) -> dict[str, Any] | None:
+        if question is None:
+            return None
+        return {
+            "dimension": question.dimension,
+            "question": question.question,
+            "section": question.section,
+            "difficulty": question.difficulty,
+            "expected_insight": question.expected_insight,
+        }

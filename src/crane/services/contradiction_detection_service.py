@@ -23,6 +23,22 @@ from crane.services.paper_knowledge_graph_service import PaperKnowledgeGraph
 from crane.services.section_chunker import Section, SectionChunker
 
 # ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def _safe_json_parse(text: str, fallback: dict) -> dict:
+    """Parse LLM JSON output with fallback on failure."""
+    match = re.search(r"\{.*\}", text, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group())
+        except json.JSONDecodeError:
+            pass
+    return fallback
+
+
+# ---------------------------------------------------------------------------
 # Data structures
 # ---------------------------------------------------------------------------
 
@@ -419,7 +435,8 @@ class ContradictionDetectionService:
             )
             response.raise_for_status()
             content = response.json()["choices"][0]["message"]["content"].strip()
-            return json.loads(content)
+            result = _safe_json_parse(content, {})
+            return result if result else None
         except Exception:
             return None
 
