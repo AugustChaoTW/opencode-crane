@@ -61,6 +61,7 @@ from .tools.crane_help import register_tools as register_crane_help_tools
 from .tools.knowledge_graph import register_tools as register_knowledge_graph_tools
 from .tools.knowledge_gap import register_tools as register_knowledge_gap_tools
 from .tools.contradiction import register_tools as register_contradiction_tools
+from .tools.q1_pipeline import register_tools as register_q1_pipeline_tools
 
 register_transport_tools = import_module("crane.tools.transport_tools").register_tools
 
@@ -103,6 +104,7 @@ register_crane_help_tools(mcp)
 register_knowledge_graph_tools(mcp)
 register_knowledge_gap_tools(mcp)
 register_contradiction_tools(mcp)
+register_q1_pipeline_tools(mcp)
 
 
 def _check_version_on_startup():
