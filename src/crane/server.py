@@ -59,6 +59,8 @@ from .tools.karpathy_review import register_tools as register_karpathy_review_to
 from .tools.paper_index import register_tools as register_paper_index_tools
 from .tools.crane_help import register_tools as register_crane_help_tools
 from .tools.knowledge_graph import register_tools as register_knowledge_graph_tools
+from .tools.knowledge_gap import register_tools as register_knowledge_gap_tools
+from .tools.contradiction import register_tools as register_contradiction_tools
 
 register_transport_tools = import_module("crane.tools.transport_tools").register_tools
 
@@ -99,6 +101,8 @@ register_karpathy_review_tools(mcp)
 register_paper_index_tools(mcp)
 register_crane_help_tools(mcp)
 register_knowledge_graph_tools(mcp)
+register_knowledge_gap_tools(mcp)
+register_contradiction_tools(mcp)
 
 
 def _check_version_on_startup():
