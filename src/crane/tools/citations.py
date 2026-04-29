@@ -86,12 +86,29 @@ def register_tools(mcp):
             )
 
         if include_claim_analysis:
+            total_refs = result.get("total_citations", 0)
+            has_issues = bool(result.get("missing")) or not result.get("valid", True)
+            if total_refs < 15 or has_issues:
+                result["next_step"] = {
+                    "action": "q1_elevation_pipeline",
+                    "reason": "引用品質影響 Q1 審查，建議執行完整 CARE 診斷",
+                    "command": "q1_elevation_pipeline(stages=['A'])",
+                }
             return result
 
         sanitized = dict(result)
         sanitized.pop("claims", None)
         sanitized.pop("unverified_count", None)
         sanitized.pop("contradictions", None)
+
+        total_refs = sanitized.get("total_citations", 0)
+        has_issues = bool(sanitized.get("missing")) or not sanitized.get("valid", True)
+        if total_refs < 15 or has_issues:
+            sanitized["next_step"] = {
+                "action": "q1_elevation_pipeline",
+                "reason": "引用品質影響 Q1 審查，建議執行完整 CARE 診斷",
+                "command": "q1_elevation_pipeline(stages=['A'])",
+            }
         return sanitized
 
     @mcp.tool()

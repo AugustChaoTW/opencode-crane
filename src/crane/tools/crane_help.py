@@ -302,6 +302,55 @@ _INTENT_MAP: list[tuple[list[str], dict[str, Any]]] = [
             "see_also": ["init_research", "init_traceability"],
         },
     ),
+    # ── CARE / Q1 Elevation ────────────────────────────────────────────────
+    (
+        ["q1", "提升", "elevation", "care pipeline", "q1 elevation",
+         "升級", "journal elevation", "care", "improve paper", "q1 診斷"],
+        {
+            "title": "Q1 期刊準備度診斷（CARE Pipeline）",
+            "tool": "q1_elevation_pipeline",
+            "description": "用 CARE 流程評估論文距離 Q1 等級的差距",
+            "tools": ["q1_elevation_pipeline", "detect_contradictions",
+                      "evaluate_knowledge_gaps", "build_paper_knowledge_graph"],
+            "quick_start": "q1_elevation_pipeline()  # 自動偵測 paper_path",
+            "call": "q1_elevation_pipeline(paper_path='<path/to/paper.tex>')",
+            "stages": "C=矛盾偵測, A=知識缺口, R=因果推論, E=可解釋性壓測",
+            "see_also": ["evaluate_paper_v2", "detect_contradictions",
+                         "evaluate_knowledge_gaps"],
+        },
+    ),
+    (
+        ["stuck", "卡住", "接下來", "next step", "what to do", "下一步",
+         "不知道", "how to proceed"],
+        {
+            "title": "我卡住了，接下來做什麼？",
+            "tool": "workspace_status",
+            "description": "根據目前的工作狀態推薦下一步",
+            "advice": [
+                "若剛寫完草稿 → evaluate_paper_v2(paper_path)",
+                "若評分 < 70 → q1_elevation_pipeline()",
+                "若不知道研究定位 → analyze_research_positioning(paper_path)",
+                "若要準備投稿 → run_submission_check(paper_path)",
+            ],
+            "call": "workspace_status()  # 查看當前狀態與建議",
+            "see_also": ["evaluate_paper_v2", "q1_elevation_pipeline",
+                         "analyze_research_positioning", "run_submission_check"],
+        },
+    ),
+    (
+        ["投稿", "submit", "submit paper", "ready to submit", "準備投稿",
+         "submission ready"],
+        {
+            "title": "準備投稿",
+            "tool": "q1_elevation_pipeline",
+            "tools": ["q1_elevation_pipeline", "match_journal_v2", "run_submission_check"],
+            "description": "先執行 CARE 診斷確保品質，再進行期刊匹配與投稿確認",
+            "quick_start": "q1_elevation_pipeline()  # 先診斷，再投稿",
+            "call": "q1_elevation_pipeline(paper_path='<path/to/paper.tex>')",
+            "see_also": ["match_journal_v2", "run_submission_check",
+                         "simulate_submission_outcome"],
+        },
+    ),
 ]
 
 

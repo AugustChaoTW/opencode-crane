@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -14,11 +15,28 @@ from crane.models.paper_profile import (
 )
 from crane.services.apc_analysis_service import APCAnalysisService
 from crane.services.evidence_evaluation_service import EvidenceEvaluationService
-from crane.services.feynman_session_service import FeynmanSession, FeynmanSessionService
+from crane.services.feynman_session_service import (
+    FeynmanInteractiveSession,
+    FeynmanSession,
+    FeynmanSessionService,
+)
 from crane.services.journal_matching_service import JournalMatchingService
 from crane.services.paper_profile_service import PaperProfileService
 from crane.services.revision_planning_service import RevisionPlanningService
 from crane.workspace import resolve_workspace
+
+
+def _save_feynman_session(session: FeynmanInteractiveSession) -> None:
+    path = Path(f"_paper_trace/v2/feynman_{session.session_id}.json")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(session.to_dict(), ensure_ascii=False, indent=2))
+
+
+def _load_feynman_session(session_token: str) -> FeynmanInteractiveSession | None:
+    path = Path(f"_paper_trace/v2/feynman_{session_token}.json")
+    if not path.exists():
+        return None
+    return FeynmanInteractiveSession.from_dict(json.loads(path.read_text()))
 
 
 def _resolve_paper_path(paper_path: str, project_dir: str | None) -> str:
@@ -175,7 +193,7 @@ def register_tools(mcp):
         """
         resolved_paper_path = _resolve_paper_path(paper_path, project_dir)
         evaluation = EvidenceEvaluationService(mode=mode).evaluate(resolved_paper_path)
-        return {
+        result = {
             "paper_path": evaluation.paper_path,
             "mode": mode,
             "profile": _profile_to_dict(evaluation.profile),
@@ -185,6 +203,15 @@ def register_tools(mcp):
             "readiness": evaluation.readiness,
             "revision_plan": _revision_plan_to_dict(evaluation.revision_plan),
         }
+        if evaluation.overall_score < 70:
+            weak = [s.dimension for s in evaluation.dimension_scores if s.score < 70]
+            result["next_step"] = {
+                "action": "q1_elevation_pipeline",
+                "reason": f"{len(weak)} 個維度低於門檻（{', '.join(weak[:3])}），建議執行 CARE 流程",
+                "command": f"q1_elevation_pipeline(paper_path='{paper_path}')",
+                "estimated_minutes": "3-5",
+            }
+        return result
 
     @mcp.tool()
     def match_journal_v2(
@@ -331,3 +358,59 @@ def register_tools(mcp):
             "session": _feynman_session_to_dict(session),
             "report_markdown": report,
         }
+
+    @mcp.tool()
+    def feynman_start(
+        paper_path: str,
+        num_questions: int = 5,
+        project_dir: str | None = None,
+    ) -> dict[str, Any]:
+        """Start an interactive Feynman questioning session.
+
+        Returns the first question and a session_token used to submit answers
+        via feynman_answer.
+
+        Args:
+            paper_path: Path to the paper file (.tex or .pdf).
+            num_questions: How many questions to include in the session.
+            project_dir: Project root (auto-detected if None).
+        """
+        resolved = _resolve_paper_path(paper_path, project_dir)
+        evaluation = EvidenceEvaluationService(mode="hybrid").evaluate(resolved)
+        service = FeynmanSessionService()
+        session = service.start_interactive(
+            dimension_scores=evaluation.dimension_scores,
+            paper_path=resolved,
+            num_questions=num_questions,
+        )
+        _save_feynman_session(session)
+        q = session.current_question()
+        return {
+            "session_token": session.session_id,
+            "question_number": 1,
+            "total_questions": len(session.questions),
+            "question": q.question if q else None,
+            "difficulty": q.difficulty if q else None,
+            "hint": "試著用非專業人士也能理解的語言回答",
+        }
+
+    @mcp.tool()
+    def feynman_answer(
+        session_token: str,
+        answer: str,
+        confidence: int | None = None,
+    ) -> dict[str, Any]:
+        """Submit an answer to the current Feynman question.
+
+        Args:
+            session_token: The token returned by feynman_start.
+            answer: Your answer to the current question.
+            confidence: Self-rated confidence 1–5 (optional).
+        """
+        session = _load_feynman_session(session_token)
+        if session is None:
+            return {"error": f"Session {session_token} not found"}
+        service = FeynmanSessionService()
+        result = service.evaluate_answer(session, answer, confidence)
+        _save_feynman_session(session)
+        return result

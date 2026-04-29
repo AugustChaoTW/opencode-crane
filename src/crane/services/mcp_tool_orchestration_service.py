@@ -70,6 +70,23 @@ class MCPToolOrchestrationService:
             ],
             "description": "Systems/distributed research and performance profiling",
         },
+        "q1_elevation": {
+            "aliases": ["q1_elevation", "q1 elevation", "care pipeline", "care"],
+            "keywords": [
+                "q1",
+                "提升",
+                "升級",
+                "elevation",
+                "journal",
+                "投稿",
+                "accept",
+                "reject",
+                "review quality",
+                "improve paper",
+            ],
+            "tools": ["q1_elevation_pipeline"],
+            "description": "Q1 期刊準備度診斷與提升",
+        },
     }
 
     MODULE_DOMAIN_MAP: dict[str, list[str]] = {

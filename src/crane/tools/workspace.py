@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -125,6 +127,45 @@ def _check_capabilities(references_dir: str) -> dict[str, Any]:
     return capabilities
 
 
+def _compute_next_action(project_dir: str) -> dict | None:
+    trace_dir = Path(project_dir) / "_paper_trace" / "v2"
+    cache_file = trace_dir / "care_stage_cache.json"
+    contribution = trace_dir / "1_contribution.yaml"
+
+    paper_files = list(Path(project_dir).glob("*.tex")) + list(Path(project_dir).glob("*.pdf"))
+    has_paper = len(paper_files) > 0
+    has_trace = contribution.exists()
+
+    if has_paper and not has_trace:
+        return {
+            "action": "init_traceability",
+            "message": "偵測到論文但尚未初始化 Paper Trace，建議先執行 init_traceability",
+        }
+
+    if has_trace and not cache_file.exists():
+        return {
+            "action": "q1_elevation_pipeline",
+            "message": "Paper Trace 已就緒，建議首次執行 CARE 診斷",
+        }
+
+    if cache_file.exists():
+        try:
+            cache = json.loads(cache_file.read_text())
+            last_run = cache.get("last_run", "")
+            if last_run:
+                dt = datetime.fromisoformat(last_run)
+                days = (datetime.now(timezone.utc) - dt.astimezone(timezone.utc)).days
+                if days > 7:
+                    return {
+                        "action": "q1_elevation_pipeline",
+                        "message": f"上次 CARE 診斷已過 {days} 天，建議重新執行",
+                    }
+        except Exception:
+            pass
+
+    return None
+
+
 def register_tools(mcp):
     @mcp.tool()
     def workspace_status(project_dir: str | None = None) -> dict[str, Any]:
@@ -155,7 +196,7 @@ def register_tools(mcp):
                 "Run run_pipeline('literature-review', topic='...') to start your library"
             )
 
-        return {
+        result = {
             "workspace": workspace.to_dict(),
             "references": _reference_counts(workspace.references_dir),
             "tasks": _list_open_issues(task_service, "kind:task"),
@@ -164,6 +205,10 @@ def register_tools(mcp):
             "capabilities": capabilities,
             "suggested_next_actions": suggested,
         }
+        next_action = _compute_next_action(project_dir or ".")
+        if next_action:
+            result["next_action"] = next_action
+        return result
 
     @mcp.tool()
     def check_prerequisites(
