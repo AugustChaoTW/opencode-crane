@@ -58,6 +58,7 @@ from .tools.traceability import register_tools as register_traceability_tools
 from .tools.karpathy_review import register_tools as register_karpathy_review_tools
 from .tools.paper_index import register_tools as register_paper_index_tools
 from .tools.crane_help import register_tools as register_crane_help_tools
+from .tools.knowledge_graph import register_tools as register_knowledge_graph_tools
 
 register_transport_tools = import_module("crane.tools.transport_tools").register_tools
 
@@ -97,6 +98,7 @@ register_traceability_tools(mcp)
 register_karpathy_review_tools(mcp)
 register_paper_index_tools(mcp)
 register_crane_help_tools(mcp)
+register_knowledge_graph_tools(mcp)
 
 
 def _check_version_on_startup():
